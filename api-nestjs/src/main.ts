@@ -12,6 +12,8 @@ async function bootstrap() {
 
   app.use(morgan('[:method :url :status :time]'));
 
+  app.enableCors();
+
   await app.listen(3003);
 }
 bootstrap();

@@ -8,7 +8,7 @@ import { JwtModule } from '@nestjs/jwt';
 import { JwtStrategy } from './strategy/jwt.strategy';
 import { GoogleStrategy } from './strategy/google.strategy';
 import { MagicLoginStrategy } from './strategy/magic-login.strategy';
-import { JWT_EXPIRATION_TIME } from './constant/constant';
+import { JWT_TOKEN_EXPIRATION_TIME } from 'src/constant/constant';
 
 @Module({
   imports: [
@@ -19,7 +19,7 @@ import { JWT_EXPIRATION_TIME } from './constant/constant';
       useFactory: async (configService: ConfigService) => ({
         secret: configService.get<string>('JWT_SECRET_KEY'),
         signOptions: {
-          expiresIn: JWT_EXPIRATION_TIME,
+          expiresIn: JWT_TOKEN_EXPIRATION_TIME,
           algorithm: 'HS256',
           encoding: 'UTF8',
         },
