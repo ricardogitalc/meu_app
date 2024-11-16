@@ -1,0 +1,39 @@
+# # Contexto da Aplicação
+
+## Arquitetura
+- Frontend: Next.js (React) em TypeScript
+- Backend: NestJS em TypeScript
+- Autenticação: Múltiplos provedores (Magic Link, Google OAuth)
+
+## Funcionalidades Atuais
+
+### Autenticação (/auth)
+1. Login via Magic Link
+   - Endpoint: POST /auth/login
+   - Callback: GET /auth/login/callback
+   
+2. Login via Google
+   - Endpoint: GET /auth/google
+   - Callback: GET /auth/google/callback
+
+### Segurança
+- Filtros de exceção HTTP implementados
+- Validação de dados via Pipes
+- Guards de autenticação
+- Estratégias de login configuradas
+
+## Estrutura do Projeto
+
+### Frontend (ui-nextjs)
+- Utiliza Next.js 14+
+- Implementa sistema de rotas baseado em arquivos
+- Otimização de fontes com next/font
+- Suporte a Tailwind CSS
+
+### Backend (api-nestjs)
+- Arquitetura modular NestJS
+- Módulos principais:
+  - Auth: Gerenciamento de autenticação
+  - Users: Gestão de usuários
+  - Messages: Sistema de mensagens
+  - Common: Utilitários compartilhados

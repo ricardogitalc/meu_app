@@ -12,7 +12,7 @@ import {
 } from '@nestjs/common';
 import { AuthService } from './auth.service';
 import { AuthGuard } from '@nestjs/passport';
-import { MagicLoginStrategy } from './strategy/magic-login.strategy'; // Correção da importação
+import { MagicLoginStrategy } from './strategy/magic-login.strategy';
 import { LoginDto } from './dto/login.dto';
 import { HttpExceptionsFilter } from 'src/common/filter/http-exception.filter';
 
@@ -21,7 +21,7 @@ import { HttpExceptionsFilter } from 'src/common/filter/http-exception.filter';
 export class AuthController {
   constructor(
     private readonly authService: AuthService,
-    private readonly strategy: MagicLoginStrategy, // Adicionar readonly
+    private readonly strategy: MagicLoginStrategy,
   ) {}
 
   @Post('login')

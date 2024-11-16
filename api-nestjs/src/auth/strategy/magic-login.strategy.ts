@@ -3,6 +3,7 @@ import { PassportStrategy } from '@nestjs/passport';
 import { ConfigService } from '@nestjs/config';
 import Strategy from 'passport-magic-login';
 import { AuthService } from '../auth.service';
+import { TOKEN_MAGIC_LINK_EXPIRATION_TIME } from '../constant/constant';
 
 @Injectable()
 export class MagicLoginStrategy extends PassportStrategy(Strategy) {
@@ -12,17 +13,19 @@ export class MagicLoginStrategy extends PassportStrategy(Strategy) {
     private authService: AuthService,
     private configService: ConfigService,
   ) {
-    const secret = configService.get<string>('JWT_SECRET_KEY');
-
     super({
-      secret,
+      secret: configService.get<string>('JWT_SECRET_KEY'),
       jwtOptions: {
-        expiresIn: '1m',
+        expiresIn: TOKEN_MAGIC_LINK_EXPIRATION_TIME,
       },
-      callbackUrl: 'http://localhost:3003/auth/login/callback',
+      callbackUrl: `${configService.get<string>(
+        'BACKEND_URL',
+      )}/auth/login/callback`,
       sendMagicLink: async (destination, href) => {
         // TODO: send email
-        this.logger.debug(`sending email to ${destination} with Link ${href}`);
+        this.logger.debug(
+          `Email enviado para [${destination}] com o mágic link [${href}]`,
+        );
       },
       verify: async (payload, callback) =>
         callback(null, this.validate(payload)),

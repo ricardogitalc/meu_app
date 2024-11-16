@@ -2,6 +2,7 @@
 
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import { FcGoogle } from "react-icons/fc";
 
 export default function LoginPage() {
   return (
@@ -9,7 +10,14 @@ export default function LoginPage() {
       <div className="bg-white p-8 rounded shadow-md w-full max-w-sm">
         <h2 className="text-2xl font-bold mb-6 text-center">Login Page</h2>
         <Input type="text" placeholder="Username" className="mb-4 w-full" />
-        <Button className="w-full">Login</Button>
+        <Button className="w-full mb-4">Login</Button>
+        <Button
+          variant="outline"
+          className="w-full flex items-center justify-center gap-2"
+        >
+          <FcGoogle />
+          Login with Google
+        </Button>
       </div>
     </div>
   );

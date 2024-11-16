@@ -20,6 +20,8 @@ import { JWT_EXPIRATION_TIME } from './constant/constant';
         secret: configService.get<string>('JWT_SECRET_KEY'),
         signOptions: {
           expiresIn: JWT_EXPIRATION_TIME,
+          algorithm: 'HS256',
+          encoding: 'UTF8',
         },
       }),
       inject: [ConfigService],
