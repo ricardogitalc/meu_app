@@ -16,6 +16,8 @@ import { MagicLoginStrategy } from './strategy/magic-login.strategy';
 import { LoginDto } from './dto/login.dto';
 import { HttpExceptionsFilter } from 'src/common/filter/http-exception.filter';
 import { LoginGuard } from './guards/login.guard';
+import { Response } from 'express';
+import { COOKIE_EXPIRATION_TIME } from 'src/constant/constant';
 
 @Controller('auth')
 @UseFilters(HttpExceptionsFilter)
@@ -35,25 +37,31 @@ export class AuthController {
   }
 
   @Post('verify-login')
-  async verifyMagicLink(@Body() body: { login_token: string }) {
+  async verifyMagicLink(
+    @Body() body: { login_token: string },
+    @Res({ passthrough: true }) response: Response,
+  ) {
     const user = await this.authService.verifyMagicLinkToken(body.login_token);
-    return this.authService.generateTokens(user);
-  }
+    const { jwt_token } = this.authService.generateTokens(user);
 
-  // @UseGuards(MagicLinkGuard)
-  // @Get('login/callback')
-  // callback(@Req() req) {
-  //   // return req.user;
-  //   return this.authService.generateTokens(req.user);
-  // }
+    response.cookie('jwt_token', jwt_token, {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === 'production',
+      sameSite: 'lax',
+      path: '/',
+      maxAge: COOKIE_EXPIRATION_TIME,
+    });
+
+    return { success: true, message: 'Login verificado com sucesso' };
+  }
 
   @Get('google')
   @UseGuards(AuthGuard('google'))
-  googleAuth() {}
+  async googleAuth() {}
 
   @Get('google/callback')
   @UseGuards(AuthGuard('google'))
-  googleAuthCallback(@Req() req) {
+  async googleAuthCallback(@Req() req) {
     return this.authService.generateTokens(req.user);
   }
 }

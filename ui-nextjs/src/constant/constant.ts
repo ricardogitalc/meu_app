@@ -1,3 +1,1 @@
-export const JWT_EXPIRATION_TIME = '10s';
-export const MAGIC_LINK_EXPIRATION_TIME = '3s';
-export const COOKIE_EXPIRATION_TIME = 60 * 1000; // 60 SEGUNDOS
+export const COOKIE_EXPIRATION_TIME = 60; // 60 SEGUNDOS
