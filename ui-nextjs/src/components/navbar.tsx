@@ -1,14 +1,6 @@
 // "use client";
 
-import {
-  User,
-  Download,
-  Star,
-  CreditCard,
-  Users,
-  LogOut,
-  Rocket,
-} from "lucide-react";
+import { User, Download, Star, CreditCard, Users, Rocket } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import {
   DropdownMenu,
@@ -22,21 +14,9 @@ import Link from "next/link";
 import { Avatar, AvatarFallback, AvatarImage } from "./ui/avatar";
 import { auth } from "../auth";
 import { SignOut } from "./signout-button";
-import { signOut } from "../auth";
 
 export default async function Navbar() {
   const session = await auth();
-
-  if (!session?.user) {
-    console.log("🔴 Usuário não autenticado");
-  } else {
-    console.log("🟢 Usuário autenticado:", {
-      id: session.user.id,
-      name: session.user.name,
-      email: session.user.email,
-      jwt: session.user.jwt_token,
-    });
-  }
 
   return (
     <header className="w-full border-b bg-card">

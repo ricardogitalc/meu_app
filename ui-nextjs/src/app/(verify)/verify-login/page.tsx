@@ -31,7 +31,8 @@ export default function VerifyPage() {
           if (result?.ok) {
             console.log("🟢 Login bem sucedido:", result);
             setStatus("Login verificado, redirecionando...");
-            router.push("/dashboard");
+            // Substituir o router.push por um redirecionamento com refresh
+            window.location.href = "/dashboard";
           } else {
             console.log("🔴 Erro no login:", result);
             setStatus(

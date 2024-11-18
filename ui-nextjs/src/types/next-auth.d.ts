@@ -7,9 +7,10 @@ declare module "next-auth" {
     email: string;
     name: string;
     jwt_token: string;
+    emailVerified?: Date | null;
   }
 
-  interface Session {
+  interface Session extends DefaultSession {
     user: {
       id: string;
       email: string;

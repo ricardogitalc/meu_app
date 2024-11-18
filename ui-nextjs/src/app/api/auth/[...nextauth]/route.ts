@@ -3,6 +3,8 @@ import type { NextAuthConfig } from "next-auth";
 import CredentialsProvider from "next-auth/providers/credentials";
 import { cookies } from "next/headers";
 import * as jose from "jose";
+import type { User } from "next-auth";
+import type { JWT } from "next-auth/jwt";
 
 export const authConfig: NextAuthConfig = {
   pages: {
@@ -64,11 +66,11 @@ export const authConfig: NextAuthConfig = {
       if (user) {
         return {
           ...token,
-          id: user.id,
-          email: user.email,
-          name: user.name,
-          jwt_token: user.jwt_token,
-        };
+          id: user.id || "",
+          name: user.name || "",
+          email: user.email || "",
+          jwt_token: user.jwt_token || "",
+        } satisfies JWT;
       }
       return token;
     },
@@ -76,11 +78,10 @@ export const authConfig: NextAuthConfig = {
       return {
         ...session,
         user: {
-          ...session.user,
-          id: token.id as string,
-          email: token.email as string,
-          name: token.name as string,
-          jwt_token: token.jwt_token as string,
+          id: token.id || "",
+          name: token.name || "",
+          email: token.email || "",
+          jwt_token: token.jwt_token || "",
         },
       };
     },
