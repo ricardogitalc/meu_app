@@ -13,12 +13,14 @@ export default function VerifyPage() {
   useEffect(() => {
     const verifyLogin = async () => {
       if (!login_token) {
+        console.log("🔴 Token não encontrado");
         setStatus("Token de login não encontrado. Verifique a URL.");
         return;
       }
 
       if (!tokenProcessed) {
         setStatus("Verificando token...");
+        console.log("🟡 Iniciando verificação do token:", login_token);
 
         try {
           const result = await signIn("credentials", {
@@ -27,14 +29,17 @@ export default function VerifyPage() {
           });
 
           if (result?.ok) {
+            console.log("🟢 Login bem sucedido:", result);
             setStatus("Login verificado, redirecionando...");
             router.push("/dashboard");
           } else {
+            console.log("🔴 Erro no login:", result);
             setStatus(
               `Erro na verificação: ${result?.error || "Falha na autenticação"}`
             );
           }
         } catch (error) {
+          console.error("🔴 Erro inesperado:", error);
           setStatus("Erro inesperado durante a verificação");
         }
         setTokenProcessed(true);

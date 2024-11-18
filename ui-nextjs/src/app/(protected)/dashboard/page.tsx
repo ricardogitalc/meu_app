@@ -1,7 +1,7 @@
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Activity, CreditCard, DollarSign, Users } from "lucide-react";
 
-export default function DashboardPage() {
+export default async function DashboardPage() {
   return (
     <div className="p-6 space-y-6">
       <h2 className="text-3xl font-bold tracking-tight">Dashboard</h2>

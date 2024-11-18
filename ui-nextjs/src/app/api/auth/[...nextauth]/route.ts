@@ -2,6 +2,7 @@ import NextAuth from "next-auth";
 import type { NextAuthConfig } from "next-auth";
 import CredentialsProvider from "next-auth/providers/credentials";
 import { cookies } from "next/headers";
+import * as jose from "jose";
 
 export const authConfig: NextAuthConfig = {
   pages: {
@@ -12,7 +13,7 @@ export const authConfig: NextAuthConfig = {
       credentials: {
         login_token: { type: "text" },
       },
-      async authorize(credentials, request) {
+      async authorize(credentials) {
         if (!credentials?.login_token) {
           return null;
         }
@@ -34,6 +35,9 @@ export const authConfig: NextAuthConfig = {
           const authData = await response.json();
           if (!authData.jwt_token) return null;
 
+          const secret = new TextEncoder().encode(process.env.JWT_SECRET_KEY);
+          const { payload } = await jose.jwtVerify(authData.jwt_token, secret);
+
           const cookieStore = await cookies();
           cookieStore.set("jwt_token", authData.jwt_token, {
             httpOnly: true,
@@ -43,12 +47,13 @@ export const authConfig: NextAuthConfig = {
           });
 
           return {
-            id: authData.sub,
-            email: authData.email || "",
-            name: authData.name || "",
+            id: String(payload.sub),
+            email: String(payload.email),
+            name: String(payload.name),
             jwt_token: authData.jwt_token,
           };
         } catch (e) {
+          console.error("Erro ao verificar JWT:", e);
           return null;
         }
       },
@@ -56,10 +61,28 @@ export const authConfig: NextAuthConfig = {
   ],
   callbacks: {
     async jwt({ token, user }) {
-      return { ...token, ...user };
+      if (user) {
+        return {
+          ...token,
+          id: user.id,
+          email: user.email,
+          name: user.name,
+          jwt_token: user.jwt_token,
+        };
+      }
+      return token;
     },
     async session({ session, token }) {
-      return { ...session, ...token };
+      return {
+        ...session,
+        user: {
+          ...session.user,
+          id: token.id as string,
+          email: token.email as string,
+          name: token.name as string,
+          jwt_token: token.jwt_token as string,
+        },
+      };
     },
   },
 };
