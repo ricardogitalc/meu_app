@@ -14,6 +14,7 @@ import Link from "next/link";
 import { Avatar, AvatarFallback, AvatarImage } from "./ui/avatar";
 import { auth } from "../auth";
 import { SignOut } from "./signout-button";
+import { ModeToggle } from "./theme/ModeToggle";
 
 export default async function Navbar() {
   const session = await auth();
@@ -28,7 +29,8 @@ export default async function Navbar() {
             </Link>
           </div>
           <div className="flex items-center space-x-2 sm:space-x-4">
-            <Link href="/assinatura">
+            <ModeToggle />
+            <Link href="/planos">
               <Button>
                 <Rocket className="h-4 w-4" />
                 <p>Assinar</p>
@@ -66,10 +68,10 @@ export default async function Navbar() {
                     </div>
                   </DropdownMenuLabel>
                   <DropdownMenuSeparator />
-                  <Link href="/profile">
+                  <Link href="/perfil">
                     <DropdownMenuItem>
                       <User className="mr-2 h-4 w-4" />
-                      <span>Minha conta</span>
+                      <span>Meu perfil</span>
                     </DropdownMenuItem>
                   </Link>
                   <Link href="/downloads">
