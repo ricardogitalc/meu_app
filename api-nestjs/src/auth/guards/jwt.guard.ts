@@ -7,7 +7,7 @@ import { AuthGuard } from '@nestjs/passport';
 import { MESSAGES } from '../../messages/messages';
 
 @Injectable()
-export class JwtGuard extends AuthGuard('magiclogin') {
+export class JwtGuard extends AuthGuard('jwt') {
   async canActivate(context: ExecutionContext): Promise<boolean> {
     try {
       const result = await super.canActivate(context);

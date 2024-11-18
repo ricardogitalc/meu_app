@@ -1,73 +1,69 @@
 "use client";
-
+import { signIn } from "next-auth/react";
 import { useSearchParams, useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
-import { verifyLogin } from "@/api/api";
 
 export default function VerifyPage() {
   const searchParams = useSearchParams();
   const router = useRouter();
-  const [status, setStatus] = useState<{ error?: string; success?: string }>(
-    {}
-  );
-  const [isVerifying, setIsVerifying] = useState(true);
+  const [tokenProcessed, setTokenProcessed] = useState(false);
+  const [status, setStatus] = useState("Iniciando verificação...");
+  const login_token = searchParams.get("login_token");
 
   useEffect(() => {
-    async function verify() {
-      const login_token = searchParams.get("login_token");
-
+    const verifyLogin = async () => {
       if (!login_token) {
-        setStatus({ error: "Token de login não encontrado" });
-        setIsVerifying(false);
+        setStatus("Token de login não encontrado. Verifique a URL.");
         return;
       }
 
-      try {
-        const result = await verifyLogin(login_token);
+      if (!tokenProcessed) {
+        setStatus("Verificando token...");
 
-        if (result.success) {
-          setStatus({ success: result.message });
-          // Redireciona após verificação bem-sucedida
-          setTimeout(() => {
-            router.push("/dashboard"); // ou qualquer outra rota desejada
-          }, 2000);
-        } else {
-          setStatus({ error: result.error });
+        try {
+          const result = await signIn("credentials", {
+            login_token,
+            redirect: false,
+          });
+
+          if (result?.ok) {
+            setStatus("Login verificado, redirecionando...");
+            router.push("/dashboard");
+          } else {
+            setStatus(
+              `Erro na verificação: ${result?.error || "Falha na autenticação"}`
+            );
+          }
+        } catch (error) {
+          setStatus("Erro inesperado durante a verificação");
         }
-      } catch (error) {
-        setStatus({ error: "Erro ao verificar login" });
-      } finally {
-        setIsVerifying(false);
+        setTokenProcessed(true);
       }
-    }
+    };
 
-    verify();
-  }, [searchParams, router]);
+    verifyLogin();
+  }, [login_token, tokenProcessed, router]);
+
+  if (!login_token) {
+    return (
+      <div className="flex flex-col items-center justify-center min-h-screen">
+        <p className="text-lg text-red-600 mb-4">
+          Token de acesso não encontrado
+        </p>
+        <p className="text-sm text-gray-600">
+          Verifique se você está acessando através do link correto enviado por
+          email.
+        </p>
+      </div>
+    );
+  }
 
   return (
-    <div className="flex flex-col items-center justify-center min-h-screen bg-gray-100">
-      <div className="bg-white p-8 rounded shadow-md w-full max-w-sm">
-        <h2 className="text-2xl font-bold mb-6 text-center">
-          Verificação de Login
-        </h2>
-
-        {isVerifying && (
-          <div className="text-center text-gray-600">
-            Verificando seu login...
-          </div>
-        )}
-
-        {status.error && (
-          <div className="text-red-500 mb-4 text-center">{status.error}</div>
-        )}
-
-        {status.success && (
-          <div className="text-green-500 mb-4 text-center">
-            {status.success}
-            <p className="text-sm mt-2">Redirecionando para o dashboard...</p>
-          </div>
-        )}
+    <div className="flex flex-col items-center justify-center min-h-screen">
+      <div className="mb-4">
+        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-gray-900"></div>
       </div>
+      <p className="text-lg text-gray-700">{status}</p>
     </div>
   );
 }

@@ -12,7 +12,7 @@ export class LoginGuard extends AuthGuard('magiclogin') {
     try {
       const result = await super.canActivate(context);
       return result as boolean;
-    } catch (err) {
+    } catch {
       throw new UnauthorizedException(MESSAGES.MagicLoginExpired);
     }
   }
