@@ -4,15 +4,10 @@ export const CONFIG_TIMES = {
 };
 
 export const CONFIG_MESSAGES = {
-  MagicLoginExpired: 'Link de acesso expirado',
-  JwtTokenExpired: 'Token JWT expirado',
+  JwtTokenExpired: 'Token inválido ou expirado',
   LoginTokenExpired: 'Link de acesso expirado',
+  UserNotFound: 'Usuário não foi encontrado',
+  UserAlReady: 'Usuário já está cadastrado',
   InvalidEmail: 'Digite um email válido, por favor',
-  UserNotFound: 'Usuário não encontrado',
-  SendTokenLogin: 'Link de acesso enviado para seu email',
-  SendTokenRegister: 'Verifique seu email para concluir o cadastro',
-  VerifyEmailLoginError: 'Email não verificado',
-  EmailAlreayRegistred: 'Email já cadastrado',
-  UpdateProfileSucess: 'Perfil atualizado com sucessosss',
   TooManyRequests: 'Muitas tentativas',
 };

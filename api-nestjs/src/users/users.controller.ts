@@ -19,6 +19,7 @@ import { UsersService } from './users.service';
 import { CreateUserDto, UpdateUserDto } from './dto/users.dto';
 import { User } from '@prisma/client';
 import { HttpExceptionsFilter } from 'src/common/filter/http-exception.filter';
+import { CONFIG_MESSAGES } from 'src/config/config';
 
 @Controller('users')
 @UseFilters(HttpExceptionsFilter)
@@ -30,7 +31,7 @@ export class UsersController {
     try {
       return await this.usersService.createUser(createUserDto);
     } catch (error) {
-      throw new UnauthorizedException('Usuário já cadastrado');
+      throw new UnauthorizedException(CONFIG_MESSAGES.UserAlReady);
     }
   }
 

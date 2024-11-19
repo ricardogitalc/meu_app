@@ -5,6 +5,7 @@ import {
   UnauthorizedException,
 } from '@nestjs/common';
 import { User, Prisma } from '@prisma/client';
+import { CONFIG_MESSAGES } from 'src/config/config';
 import { PrismaService } from 'src/prisma/prisma.service';
 
 @Injectable()
@@ -19,7 +20,7 @@ export class UsersService {
     });
 
     if (!user) {
-      throw new UnauthorizedException('Usuário não encontrado');
+      throw new UnauthorizedException(CONFIG_MESSAGES.UserNotFound);
     }
 
     return user;
@@ -42,7 +43,7 @@ export class UsersService {
     });
 
     if (!users.length) {
-      throw new UnauthorizedException('Nenhum usuário encontrado');
+      throw new UnauthorizedException(CONFIG_MESSAGES.UserNotFound);
     }
 
     return users;
@@ -54,7 +55,7 @@ export class UsersService {
     });
 
     if (existingUser) {
-      throw new UnauthorizedException('Usuário já cadastrado');
+      throw new UnauthorizedException(CONFIG_MESSAGES.UserAlReady);
     }
 
     return this.prisma.user.create({
@@ -72,9 +73,7 @@ export class UsersService {
     });
 
     if (!existingUser) {
-      throw new UnauthorizedException(
-        'Usuário não encontrado para atualização',
-      );
+      throw new UnauthorizedException(CONFIG_MESSAGES.UserNotFound);
     }
 
     return this.prisma.user.update({
@@ -89,7 +88,7 @@ export class UsersService {
     });
 
     if (!existingUser) {
-      throw new UnauthorizedException('Usuário não encontrado para exclusão');
+      throw new UnauthorizedException(CONFIG_MESSAGES.UserNotFound);
     }
 
     return this.prisma.user.delete({
