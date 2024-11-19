@@ -1,6 +1,7 @@
 export const MESSAGES = {
   MagicLoginExpired: 'Link de acesso expirado',
-  JwtExpired: 'Jwt expirado ou inválido',
+  TokenAccessExpired:
+    'O link de acesso expirou ou é inválido. Por favor, solicite um novo link.',
   InvalidEmail: 'Digite um email válido, por favor.',
   UserNotFound: 'Usuário não encontrado',
   SendTokenLogin: 'Link de acesso enviado para seu email',

@@ -8,6 +8,7 @@ import type { JWT } from "next-auth/jwt";
 export const authConfig: NextAuthConfig = {
   pages: {
     signIn: "/verify-login",
+    error: "/login", // Adicionando página de erro
   },
   providers: [
     CredentialsProvider({
@@ -31,6 +32,7 @@ export const authConfig: NextAuthConfig = {
             }
           );
 
+          if (response.status === 401) return null;
           if (response.status !== 201) return null;
 
           const authData = await response.json();
@@ -56,16 +58,24 @@ export const authConfig: NextAuthConfig = {
             jwt_token: authData.jwt_token,
           };
 
-          console.log("Dados completos do usuário:", userData);
-
           return userData;
         } catch (e) {
-          console.error("Erro ao verificar JWT:", e);
           return null;
         }
       },
     }),
   ],
+  cookies: {
+    sessionToken: {
+      name: "authjs.session-token",
+      options: {
+        httpOnly: true,
+        sameSite: "lax",
+        path: "/",
+        secure: process.env.NODE_ENV === "production",
+      },
+    },
+  },
   callbacks: {
     async jwt({ token, user }) {
       if (user) {

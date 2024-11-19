@@ -1,54 +1,38 @@
 "use client";
 import { signIn } from "next-auth/react";
 import { useSearchParams, useRouter } from "next/navigation";
-import { useEffect, useState } from "react";
+import { useEffect } from "react";
 
 export default function VerifyPage() {
   const searchParams = useSearchParams();
   const router = useRouter();
-  const [tokenProcessed, setTokenProcessed] = useState(false);
-  const [status, setStatus] = useState("Iniciando verificação...");
   const login_token = searchParams.get("login_token");
 
   useEffect(() => {
     const verifyLogin = async () => {
-      if (!login_token) {
-        console.log("🔴 Token não encontrado");
-        setStatus("Token de login não encontrado. Verifique a URL.");
-        return;
-      }
+      if (!login_token) return;
 
-      if (!tokenProcessed) {
-        setStatus("Verificando token...");
-        console.log("🟡 Iniciando verificação do token:", login_token);
+      try {
+        const result = await signIn("credentials", {
+          login_token,
+          redirect: false,
+        });
 
-        try {
-          const result = await signIn("credentials", {
-            login_token,
-            redirect: false,
-          });
-
-          if (result?.ok) {
-            console.log("🟢 Login bem sucedido:", result);
-            setStatus("Login verificado, redirecionando...");
-            // Substituir o router.push por um redirecionamento com refresh
-            window.location.href = "/dashboard";
-          } else {
-            console.log("🔴 Erro no login:", result);
-            setStatus(
-              `Erro na verificação: ${result?.error || "Falha na autenticação"}`
-            );
-          }
-        } catch (error) {
-          console.error("🔴 Erro inesperado:", error);
-          setStatus("Erro inesperado durante a verificação");
+        if (result?.error) {
+          router.push("/login?error=token-invalido-ou-expirado");
+          return;
         }
-        setTokenProcessed(true);
+
+        if (result?.ok) {
+          window.location.href = "/dashboard";
+        }
+      } catch (error) {
+        router.push("/login?error=falha-autenticacao");
       }
     };
 
     verifyLogin();
-  }, [login_token, tokenProcessed, router]);
+  }, [login_token, router]);
 
   if (!login_token) {
     return (
@@ -66,10 +50,7 @@ export default function VerifyPage() {
 
   return (
     <div className="flex flex-col items-center justify-center min-h-screen">
-      <div className="mb-4">
-        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-gray-900"></div>
-      </div>
-      <p className="text-lg text-gray-700">{status}</p>
+      <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-gray-900" />
     </div>
   );
 }

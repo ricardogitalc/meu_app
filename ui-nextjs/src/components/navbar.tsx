@@ -15,6 +15,7 @@ import { Avatar, AvatarFallback, AvatarImage } from "./ui/avatar";
 import { auth } from "../auth";
 import { SignOut } from "./signout-button";
 import { ModeToggle } from "./theme/ModeToggle";
+import LogoIcon from "./icons/logoIcon";
 
 export default async function Navbar() {
   const session = await auth();
@@ -25,7 +26,7 @@ export default async function Navbar() {
         <div className="flex h-16 items-center justify-between">
           <div className="flex items-center">
             <Link href="/">
-              <span className="text-xl font-bold">Logo</span>
+              <LogoIcon />
             </Link>
           </div>
           <div className="flex items-center space-x-2 sm:space-x-4">

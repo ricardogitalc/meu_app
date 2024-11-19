@@ -53,7 +53,7 @@ export class AuthService {
       const user = await this.validateUser(payload.destination);
       return user;
     } catch (error) {
-      throw new UnauthorizedException('Token inválido ou expirado');
+      throw new UnauthorizedException(MESSAGES.TokenAccessExpired);
     }
   }
 }
