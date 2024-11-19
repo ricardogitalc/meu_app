@@ -14,6 +14,8 @@ import {
 } from "@/components/ui/card";
 import { Alert, AlertDescription } from "../ui/alert";
 import { Loader2 } from "lucide-react";
+import { GoogleButton } from "./google-button";
+import { Separator } from "../ui/separator";
 
 export function LoginForm() {
   return (
@@ -49,6 +51,8 @@ export function LoginForm() {
           <Button className="w-full" type="submit">
             Fazer login
           </Button>
+          <Separator className="my-2" />
+          <GoogleButton />
         </CardFooter>
       </form>
     </Card>

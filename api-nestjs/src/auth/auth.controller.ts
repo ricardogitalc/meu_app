@@ -68,14 +68,6 @@ export class AuthController {
     const user = await this.authService.verifyMagicLinkToken(body.login_token);
     const { jwt_token } = this.authService.generateTokens(user);
 
-    // SETA O COOKIE COM
-    // response.cookie('jwt_token', jwt_token, {
-    //   httpOnly: true,
-    //   secure: process.env.NODE_ENV === 'production',
-    //   sameSite: 'strict',
-    //   path: '/',
-    // });
-
     return {
       success: true,
       message: 'Login verificado com sucesso',

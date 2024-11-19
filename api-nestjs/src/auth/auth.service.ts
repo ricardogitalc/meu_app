@@ -1,10 +1,10 @@
 import { Injectable, UnauthorizedException } from '@nestjs/common';
-import { UsersService } from 'src/users/users.service';
-import { User } from '../users/user.entity';
+import { User } from '../users/users.entity';
 import { JwtService } from '@nestjs/jwt';
 import { ConfigService } from '@nestjs/config';
 import { MESSAGES } from 'src/messages/messages';
 import { LOGIN_TOKEN_EXPIRATION_TIME } from 'src/constant/constant';
+import { UsersService } from 'src/users/users.service';
 
 @Injectable()
 export class AuthService {
@@ -15,7 +15,7 @@ export class AuthService {
   ) {}
 
   validateUser(email: string) {
-    const user = this.usersService.findOneByEmail(email);
+    const user = this.usersService.user({ email });
 
     if (!user) {
       throw new UnauthorizedException(MESSAGES.UserNotFound);
@@ -30,7 +30,7 @@ export class AuthService {
       email: user.email,
       firstName: user.firstName,
       lastName: user.lastName,
-      role: user.role,
+      whatsappNumber: user.whatsappNumber,
     };
     return { jwt_token: this.jwtService.sign(payload) };
   }
