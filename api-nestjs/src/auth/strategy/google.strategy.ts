@@ -25,8 +25,23 @@ export class GoogleStrategy extends PassportStrategy(Strategy) {
     profile: any,
     done: VerifyCallback,
   ) {
-    const { emails } = profile;
-    const user = await this.authService.validateUser(emails[0].value);
-    done(null, user);
+    const { emails, name, photos } = profile;
+    const email = emails[0].value;
+
+    try {
+      // Tenta validar usuário existente
+      const user = await this.authService.validateUser(email);
+      done(null, user);
+    } catch (error) {
+      // Se usuário não existir, cria novo
+      const newUser = await this.authService.createGoogleUser({
+        email: email,
+        firstName: name.givenName,
+        lastName: name.familyName,
+        imageUrl: photos[0]?.value,
+        verified: true, // Google já verificou o email
+      });
+      done(null, newUser);
+    }
   }
 }

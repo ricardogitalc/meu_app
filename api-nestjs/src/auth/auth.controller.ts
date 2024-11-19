@@ -8,6 +8,7 @@ import {
   ValidationPipe,
   UseGuards,
   UseFilters,
+  UnauthorizedException,
 } from '@nestjs/common';
 import { AuthService } from './auth.service';
 import { AuthGuard } from '@nestjs/passport';
@@ -17,6 +18,7 @@ import { HttpExceptionsFilter } from 'src/common/filter/http-exception.filter';
 import { Response } from 'express';
 import { ApiTags, ApiOperation, ApiResponse, ApiBody } from '@nestjs/swagger';
 import { JwtGuard } from './guards/jwt.guard';
+import { CONFIG_MESSAGES } from 'src/config/config';
 
 @ApiTags('auth')
 @Controller('auth')
@@ -36,7 +38,12 @@ export class AuthController {
     description: 'Dados para geração do magic link',
   })
   async login(@Body(new ValidationPipe()) body: LoginDto) {
-    await this.authService.validateUser(body.destination);
+    const user = await this.authService.validateUser(body.destination);
+
+    if (!user.verified) {
+      throw new UnauthorizedException(CONFIG_MESSAGES.EmailNotVerified);
+    }
+
     const tokens = await this.authService.generateMagicLinkToken(
       body.destination,
     );
@@ -72,6 +79,7 @@ export class AuthController {
     };
   }
 
+  @Post('verify-register')
   @Get('google')
   @UseGuards(AuthGuard('google'))
   async googleAuth() {}

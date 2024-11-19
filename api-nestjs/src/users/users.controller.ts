@@ -14,12 +14,14 @@ import {
   HttpException,
   UnauthorizedException,
   UseFilters,
+  UseGuards,
 } from '@nestjs/common';
 import { UsersService } from './users.service';
 import { CreateUserDto, UpdateUserDto } from './dto/users.dto';
 import { User } from '@prisma/client';
 import { HttpExceptionsFilter } from 'src/common/filter/http-exception.filter';
 import { CONFIG_MESSAGES } from 'src/config/config';
+import { AdminGuard } from './guards/admin.guard';
 
 @Controller('users')
 @UseFilters(HttpExceptionsFilter)
@@ -35,7 +37,8 @@ export class UsersController {
     }
   }
 
-  @Get()
+  @Get('all')
+  @UseGuards(AdminGuard)
   async findAll(
     @Query('skip') skip?: number,
     @Query('take') take?: number,

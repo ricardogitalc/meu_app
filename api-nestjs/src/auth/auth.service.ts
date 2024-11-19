@@ -23,6 +23,20 @@ export class AuthService {
     return user;
   }
 
+  async createGoogleUser(userData: {
+    email: string;
+    firstName: string;
+    lastName: string;
+    imageUrl?: string;
+    verified: boolean;
+  }) {
+    try {
+      return await this.usersService.createUser(userData);
+    } catch (error) {
+      throw new UnauthorizedException('Falha na autenticação com Google');
+    }
+  }
+
   generateTokens(user: User) {
     const payload = {
       sub: user.id,
@@ -30,6 +44,8 @@ export class AuthService {
       firstName: user.firstName,
       lastName: user.lastName,
       whatsappNumber: user.whatsappNumber,
+      imageUrl: user.imageUrl,
+      verified: user.verified,
     };
     return { jwt_token: this.jwtService.sign(payload) };
   }

@@ -8,6 +8,8 @@ export const CONFIG_MESSAGES = {
   LoginTokenExpired: 'Link de acesso expirado',
   UserNotFound: 'Usuário não foi encontrado',
   UserAlReady: 'Usuário já está cadastrado',
+  AdminOnly: 'Você não é um administrador',
   InvalidEmail: 'Digite um email válido, por favor',
+  EmailNotVerified: 'Seu email não foi verificado',
   TooManyRequests: 'Muitas tentativas',
 };
