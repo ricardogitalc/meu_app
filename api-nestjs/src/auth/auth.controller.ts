@@ -8,16 +8,13 @@ import {
   ValidationPipe,
   UseGuards,
   UseFilters,
-  UseInterceptors,
 } from '@nestjs/common';
 import { AuthService } from './auth.service';
 import { AuthGuard } from '@nestjs/passport';
 import { MagicLoginStrategy } from './strategy/magic-login.strategy';
 import { LoginDto } from './dto/login.dto';
 import { HttpExceptionsFilter } from 'src/common/filter/http-exception.filter';
-import { LoginGuard } from './guards/login.guard';
 import { Response } from 'express';
-import { COOKIE_EXPIRATION_TIME } from 'src/constant/constant';
 import { ApiTags, ApiOperation, ApiResponse, ApiBody } from '@nestjs/swagger';
 import { JwtGuard } from './guards/jwt.guard';
 

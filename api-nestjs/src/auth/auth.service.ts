@@ -1,10 +1,9 @@
 import { Injectable, UnauthorizedException } from '@nestjs/common';
-import { User } from '../users/users.entity';
+import { User } from '../users/entity/users.entity';
 import { JwtService } from '@nestjs/jwt';
 import { ConfigService } from '@nestjs/config';
-import { MESSAGES } from 'src/messages/messages';
-import { LOGIN_TOKEN_EXPIRATION_TIME } from 'src/constant/constant';
 import { UsersService } from 'src/users/users.service';
+import { CONFIG_MESSAGES, CONFIG_TIMES } from 'src/config/config';
 
 @Injectable()
 export class AuthService {
@@ -18,7 +17,7 @@ export class AuthService {
     const user = this.usersService.user({ email });
 
     if (!user) {
-      throw new UnauthorizedException(MESSAGES.UserNotFound);
+      throw new UnauthorizedException(CONFIG_MESSAGES.UserNotFound);
     }
 
     return user;
@@ -38,7 +37,7 @@ export class AuthService {
   generateMagicLinkToken(destination: string) {
     const payload = { destination };
     const login_token = this.jwtService.sign(payload, {
-      expiresIn: LOGIN_TOKEN_EXPIRATION_TIME,
+      expiresIn: CONFIG_TIMES.LOGIN_TOKEN,
     });
     const verify_url = `${this.configService.get<string>(
       'FRONTEND_URL',
@@ -53,7 +52,7 @@ export class AuthService {
       const user = await this.validateUser(payload.destination);
       return user;
     } catch (error) {
-      throw new UnauthorizedException(MESSAGES.TokenAccessExpired);
+      throw new UnauthorizedException(CONFIG_MESSAGES.JwtTokenExpired);
     }
   }
 }

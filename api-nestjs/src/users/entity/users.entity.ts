@@ -7,4 +7,5 @@ export class User {
   verified: boolean;
   createdAt?: Date;
   updatedAt?: Date;
+  role: string;
 }

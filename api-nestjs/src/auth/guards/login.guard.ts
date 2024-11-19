@@ -4,7 +4,7 @@ import {
   UnauthorizedException,
 } from '@nestjs/common';
 import { AuthGuard } from '@nestjs/passport';
-import { MESSAGES } from '../../messages/messages';
+import { CONFIG_MESSAGES } from 'src/config/config';
 
 @Injectable()
 export class LoginGuard extends AuthGuard('magiclogin') {
@@ -13,7 +13,7 @@ export class LoginGuard extends AuthGuard('magiclogin') {
       const result = await super.canActivate(context);
       return result as boolean;
     } catch {
-      throw new UnauthorizedException(MESSAGES.MagicLoginExpired);
+      throw new UnauthorizedException(CONFIG_MESSAGES.LoginTokenExpired);
     }
   }
 }

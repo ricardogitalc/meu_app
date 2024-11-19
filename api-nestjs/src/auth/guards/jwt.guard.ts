@@ -4,7 +4,7 @@ import {
   UnauthorizedException,
 } from '@nestjs/common';
 import { AuthGuard } from '@nestjs/passport';
-import { MESSAGES } from '../../messages/messages';
+import { CONFIG_MESSAGES } from 'src/config/config';
 
 @Injectable()
 export class JwtGuard extends AuthGuard('jwt') {
@@ -13,7 +13,7 @@ export class JwtGuard extends AuthGuard('jwt') {
       const result = await super.canActivate(context);
       return result as boolean;
     } catch {
-      throw new UnauthorizedException(MESSAGES.TokenAccessExpired);
+      throw new UnauthorizedException(CONFIG_MESSAGES.JwtTokenExpired);
     }
   }
 }
