@@ -3,7 +3,8 @@ export class User {
   email: string;
   firstName: string;
   lastName: string;
-  whatsappNumber?: string; // Alterado de number para string e adicionado ? para opcional
+  whatsappNumber?: string;
+  verified: boolean;
   createdAt?: Date;
   updatedAt?: Date;
 }

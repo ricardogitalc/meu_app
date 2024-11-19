@@ -54,7 +54,6 @@ export const authConfig: NextAuthConfig = {
             email: String(payload.email),
             firstName: String(payload.firstName),
             lastName: String(payload.lastName),
-            role: String(payload.role),
             jwt_token: authData.jwt_token,
           };
 
@@ -85,7 +84,6 @@ export const authConfig: NextAuthConfig = {
           firstName: user.firstName || "",
           lastName: user.lastName || "",
           email: user.email || "",
-          role: token.role || "",
           jwt_token: user.jwt_token || "",
         } satisfies JWT;
       }
@@ -99,7 +97,6 @@ export const authConfig: NextAuthConfig = {
           firstName: token.firstName || "",
           lastName: token.lastName || "",
           email: token.email || "",
-          role: token.role || "",
           jwt_token: token.jwt_token || "",
         },
       };
