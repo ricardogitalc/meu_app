@@ -68,12 +68,13 @@ export class AuthController {
     const user = await this.authService.verifyMagicLinkToken(body.login_token);
     const { jwt_token } = this.authService.generateTokens(user);
 
-    response.cookie('jwt_token', jwt_token, {
-      httpOnly: true,
-      secure: process.env.NODE_ENV === 'production',
-      sameSite: 'strict',
-      path: '/',
-    });
+    // SETA O COOKIE COM
+    // response.cookie('jwt_token', jwt_token, {
+    //   httpOnly: true,
+    //   secure: process.env.NODE_ENV === 'production',
+    //   sameSite: 'strict',
+    //   path: '/',
+    // });
 
     return {
       success: true,
@@ -92,12 +93,15 @@ export class AuthController {
     return this.authService.generateTokens(req.user);
   }
 
-  @Get('protected')
+  @Get('me')
   @UseGuards(JwtGuard)
-  @ApiOperation({ summary: 'Verificar validade do token JWT' })
-  @ApiResponse({ status: 200, description: 'Token válido' })
+  @ApiOperation({ summary: 'Retornar dados do usuario' })
+  @ApiResponse({
+    status: 200,
+    description: 'Dados do usuário retornados com sucesso',
+  })
   @ApiResponse({ status: 401, description: 'Token inválido ou expirado' })
-  async verifyToken() {
-    return { isValid: true, message: 'Token válido' };
+  async verifyToken(@Req() req) {
+    return req.user;
   }
 }

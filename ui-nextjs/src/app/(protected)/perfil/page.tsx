@@ -1,3 +1,5 @@
+import ProfileForm from "@/components/auth/profile-form";
+
 export default function PerfilPage() {
-  return <div>PerfilPage</div>;
+  return <ProfileForm />;
 }

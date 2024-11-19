@@ -3,7 +3,6 @@ import type { NextAuthConfig } from "next-auth";
 import CredentialsProvider from "next-auth/providers/credentials";
 import { cookies } from "next/headers";
 import * as jose from "jose";
-import type { User } from "next-auth";
 import type { JWT } from "next-auth/jwt";
 
 export const authConfig: NextAuthConfig = {
@@ -48,12 +47,18 @@ export const authConfig: NextAuthConfig = {
             path: "/",
           });
 
-          return {
+          const userData = {
             id: String(payload.sub),
             email: String(payload.email),
-            name: String(payload.name),
+            firstName: String(payload.firstName),
+            lastName: String(payload.lastName),
+            role: String(payload.role),
             jwt_token: authData.jwt_token,
           };
+
+          console.log("Dados completos do usuário:", userData);
+
+          return userData;
         } catch (e) {
           console.error("Erro ao verificar JWT:", e);
           return null;
@@ -67,8 +72,10 @@ export const authConfig: NextAuthConfig = {
         return {
           ...token,
           id: user.id || "",
-          name: user.name || "",
+          firstName: user.firstName || "",
+          lastName: user.lastName || "",
           email: user.email || "",
+          role: token.role || "",
           jwt_token: user.jwt_token || "",
         } satisfies JWT;
       }
@@ -79,8 +86,10 @@ export const authConfig: NextAuthConfig = {
         ...session,
         user: {
           id: token.id || "",
-          name: token.name || "",
+          firstName: token.firstName || "",
+          lastName: token.lastName || "",
           email: token.email || "",
+          role: token.role || "",
           jwt_token: token.jwt_token || "",
         },
       };
