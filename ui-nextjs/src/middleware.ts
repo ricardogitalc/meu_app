@@ -1,44 +1,21 @@
-import { NextResponse } from "next/server";
-import type { NextRequest } from "next/server";
-import { verifyJWT } from "./lib/lib";
+import { NextRequest, NextResponse } from "next/server";
+import { updateSession } from "./lib/lib";
+import { isAuthRoute, isProtectedRoute } from "./routes/routes";
 
 export async function middleware(request: NextRequest) {
-  const token = request.cookies.get("jwt_token")?.value;
+  const session = await updateSession(request);
+  const path = request.nextUrl.pathname;
+  console.log("path:", path);
 
-  const protectedPaths = [
-    "/assinatura",
-    "/dashboard",
-    "/downloads",
-    "/favoritos",
-    "/perfil",
-    "/seguindo",
-  ];
-
-  const isProtectedPath = protectedPaths.some((path) =>
-    request.nextUrl.pathname.startsWith(path)
-  );
-
-  const isAuthPath = [
-    "/login",
-    "/register",
-    "/verify-login",
-    "/verify-register",
-  ].some((path) => request.nextUrl.pathname.startsWith(path));
-
-  if (isProtectedPath) {
-    const payload = token ? await verifyJWT(token) : null;
-
-    if (!payload) {
-      return NextResponse.redirect(new URL("/login", request.url));
-    }
+  // Usuário autenticado tentando acessar rotas de auth
+  if (session && isAuthRoute(path)) {
+    return NextResponse.redirect(new URL("/", request.url));
   }
 
-  if (isAuthPath && token) {
-    const payload = await verifyJWT(token);
-    if (payload) {
-      return NextResponse.redirect(new URL("/", request.url));
-    }
+  // Usuário não autenticado tentando acessar rotas protegidas
+  if (!session && isProtectedRoute(path)) {
+    return NextResponse.redirect(new URL("/login", request.url));
   }
 
-  return NextResponse.next();
+  return session;
 }
