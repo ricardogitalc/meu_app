@@ -42,6 +42,10 @@ export class AuthController {
   async login(@Body(new ValidationPipe()) body: LoginDto) {
     const user = await this.authService.validateUser(body.destination);
 
+    if (!user) {
+      throw new UnauthorizedException(CONFIG_MESSAGES.UserNotFound);
+    }
+
     if (!user.verified) {
       throw new UnauthorizedException(CONFIG_MESSAGES.EmailNotVerified);
     }
@@ -97,30 +101,25 @@ export class AuthController {
     },
   })
   async verifyRegister(@Body() body: { register_token: string }) {
-    // Verifica o token e extrai os dados do usuário
+    // Verifica o token e extrai o email
     const userData = await this.authService.verifyRegisterToken(
       body.register_token,
     );
 
-    try {
-      // Cria o usuário com os dados extraídos do token
-      const user = await this.usersService.createUser({
-        ...userData,
-        verified: true, // Marca como verificado
-      });
+    // Atualiza usuário para verificado
+    const user = await this.usersService.updateUser({
+      where: { email: userData.email },
+      data: { verified: true },
+    });
 
-      // Gera o JWT token
-      const { jwt_token } = this.authService.generateTokens(user);
+    // Gera o JWT token
+    const { jwt_token } = this.authService.generateTokens(user);
 
-      // Retorna usuário + jwt_token
-      return {
-        message: CONFIG_MESSAGES.UserCreatedVerified,
-        user: user,
-        jwt_token: jwt_token,
-      };
-    } catch (error) {
-      throw new UnauthorizedException(CONFIG_MESSAGES.UserAlReady);
-    }
+    return {
+      message: CONFIG_MESSAGES.UserCreatedVerified,
+      user: user,
+      jwt_token: jwt_token,
+    };
   }
 
   @Get('google')

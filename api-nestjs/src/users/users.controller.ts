@@ -22,6 +22,7 @@ import { CONFIG_MESSAGES } from 'src/config/config';
 import { AdminGuard } from './guards/admin.guard';
 import { AuthService } from 'src/auth/auth.service';
 import { ConfigService } from '@nestjs/config';
+import { JwtGuard } from 'src/auth/guards/jwt.guard';
 
 @Controller('users')
 @UseFilters(HttpExceptionsFilter)
@@ -35,19 +36,17 @@ export class UsersController {
 
   @Post('register')
   async create(@Body() createUserDto: CreateUserDto): Promise<any> {
-    // Primeiro verifica se o usuário já existe
-    if (
-      await this.usersService.UserFindUnique({
-        email: createUserDto.email,
-      })
-    ) {
-      throw new UnauthorizedException(CONFIG_MESSAGES.UserAlReady);
-    }
+    // Cria usuário não verificado
+    const user = await this.usersService.createUser({
+      ...createUserDto,
+      verified: false,
+    });
 
-    // Se não existir, prossegue com o fluxo de registro
+    // Gera token de registro
     const register_token = await this.authService.generateRegisterToken(
       createUserDto,
     );
+
     const verify_url = `${this.configService.get<string>(
       'FRONTEND_URL',
     )}/verify-register?register_token=${register_token}`;
@@ -76,6 +75,7 @@ export class UsersController {
   }
 
   @Get(':id')
+  @UseGuards(JwtGuard)
   async findOne(@Param('id', ParseIntPipe) id: number): Promise<User> {
     try {
       return await this.usersService.UserFindUnique({ id });
@@ -85,6 +85,7 @@ export class UsersController {
   }
 
   @Patch(':id')
+  @UseGuards(JwtGuard)
   async update(
     @Param('id', ParseIntPipe) id: number,
     @Body() updateUserDto: UpdateUserDto,
@@ -100,6 +101,7 @@ export class UsersController {
   }
 
   @Delete(':id')
+  @UseGuards(JwtGuard)
   async remove(@Param('id', ParseIntPipe) id: number): Promise<User> {
     try {
       return await this.usersService.deleteUser({ id });

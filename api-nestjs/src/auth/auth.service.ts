@@ -15,13 +15,7 @@ export class AuthService {
   ) {}
 
   validateUser(email: string) {
-    const user = this.usersService.UserFindUnique({ email });
-
-    if (!user) {
-      throw new UnauthorizedException(CONFIG_MESSAGES.UserNotFound);
-    }
-
-    return user;
+    return this.usersService.UserFindUnique({ email });
   }
 
   async createGoogleUser(userData: {

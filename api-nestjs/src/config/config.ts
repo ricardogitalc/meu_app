@@ -4,14 +4,16 @@ export const CONFIG_TIMES = {
 };
 
 export const CONFIG_MESSAGES = {
-  JwtTokenExpired: 'Token inválido ou expirado',
-  LoginTokenExpired: 'Link de acesso expirado',
-  UserNotFound: 'Usuário não encontrado',
-  UserAlReady: 'Usuário já cadastrado',
-  AdminOnly: 'Você não é um administrador',
-  InvalidEmail: 'Digite um email válido, por favor',
-  EmailNotVerified: 'Seu email não foi verificado',
-  UserCreatedVerified: 'Usuário verificado com sucesso',
-  SendVerificationLink: 'Verifique seu email para concluir o cadastro',
-  TooManyRequests: 'Muitas tentativas',
+  JwtTokenExpired: 'O token é inválido ou expirou.',
+  LoginTokenExpired: 'O link de acesso expirou.',
+  UserNotFound: 'Usuário não encontrado.',
+  UserAlReady: 'O usuário já está cadastrado.',
+  AdminOnly: 'Você não é um administrador.',
+  InvalidEmail: 'Insira um email válido.',
+  EmailNotVerified: 'O email ainda não foi verificado.',
+  UserCreatedVerified: 'Usuário verificado com sucesso.',
+  SendVerificationLink:
+    'Usuário criado. Verifique seu email para ativar a conta.',
+  TooManyRequests:
+    'Muitas tentativas realizadas. Aguarde um momento e tente novamente.',
 };
