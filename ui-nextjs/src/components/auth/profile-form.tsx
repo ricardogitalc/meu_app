@@ -64,14 +64,14 @@ export default function ProfileForm() {
           <div className="space-y-2">
             <Label htmlFor="whatsapp">WhatsApp</Label>
             <Input
-              {...register("whatsapp")}
+              {...register("whatsappNumber")}
               placeholder="Ex: 11999999999"
               type="tel"
               maxLength={11}
             />
-            {errors.whatsapp && (
+            {errors.whatsappNumber && (
               <span className="text-sm text-red-500">
-                {errors.whatsapp.message}
+                {errors.whatsappNumber.message}
               </span>
             )}
           </div>

@@ -9,7 +9,7 @@ export const registerSchema = z
     lastName: z.string().min(2, AUHT_MENSSAGES.lastNameError),
     email: z.string().email(AUHT_MENSSAGES.invalidEmail),
     confirmEmail: z.string().email(AUHT_MENSSAGES.confirmEmail),
-    whatsapp: z
+    whatsappNumber: z
       .string()
       .min(1, AUHT_MENSSAGES.minWhatsappError)
       .regex(whatsappRegex, AUHT_MENSSAGES.regexWhatsappError),
@@ -19,14 +19,19 @@ export const registerSchema = z
     path: ["confirmEmail"],
   });
 
+export type RegisterFormOutput = Omit<
+  z.infer<typeof registerSchema>,
+  "confirmEmail"
+>;
+
 export const loginSchema = z.object({
-  email: z.string().email(AUHT_MENSSAGES.invalidEmail),
+  destination: z.string().email(AUHT_MENSSAGES.invalidEmail),
 });
 
 export const profileSchema = z.object({
   firstName: z.string().min(2, AUHT_MENSSAGES.firstNameError),
   lastName: z.string().min(2, AUHT_MENSSAGES.lastNameError),
-  whatsapp: z
+  whatsappNumber: z
     .string()
     .min(1, AUHT_MENSSAGES.minWhatsappError)
     .regex(whatsappRegex, AUHT_MENSSAGES.regexWhatsappError),

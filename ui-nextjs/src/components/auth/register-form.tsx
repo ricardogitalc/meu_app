@@ -15,7 +15,7 @@ import { AuthLinks } from "./auth-links";
 import { GoogleButton } from "./google-button";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { registerSchema } from "@/schemas/auth";
+import { registerSchema, type RegisterFormOutput } from "@/schemas/auth";
 import type { z } from "zod";
 
 type RegisterFormData = z.infer<typeof registerSchema>;
@@ -30,7 +30,14 @@ export function RegisterForm() {
   });
 
   const onSubmit = (data: RegisterFormData) => {
-    console.log("Dados do registro:", data);
+    // Removendo confirmEmail dos dados antes de enviar
+    const outputData: RegisterFormOutput = {
+      email: data.email,
+      firstName: data.firstName,
+      lastName: data.lastName,
+      whatsappNumber: data.whatsappNumber,
+    };
+    console.log("Dados do registro:", outputData);
   };
 
   return (
@@ -91,16 +98,16 @@ export function RegisterForm() {
             )}
           </div>
           <div className="space-y-2">
-            <Label htmlFor="whatsapp">WhatsApp</Label>
+            <Label htmlFor="whatsappNumber">WhatsApp</Label>
             <Input
-              {...register("whatsapp")}
+              {...register("whatsappNumber")}
               placeholder="Ex: 11999999999"
               type="tel"
               maxLength={11}
             />
-            {errors.whatsapp && (
+            {errors.whatsappNumber && (
               <span className="text-sm text-red-500">
-                {errors.whatsapp.message}
+                {errors.whatsappNumber.message}
               </span>
             )}
           </div>

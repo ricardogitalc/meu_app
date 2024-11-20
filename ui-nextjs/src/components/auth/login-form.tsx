@@ -47,12 +47,12 @@ export function LoginForm() {
             <Label htmlFor="email">Email</Label>
             <Input
               type="email"
-              {...register("email")}
+              {...register("destination")}
               placeholder="seu@email.com"
             />
-            {errors.email && (
+            {errors.destination && (
               <span className="text-sm text-red-500">
-                {errors.email.message}
+                {errors.destination.message}
               </span>
             )}
           </div>
