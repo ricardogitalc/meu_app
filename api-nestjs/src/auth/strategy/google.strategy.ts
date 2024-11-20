@@ -1,17 +1,17 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, UnauthorizedException } from '@nestjs/common';
 import { PassportStrategy } from '@nestjs/passport';
 import { Strategy, VerifyCallback } from 'passport-google-oauth20';
-import { AuthService } from '../auth.service';
 import { ConfigService } from '@nestjs/config';
+import { UsersService } from 'src/users/users.service';
+import { CONFIG_MESSAGES } from 'src/config/config';
 
 @Injectable()
 export class GoogleStrategy extends PassportStrategy(Strategy) {
   constructor(
-    private authService: AuthService,
+    private usersService: UsersService,
     private configService: ConfigService,
   ) {
     super({
-      secret: configService.get<string>('JWT_SECRET_KEY'),
       clientID: configService.get<string>('GOOGLE_CLIENT_ID'),
       clientSecret: configService.get<string>('GOOGLE_SECRET_KEY'),
       callbackURL: configService.get<string>('GOOGLE_CALLBACK_URL'),
@@ -25,23 +25,30 @@ export class GoogleStrategy extends PassportStrategy(Strategy) {
     profile: any,
     done: VerifyCallback,
   ) {
-    const { emails, name, photos } = profile;
-    const email = emails[0].value;
-
     try {
-      // Tenta validar usuário existente
-      const user = await this.authService.validateUser(email);
-      done(null, user);
+      const { emails, name, photos } = profile;
+      const email = emails[0].value;
+
+      // Tenta encontrar usuário existente
+      let user = await this.usersService.UserFindUnique({ email: email });
+
+      // Se não existir, cria novo usuário
+      if (!user) {
+        user = await this.usersService.createUser({
+          email,
+          firstName: name.givenName,
+          lastName: name.familyName,
+          imageUrl: photos[0]?.value,
+          verified: true,
+        });
+      }
+
+      return done(null, user);
     } catch (error) {
-      // Se usuário não existir, cria novo
-      const newUser = await this.authService.createGoogleUser({
-        email: email,
-        firstName: name.givenName,
-        lastName: name.familyName,
-        imageUrl: photos[0]?.value,
-        verified: true, // Google já verificou o email
-      });
-      done(null, newUser);
+      return done(
+        new UnauthorizedException(CONFIG_MESSAGES.GoogleLoginError),
+        false,
+      );
     }
   }
 }

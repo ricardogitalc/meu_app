@@ -1,9 +1,4 @@
-import {
-  Injectable,
-  ConflictException,
-  NotFoundException,
-  UnauthorizedException,
-} from '@nestjs/common';
+import { Injectable, UnauthorizedException } from '@nestjs/common';
 import { User, Prisma } from '@prisma/client';
 import { CONFIG_MESSAGES } from 'src/config/config';
 import { PrismaService } from 'src/prisma/prisma.service';

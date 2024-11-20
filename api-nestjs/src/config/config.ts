@@ -12,6 +12,7 @@ export const CONFIG_MESSAGES = {
   InvalidEmail: 'Insira um email válido.',
   EmailNotVerified: 'O email ainda não foi verificado.',
   UserCreatedVerified: 'Usuário verificado com sucesso.',
+  GoogleLoginError: 'Ocorreu um erro ao tentar entrar com Google.',
   SendVerificationLink:
     'Usuário criado. Verifique seu email para ativar a conta.',
   TooManyRequests:
