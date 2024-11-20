@@ -1,5 +1,4 @@
-export class User {
-  role: string;
+export class UserEntity {
   id: number;
   email: string;
   firstName: string;

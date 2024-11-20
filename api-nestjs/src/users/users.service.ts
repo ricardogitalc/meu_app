@@ -17,6 +17,20 @@ export class UsersService {
     return user;
   }
 
+  async createUser(data: Prisma.UserCreateInput): Promise<User> {
+    const user = await this.prisma.user.findUnique({
+      where: { email: data.email },
+    });
+
+    if (user) {
+      throw new UnauthorizedException(CONFIG_MESSAGES.UserAlReady);
+    }
+
+    return this.prisma.user.create({
+      data,
+    });
+  }
+
   async users(params: {
     skip?: number;
     take?: number;
@@ -38,20 +52,6 @@ export class UsersService {
     }
 
     return users;
-  }
-
-  async createUser(data: Prisma.UserCreateInput): Promise<User> {
-    const existingUser = await this.prisma.user.findUnique({
-      where: { email: data.email },
-    });
-
-    if (existingUser) {
-      throw new UnauthorizedException(CONFIG_MESSAGES.UserAlReady);
-    }
-
-    return this.prisma.user.create({
-      data,
-    });
   }
 
   async updateUser(params: {

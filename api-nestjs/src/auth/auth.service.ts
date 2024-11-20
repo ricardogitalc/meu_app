@@ -1,10 +1,10 @@
 import { Injectable, UnauthorizedException } from '@nestjs/common';
-import { User } from '../users/entity/users.entity';
 import { JwtService } from '@nestjs/jwt';
 import { ConfigService } from '@nestjs/config';
 import { UsersService } from 'src/users/users.service';
 import { CONFIG_MESSAGES, CONFIG_TIMES } from 'src/config/config';
 import { CreateUserDto } from 'src/users/dto/users.dto';
+import { UserEntity } from 'src/users/entity/users.entity';
 
 @Injectable()
 export class AuthService {
@@ -32,7 +32,7 @@ export class AuthService {
     }
   }
 
-  generateTokens(user: User) {
+  generateTokens(user: UserEntity) {
     const payload = {
       sub: user.id,
       email: user.email,
