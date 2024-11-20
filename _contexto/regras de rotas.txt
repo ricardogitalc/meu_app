@@ -1,0 +1,33 @@
+# REGRAS DE ROTAS
+
+USUÁRIO AUTENTICADO {
+  - ✅ permitido: ROTAS PÚBLICAS, ROTAS PROTEGIDAS.
+  - 🚫 bloqueado: ROTAS AUTH (redirecionar para: /)
+}
+
+USUÁRIO NÃO AUTENTICADO {
+  - ✅ permitido: ROTAS PÚBLICAS, ROTAS AUTH.
+  - 🚫 bloqueado: ROTAS PROTEGIDAS (redirecionar para: /login)
+}
+
+
+ROTAS PÚBLICAS {
+  /
+  /planos
+}
+
+ROTAS PROTEGIDAS {
+  /assinatura
+  /dashboard
+  /downloads
+  /favoritos
+  /perfil
+  /seguindo
+}
+
+ROTAS AUTH {
+  /login
+  /register
+  /verify-login
+  /verify-register
+}
