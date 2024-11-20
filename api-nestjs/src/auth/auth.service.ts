@@ -4,6 +4,7 @@ import { JwtService } from '@nestjs/jwt';
 import { ConfigService } from '@nestjs/config';
 import { UsersService } from 'src/users/users.service';
 import { CONFIG_MESSAGES, CONFIG_TIMES } from 'src/config/config';
+import { CreateUserDto } from 'src/users/dto/users.dto';
 
 @Injectable()
 export class AuthService {
@@ -14,7 +15,7 @@ export class AuthService {
   ) {}
 
   validateUser(email: string) {
-    const user = this.usersService.user({ email });
+    const user = this.usersService.UserFindUnique({ email });
 
     if (!user) {
       throw new UnauthorizedException(CONFIG_MESSAGES.UserNotFound);
@@ -70,5 +71,21 @@ export class AuthService {
     } catch (error) {
       throw new UnauthorizedException(CONFIG_MESSAGES.JwtTokenExpired);
     }
+  }
+
+  async verifyRegisterToken(token: string) {
+    try {
+      const payload = this.jwtService.verify(token);
+      return payload.userData; // Dados do usuário enviados no token
+    } catch (error) {
+      throw new UnauthorizedException(CONFIG_MESSAGES.JwtTokenExpired);
+    }
+  }
+
+  generateRegisterToken(userData: CreateUserDto) {
+    const payload = { userData };
+    return this.jwtService.sign(payload, {
+      expiresIn: CONFIG_TIMES.LOGIN_TOKEN,
+    });
   }
 }

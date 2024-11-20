@@ -19,6 +19,7 @@ import { Response } from 'express';
 import { ApiTags, ApiOperation, ApiResponse, ApiBody } from '@nestjs/swagger';
 import { JwtGuard } from './guards/jwt.guard';
 import { CONFIG_MESSAGES } from 'src/config/config';
+import { UsersService } from '../users/users.service'; // Adicionar este import
 
 @ApiTags('auth')
 @Controller('auth')
@@ -27,6 +28,7 @@ export class AuthController {
   constructor(
     private readonly authService: AuthService,
     private readonly strategy: MagicLoginStrategy,
+    private readonly usersService: UsersService, // Adicionar esta injeção
   ) {}
 
   @Post('login')
@@ -80,6 +82,47 @@ export class AuthController {
   }
 
   @Post('verify-register')
+  @ApiOperation({ summary: 'Verificar magic link de registro e criar usuário' })
+  @ApiResponse({ status: 201, description: 'Usuário criado com sucesso' })
+  @ApiResponse({ status: 401, description: 'Token inválido' })
+  @ApiBody({
+    schema: {
+      type: 'object',
+      properties: {
+        register_token: {
+          type: 'string',
+          description: 'Token do magic link de registro',
+        },
+      },
+    },
+  })
+  async verifyRegister(@Body() body: { register_token: string }) {
+    // Verifica o token e extrai os dados do usuário
+    const userData = await this.authService.verifyRegisterToken(
+      body.register_token,
+    );
+
+    try {
+      // Cria o usuário com os dados extraídos do token
+      const user = await this.usersService.createUser({
+        ...userData,
+        verified: true, // Marca como verificado
+      });
+
+      // Gera o JWT token
+      const { jwt_token } = this.authService.generateTokens(user);
+
+      // Retorna usuário + jwt_token
+      return {
+        message: CONFIG_MESSAGES.UserCreatedVerified,
+        user: user,
+        jwt_token: jwt_token,
+      };
+    } catch (error) {
+      throw new UnauthorizedException(CONFIG_MESSAGES.UserAlReady);
+    }
+  }
+
   @Get('google')
   @UseGuards(AuthGuard('google'))
   async googleAuth() {}

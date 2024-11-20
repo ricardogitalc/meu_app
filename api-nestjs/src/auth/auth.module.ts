@@ -1,4 +1,4 @@
-import { Module } from '@nestjs/common';
+import { Module, forwardRef } from '@nestjs/common';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { AuthService } from './auth.service';
 import { AuthController } from './auth.controller';
@@ -12,7 +12,7 @@ import { CONFIG_TIMES } from 'src/config/config';
 
 @Module({
   imports: [
-    UsersModule,
+    forwardRef(() => UsersModule), // Usando forwardRef aqui também
     PassportModule,
     JwtModule.registerAsync({
       imports: [ConfigModule],
@@ -28,6 +28,7 @@ import { CONFIG_TIMES } from 'src/config/config';
     }),
   ],
   controllers: [AuthController],
+  exports: [AuthService],
   providers: [AuthService, MagicLoginStrategy, JwtStrategy, GoogleStrategy],
 })
 export class AuthModule {}

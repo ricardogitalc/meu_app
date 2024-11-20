@@ -12,16 +12,12 @@ import { PrismaService } from 'src/prisma/prisma.service';
 export class UsersService {
   constructor(private prisma: PrismaService) {}
 
-  async user(
+  async UserFindUnique(
     userWhereUniqueInput: Prisma.UserWhereUniqueInput,
   ): Promise<User | null> {
     const user = await this.prisma.user.findUnique({
       where: userWhereUniqueInput,
     });
-
-    if (!user) {
-      throw new UnauthorizedException(CONFIG_MESSAGES.UserNotFound);
-    }
 
     return user;
   }
