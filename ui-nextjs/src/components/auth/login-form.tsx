@@ -13,8 +13,26 @@ import {
 } from "@/components/ui/card";
 import { GoogleButton } from "./google-button";
 import { AuthLinks } from "./auth-links";
+import { useForm } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { loginSchema } from "@/schemas/auth";
+import type { z } from "zod";
+
+type LoginFormData = z.infer<typeof loginSchema>;
 
 export function LoginForm() {
+  const {
+    register,
+    handleSubmit,
+    formState: { errors },
+  } = useForm<LoginFormData>({
+    resolver: zodResolver(loginSchema),
+  });
+
+  const onSubmit = (data: LoginFormData) => {
+    console.log("Dados do login:", data);
+  };
+
   return (
     <Card className="w-full max-w-md">
       <CardHeader>
@@ -23,25 +41,20 @@ export function LoginForm() {
           Digite seu email para receber um link de acesso
         </CardDescription>
       </CardHeader>
-      <form>
+      <form onSubmit={handleSubmit(onSubmit)}>
         <CardContent className="space-y-4">
           <div className="space-y-2">
             <Label htmlFor="email">Email</Label>
             <Input
-              required
               type="email"
-              id="email"
-              name="email"
+              {...register("email")}
               placeholder="seu@email.com"
-              onInvalid={(e) =>
-                (e.target as HTMLInputElement).setCustomValidity(
-                  "Por favor, insira um email válido."
-                )
-              }
-              onInput={(e) =>
-                (e.target as HTMLInputElement).setCustomValidity("")
-              }
             />
+            {errors.email && (
+              <span className="text-sm text-red-500">
+                {errors.email.message}
+              </span>
+            )}
           </div>
         </CardContent>
         <CardFooter className="flex flex-col gap-4">

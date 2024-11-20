@@ -1,10 +1,8 @@
 "use client";
 
-import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Loader2 } from "lucide-react";
 import {
   Card,
   CardContent,
@@ -13,107 +11,98 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
-import { Alert, AlertDescription } from "../ui/alert";
 import { AuthLinks } from "./auth-links";
 import { GoogleButton } from "./google-button";
+import { useForm } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { registerSchema } from "@/schemas/auth";
+import type { z } from "zod";
+
+type RegisterFormData = z.infer<typeof registerSchema>;
 
 export function RegisterForm() {
+  const {
+    register,
+    handleSubmit,
+    formState: { errors },
+  } = useForm<RegisterFormData>({
+    resolver: zodResolver(registerSchema),
+  });
+
+  const onSubmit = (data: RegisterFormData) => {
+    console.log("Dados do registro:", data);
+  };
+
   return (
     <Card className="w-full max-w-md">
       <CardHeader>
         <CardTitle>Criar Conta</CardTitle>
         <CardDescription>Registre-se para acessar a plataforma</CardDescription>
       </CardHeader>
-      <form>
+      <form onSubmit={handleSubmit(onSubmit)}>
         <CardContent className="space-y-4">
           <div className="flex space-x-4">
             <div className="space-y-2 flex-1">
               <Label htmlFor="firstName">Nome</Label>
-              <Input
-                required
-                id="firstName"
-                name="firstName"
-                placeholder="Digite seu nome"
-                onInvalid={(e) =>
-                  (e.target as HTMLInputElement).setCustomValidity(
-                    "Por favor, preencha seu nome."
-                  )
-                }
-                onInput={(e) =>
-                  (e.target as HTMLInputElement).setCustomValidity("")
-                }
-              />
+              <Input {...register("firstName")} placeholder="Digite seu nome" />
+              {errors.firstName && (
+                <span className="text-sm text-red-500">
+                  {errors.firstName.message}
+                </span>
+              )}
             </div>
             <div className="space-y-2 flex-1">
               <Label htmlFor="lastName">Sobrenome</Label>
               <Input
-                required
-                id="lastName"
-                name="lastName"
+                {...register("lastName")}
                 placeholder="Digite seu sobrenome"
-                onInvalid={(e) =>
-                  (e.target as HTMLInputElement).setCustomValidity(
-                    "Por favor, preencha seu sobrenome."
-                  )
-                }
-                onInput={(e) =>
-                  (e.target as HTMLInputElement).setCustomValidity("")
-                }
               />
+              {errors.lastName && (
+                <span className="text-sm text-red-500">
+                  {errors.lastName.message}
+                </span>
+              )}
             </div>
           </div>
           <div className="space-y-2">
             <Label htmlFor="email">Email</Label>
             <Input
-              required
               type="email"
-              id="email"
-              name="email"
+              {...register("email")}
               placeholder="Digite seu email"
-              onInvalid={(e) =>
-                (e.target as HTMLInputElement).setCustomValidity(
-                  "Por favor, preencha seu email."
-                )
-              }
-              onInput={(e) =>
-                (e.target as HTMLInputElement).setCustomValidity("")
-              }
             />
+            {errors.email && (
+              <span className="text-sm text-red-500">
+                {errors.email.message}
+              </span>
+            )}
           </div>
           <div className="space-y-2">
             <Label htmlFor="confirmEmail">Confirmar Email</Label>
             <Input
-              required
               type="email"
-              id="confirmEmail"
-              name="confirmEmail"
+              {...register("confirmEmail")}
               placeholder="Confirme seu email"
-              onInvalid={(e) =>
-                (e.target as HTMLInputElement).setCustomValidity(
-                  "Por favor, confirme seu email."
-                )
-              }
-              onInput={(e) =>
-                (e.target as HTMLInputElement).setCustomValidity("")
-              }
             />
+            {errors.confirmEmail && (
+              <span className="text-sm text-red-500">
+                {errors.confirmEmail.message}
+              </span>
+            )}
           </div>
           <div className="space-y-2">
-            <Label htmlFor="whatsapp">WhatsApp (opcional)</Label>
+            <Label htmlFor="whatsapp">WhatsApp</Label>
             <Input
-              required
-              id="whatsapp"
-              name="whatsapp"
+              {...register("whatsapp")}
               placeholder="Ex: 11999999999"
-              onInvalid={(e) =>
-                (e.target as HTMLInputElement).setCustomValidity(
-                  "Por favor, preencha seu whatsapp."
-                )
-              }
-              onInput={(e) =>
-                (e.target as HTMLInputElement).setCustomValidity("")
-              }
+              type="tel"
+              maxLength={11}
             />
+            {errors.whatsapp && (
+              <span className="text-sm text-red-500">
+                {errors.whatsapp.message}
+              </span>
+            )}
           </div>
         </CardContent>
         <CardFooter className="flex flex-col gap-4">
