@@ -1,0 +1,340 @@
+Title: How to do Basic Session Auth with NEXT.js 💻
+
+URL Source: https://dev.to/aadarsh-nagrath/how-to-do-basic-session-auth-with-nextjs-b1i
+
+Published Time: 2024-04-08T19:07:37Z
+
+Markdown Content:
+In this guide, we'll explore how to implement basic session authentication in Next.js without using additional libraries. We'll create a simple authentication system using TypeScript and built-in Next.js features.
+
+If you like it, do consider connecting on [Twitter](https://twitter.com/aadarsh_nagrath).
+
+### [](https://dev.to/aadarsh-nagrath/how-to-do-basic-session-auth-with-nextjs-b1i#setting-up-the-project-structure)Setting Up the Project Structure
+
+Let's start by setting up our project structure. We'll have a few files in our `app` folder:
+
+1.  `layout.tsx`: This file defines the layout of our application.
+2.  `page.tsx`: This file contains the main page where users can log in and log out.
+3.  `middleware.ts`: This file acts as middleware to handle session updates.
+4.  `lib.ts`: This file contains the core logic for authentication.
+
+### [](https://dev.to/aadarsh-nagrath/how-to-do-basic-session-auth-with-nextjs-b1i#file-contents)File Contents
+
+#### [](https://dev.to/aadarsh-nagrath/how-to-do-basic-session-auth-with-nextjs-b1i#-raw-layouttsx-endraw-)`layout.tsx`
+
+This snippet defines the layout for our Next.js application. We set metadata for SEO purposes and create a basic HTML structure with a body tag to wrap the application content. This is a basic layout.tsx file in a Next project once installed.
+
+```
+
+
+export const metadata = {
+  title: "Next.js Authentication",
+  description: "Example using NextAuth.js",
+};
+
+export default function RootLayout({
+  children,
+}: {
+  children: React.ReactNode;
+}) {
+  return (
+    <html lang="en">
+      <body>{children}</body>
+    </html>
+  );
+}
+
+
+```
+
+Enter fullscreen mode Exit fullscreen mode
+
+#### [](https://dev.to/aadarsh-nagrath/how-to-do-basic-session-auth-with-nextjs-b1i#-raw-pagetsx-endraw-)`page.tsx`
+
+In this snippet, we create the main page of our application.  
+It contains two forms, one for logging in and one for logging out. When the user submits the login form, the login function is called, which verifies the credentials, creates a session, and redirects the user to the home page. Similarly, the logout function is called when the user submits the logout form.
+
+```
+
+
+import { redirect } from "next/navigation";
+import { getSession, login, logout } from "@/lib";
+
+export default async function Page() {
+  const session = await getSession();
+  return (
+    <section>
+      <form
+        action={async (formData) => {
+          "use server";
+          await login(formData);
+          redirect("/");
+        }}
+      >
+        <input type="email" placeholder="Email" />
+        <br />
+        <button type="submit">Login</button>
+      </form>
+      <form
+        action={async () => {
+          "use server";
+          await logout();
+          redirect("/");
+        }}
+      >
+        <button type="submit">Logout</button>
+      </form>
+      <pre>{JSON.stringify(session, null, 2)}</pre>
+    </section>
+  );
+}
+
+
+```
+
+Enter fullscreen mode Exit fullscreen mode
+
+[![Image 1: .](https://media2.dev.to/dynamic/image/width=800%2Cheight=%2Cfit=scale-down%2Cgravity=auto%2Cformat=auto/https%3A%2F%2Fdev-to-uploads.s3.amazonaws.com%2Fuploads%2Farticles%2F2ljkkq47ba1a0i9ylf1b.png)](https://media2.dev.to/dynamic/image/width=800%2Cheight=%2Cfit=scale-down%2Cgravity=auto%2Cformat=auto/https%3A%2F%2Fdev-to-uploads.s3.amazonaws.com%2Fuploads%2Farticles%2F2ljkkq47ba1a0i9ylf1b.png)
+
+#### [](https://dev.to/aadarsh-nagrath/how-to-do-basic-session-auth-with-nextjs-b1i#-raw-middlewarets-endraw-)`middleware.ts`
+
+This snippet defines a middleware function that updates the session on each request. It calls the updateSession function from the lib.ts file to refresh the session expiration time.
+
+```
+
+
+import { NextRequest } from "next/server";
+import { updateSession } from "./lib";
+
+export async function middleware(request: NextRequest) {
+  return await updateSession(request);
+}
+
+
+```
+
+Enter fullscreen mode Exit fullscreen mode
+
+#### [](https://dev.to/aadarsh-nagrath/how-to-do-basic-session-auth-with-nextjs-b1i#-raw-libts-endraw-)`lib.ts`
+
+Now let's delve into the lib.ts which contains the main logic of authentication -
+
+```
+
+
+import { SignJWT, jwtVerify } from "jose";
+import { cookies } from "next/headers";
+import { NextRequest, NextResponse } from "next/server";
+
+// Define a secret key for JWT encryption
+const secretKey = "secret";
+
+// Encode the secret key as bytes
+const key = new TextEncoder().encode(secretKey);
+
+
+```
+
+Enter fullscreen mode Exit fullscreen mode
+
+1.  **Imports**: This file imports necessary modules and functions from various libraries:
+
+    - `SignJWT` and `jwtVerify` from the `"jose"` library for JSON Web Token (JWT) signing and verification.
+    - `cookies` from `"next/headers"` for managing cookies.
+    - `NextRequest` and `NextResponse` from `"next/server"` for handling requests and responses in Next.js.
+
+2.  **Secret Key Definition**: A secret key is defined for JWT encryption. In a real-world scenario, this key should be securely stored and not hard-coded like this example.
+3.  **Key Encoding**: The secret key is encoded into bytes using `TextEncoder()`. This encoded key is required for encryption and decryption operations.
+
+```
+
+
+export async function encrypt(payload: any) {
+  return await new SignJWT(payload)
+    .setProtectedHeader({ alg: "HS256" }) // Set the algorithm for JWT signing
+    .setIssuedAt() // Set the issuance time of the JWT
+    .setExpirationTime("10 sec from now") // Set the expiration time of the JWT
+    .sign(key); // Sign the JWT using the secret key
+}
+
+
+```
+
+Enter fullscreen mode Exit fullscreen mode
+
+1.  **Encrypt Function**: The `encrypt` function takes a payload and creates a JWT with it:
+    - It initializes a new `SignJWT` instance with the provided payload.
+    - Sets the protected header specifying the algorithm used for signing the JWT (in this case, HMAC with SHA-256).
+    - Sets the issuance time and expiration time for the JWT.
+    - Finally, signs the JWT using the previously defined secret key.
+
+```
+
+
+export async function decrypt(input: string): Promise<any> {
+  const { payload } = await jwtVerify(input, key, {
+    algorithms: ["HS256"], // Specify the allowed algorithms for JWT verification
+  });
+  return payload; // Return the decrypted payload
+}
+
+
+```
+
+Enter fullscreen mode Exit fullscreen mode
+
+1.  **Decrypt Function**: The `decrypt` function takes a JWT string and decrypts it:
+    - It uses the `jwtVerify` function to verify and decode the JWT.
+    - The function verifies the JWT signature and decodes its payload using the provided secret key and algorithm (HS256 in this case).
+    - Finally, it returns the decrypted payload.
+
+```
+
+
+export async function login(formData: FormData) {
+  // Verify credentials && get the user
+
+  // Mock user data
+  const user = { email: formData.get("email"), name: "John" };
+
+  // Create the session
+  const expires = new Date(Date.now() + 10 * 1000); // Set session expiration time (10 seconds from now)
+  const session = await encrypt({ user, expires }); // Encrypt user data and set expiration time
+
+  // Save the session in a cookie
+  cookies().set("session", session, { expires, httpOnly: true }); // Set session cookie with expiration time and HTTP only flag
+}
+
+
+```
+
+Enter fullscreen mode Exit fullscreen mode
+
+1.  **Login Function**: The `login` function simulates user authentication:
+    - It receives form data (in this case, an email).
+    - Mock user data is created (name and email).
+    - A session is created by encrypting the user data and setting an expiration time.
+    - The session is saved in a cookie with an expiration time and the HTTP only flag for security.
+
+```
+
+
+export async function logout() {
+  // Destroy the session by clearing the session cookie
+  cookies().set("session", "", { expires: new Date(0) });
+}
+
+
+```
+
+Enter fullscreen mode Exit fullscreen mode
+
+1.  **Logout Function**: The `logout` function clears the session by setting an expired date to the session cookie.
+
+```
+
+
+export async function getSession() {
+  const session = cookies().get("session")?.value; // Retrieve the session cookie value
+  if (!session) return null; // If session is not found, return null
+  return await decrypt(session); // Decrypt and return the session payload
+}
+
+
+```
+
+Enter fullscreen mode Exit fullscreen mode
+
+1.  **Get Session Function**: The `getSession` function retrieves the session data from the session cookie:
+    - It retrieves the session cookie value.
+    - If the session is not found, it returns null.
+    - Otherwise, it decrypts the session data and returns the payload.
+
+```
+
+
+export async function updateSession(request: NextRequest) {
+  const session = request.cookies.get("session")?.value; // Retrieve the session cookie value from the request
+  if (!session) return; // If session is not found, return
+
+  // Refresh the session expiration time
+  const parsed = await decrypt(session); // Decrypt the session data
+  parsed.expires = new Date(Date.now() + 10 * 1000); // Set a new expiration time (10 seconds from now)
+  const res = NextResponse.next(); // Create a new response
+  res.cookies.set({
+    name: "session",
+    value: await encrypt(parsed), // Encrypt and set the updated session data
+    httpOnly: true,
+    expires: parsed.expires, // Set the expiration time
+  });
+  return res; // Return the response
+}
+
+
+```
+
+Enter fullscreen mode Exit fullscreen mode
+
+1.  **Update Session Function**: The `updateSession` function updates the session expiration time:
+    - It retrieves the session cookie value from the request.
+    - If the session is not found, it returns.
+    - The function decrypts the session data, updates the expiration time, encrypts the updated data, and sets it in a new session cookie with the updated expiration time.
+
+### [](https://dev.to/aadarsh-nagrath/how-to-do-basic-session-auth-with-nextjs-b1i#workflow)WORK-FLOW
+
+1.  **User Accesses the Application**:
+
+    - When a user accesses the Next.js application, they are initially presented with the login page.
+
+2.  **Logging In**:
+
+    - The user enters their email address into the login form and submits the form.
+    - Upon form submission, the `login()` function is called.
+    - Inside the `login()` function:
+      - The user's credentials are verified (currently mocked).
+      - If the credentials are valid, a session is created:
+      - User information (e.g., email, name) is packaged into a JSON object.
+      - An expiration time is set for the session, typically a short time in the future (e.g., 10 seconds).
+      - The session data is encrypted using a JWT (JSON Web Token) with the `encrypt()` function.
+      - The encrypted session data is stored in an HTTP-only cookie named "session" with the specified expiration time.
+    - After successful login, the user is redirected to the home page (`"/"`) or another designated page.
+
+[![Image 2: .](https://media2.dev.to/dynamic/image/width=800%2Cheight=%2Cfit=scale-down%2Cgravity=auto%2Cformat=auto/https%3A%2F%2Fdev-to-uploads.s3.amazonaws.com%2Fuploads%2Farticles%2Fbrkh7czlssbuftzqa19o.png)](https://media2.dev.to/dynamic/image/width=800%2Cheight=%2Cfit=scale-down%2Cgravity=auto%2Cformat=auto/https%3A%2F%2Fdev-to-uploads.s3.amazonaws.com%2Fuploads%2Farticles%2Fbrkh7czlssbuftzqa19o.png)
+
+1.  **Accessing Pages After Login**:
+
+    - Once logged in, the user can access protected pages or perform actions that require authentication.
+    - Each time a page is accessed, the `getSession()` function is called to retrieve the session data from the cookie.
+    - If a valid session is found:
+      - The session data is decrypted using the `decrypt()` function.
+      - The decrypted session data, containing user information and expiration time, is displayed on the page.
+    - If no valid session is found (e.g., the session has expired or the user hasn't logged in), the session data displayed on the page will be empty.
+
+2.  **Logging Out**:
+
+    - When the user decides to log out, they click the logout button on the page.
+    - Upon clicking the logout button, the `logout()` function is called.
+    - Inside the `logout()` function:
+      - The session is destroyed by removing the "session" cookie.
+    - After logging out, the user is redirected to the home page or another designated page.
+
+3.  **Session Management**:
+
+    - To ensure session validity and prevent unauthorized access, middleware intercepts incoming requests.
+    - The middleware function (`middleware.ts`) updates the session expiration time for each incoming request.
+    - If a request contains a valid session cookie, the expiration time of the session is refreshed, keeping the user logged in as long as they continue to interact with the application.
+
+---
+
+**Note:** You can copy the value of the session cookie from the browser's developer console. Once you have copied the value, you can visit [jwt.io](https://jwt.io/) and paste the copied value into the "Encoded" field. This allows you to verify and inspect the JWT token:
+
+1.  **Inspect Payload:** After pasting the token, you can inspect the payload section to view the user information stored within the token. This includes details such as the user's email, name, and expiration time.
+2.  **Verify Signature:** JWT tokens are digitally signed to ensure their authenticity. You can verify the signature of the token to ensure that it has not been tampered with. This helps guarantee the integrity of the session data.
+
+By examining the payload and verifying the signature, you can gain insights into the session data stored in the JWT token and ensure its integrity and security.
+
+---
+
+### [](https://dev.to/aadarsh-nagrath/how-to-do-basic-session-auth-with-nextjs-b1i#conclusion)Conclusion
+
+In summary, the `lib.ts` file contains functions for encryption, decryption, login, logout, session retrieval, and session update. These functions work together to manage user sessions securely in the Next.js application. It demonstrates how to implement basic session authentication without relying on additional libraries, providing full control over the authentication process.
