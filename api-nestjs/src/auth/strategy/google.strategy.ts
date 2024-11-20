@@ -29,10 +29,8 @@ export class GoogleStrategy extends PassportStrategy(Strategy) {
       const { emails, name, photos } = profile;
       const email = emails[0].value;
 
-      // Tenta encontrar usuário existente
       let user = await this.usersService.UserFindUnique({ email: email });
 
-      // Se não existir, cria novo usuário
       if (!user) {
         user = await this.usersService.createUser({
           email,

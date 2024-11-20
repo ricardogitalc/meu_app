@@ -3,6 +3,8 @@ import { AppModule } from './app.module';
 import * as morgan from 'morgan';
 import { ConfigService } from '@nestjs/config';
 import { Logger } from '@nestjs/common';
+import helmet from 'helmet';
+import * as compression from 'compression';
 
 async function bootstrap() {
   const logger = new Logger('Bootstrap');
@@ -15,9 +17,10 @@ async function bootstrap() {
   });
 
   app.use(morgan('[:method :url :status :time]'));
+  app.use(helmet());
+  app.use(compression());
 
   app.enableCors({
-    origin: 'http://localhost:3000',
     credentials: true,
     methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
     allowedHeaders: ['Content-Type', 'Authorization'],
@@ -26,6 +29,6 @@ async function bootstrap() {
 
   const port = 3003;
   await app.listen(port);
-  logger.log(`🚀 Servidor está rodando: http://localhost:${port}`);
+  logger.log(`🚀 O servidor está rodando: http://localhost:${port}`);
 }
 bootstrap();

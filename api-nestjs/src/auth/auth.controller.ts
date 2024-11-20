@@ -55,8 +55,8 @@ export class AuthController {
     const { jwt_token } = this.authService.generateTokens(user);
 
     return {
-      success: true,
       message: 'Login verificado com sucesso',
+      user,
       jwt_token,
     };
   }

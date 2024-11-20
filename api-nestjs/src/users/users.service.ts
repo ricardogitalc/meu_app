@@ -18,12 +18,19 @@ export class UsersService {
   }
 
   async createUser(data: Prisma.UserCreateInput): Promise<User> {
-    const user = await this.prisma.user.findUnique({
+    const existingUser = await this.prisma.user.findUnique({
       where: { email: data.email },
     });
 
-    if (user) {
+    if (existingUser && existingUser.verified) {
       throw new UnauthorizedException(CONFIG_MESSAGES.UserAlReady);
+    }
+
+    if (existingUser && !existingUser.verified) {
+      return this.prisma.user.update({
+        where: { email: data.email },
+        data,
+      });
     }
 
     return this.prisma.user.create({

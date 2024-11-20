@@ -36,17 +36,8 @@ export class UsersController {
 
   @Post('register')
   async create(@Body() createUserDto: CreateUserDto): Promise<any> {
-    const existingUser = await this.usersService.UserFindUnique({
-      email: createUserDto.email,
-    });
-
-    if (existingUser?.verified) {
-      throw new UnauthorizedException(CONFIG_MESSAGES.UserAlReady);
-    }
-
-    const user = await this.usersService.createUser({
+    await this.usersService.createUser({
       ...createUserDto,
-      verified: false,
     });
 
     const register_token = await this.authService.generateRegisterToken(
@@ -70,24 +61,22 @@ export class UsersController {
     @Query('skip') skip?: number,
     @Query('take') take?: number,
   ): Promise<User[]> {
-    try {
-      return await this.usersService.users({
-        skip: Number(skip) || undefined,
-        take: Number(take) || undefined,
-      });
-    } catch (error) {
-      throw new UnauthorizedException(error.message);
-    }
+    return await this.usersService.users({
+      skip: Number(skip) || undefined,
+      take: Number(take) || undefined,
+    });
   }
 
   @Get(':id')
   @UseGuards(JwtGuard)
   async findOne(@Param('id', ParseIntPipe) id: number): Promise<User> {
-    try {
-      return await this.usersService.UserFindUnique({ id });
-    } catch (error) {
-      throw new UnauthorizedException(error.message);
+    const user = await this.usersService.UserFindUnique({ id });
+
+    if (!user) {
+      throw new UnauthorizedException(CONFIG_MESSAGES.UserNotFound);
     }
+
+    return user;
   }
 
   @Patch(':id')
@@ -95,24 +84,40 @@ export class UsersController {
   async update(
     @Param('id', ParseIntPipe) id: number,
     @Body() updateUserDto: UpdateUserDto,
-  ): Promise<User> {
-    try {
-      return await this.usersService.updateUser({
-        where: { id },
-        data: updateUserDto,
-      });
-    } catch (error) {
-      throw new UnauthorizedException(error.message);
+  ): Promise<{ message: string; User: User }> {
+    const user = await this.usersService.UserFindUnique({ id });
+
+    if (!user) {
+      throw new UnauthorizedException(CONFIG_MESSAGES.UserNotFound);
     }
+
+    const User = await this.usersService.updateUser({
+      where: { id },
+      data: updateUserDto,
+    });
+
+    return {
+      message: CONFIG_MESSAGES.UpdateUserSucess,
+      User: User,
+    };
   }
 
   @Delete(':id')
   @UseGuards(JwtGuard)
-  async remove(@Param('id', ParseIntPipe) id: number): Promise<User> {
-    try {
-      return await this.usersService.deleteUser({ id });
-    } catch (error) {
-      throw new UnauthorizedException(error.message);
+  async remove(
+    @Param('id', ParseIntPipe) id: number,
+  ): Promise<{ message: string; user: User }> {
+    const user = await this.usersService.UserFindUnique({ id });
+
+    if (!user) {
+      throw new UnauthorizedException(CONFIG_MESSAGES.UserNotFound);
     }
+
+    const deletedUser = await this.usersService.deleteUser({ id });
+
+    return {
+      message: CONFIG_MESSAGES.UserDeletedSucess,
+      user: deletedUser,
+    };
   }
 }
