@@ -23,7 +23,6 @@ import { AdminGuard } from './guards/admin.guard';
 import { AuthService } from 'src/auth/auth.service';
 import { ConfigService } from '@nestjs/config';
 import { JwtGuard } from 'src/auth/guards/jwt.guard';
-import { UserEntity } from './entity/users.entity';
 
 @Controller('users')
 @UseFilters(HttpExceptionsFilter)
@@ -37,11 +36,11 @@ export class UsersController {
 
   @Post('register')
   async create(@Body() createUserDto: CreateUserDto): Promise<any> {
-    const userVerified = await this.usersService.UserFindUnique({
+    const existingUser = await this.usersService.UserFindUnique({
       email: createUserDto.email,
     });
 
-    if (userVerified.verified === true) {
+    if (existingUser?.verified) {
       throw new UnauthorizedException(CONFIG_MESSAGES.UserAlReady);
     }
 

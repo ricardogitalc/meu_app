@@ -5,17 +5,18 @@ import { PrismaService } from './prisma/prisma.service';
 import { UsersModule } from './users/users.module';
 import { ValidationPipe } from '@nestjs/common';
 import { APP_PIPE } from '@nestjs/core';
+import { AppController } from './app.controller';
 
 @Module({
   imports: [
     ConfigModule.forRoot({
-      isGlobal: true, // Torna o módulo acessível globalmente
+      isGlobal: true,
     }),
     UsersModule,
     AuthModule,
     UsersModule,
   ],
-  controllers: [],
+  controllers: [AppController],
   providers: [
     PrismaService,
     {
