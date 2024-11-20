@@ -15,7 +15,7 @@ import { AuthLinks } from "./auth-links";
 import { GoogleButton } from "./google-button";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { registerSchema, type RegisterFormOutput } from "@/schemas/auth";
+import { registerSchema, type RegisterFormOutput } from "@/auth/zod/schema";
 import type { z } from "zod";
 
 type RegisterFormData = z.infer<typeof registerSchema>;

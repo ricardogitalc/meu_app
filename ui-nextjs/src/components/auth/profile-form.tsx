@@ -13,7 +13,7 @@ import {
 } from "@/components/ui/card";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { profileSchema } from "@/schemas/auth";
+import { profileSchema } from "@/auth/zod/schema";
 import type { z } from "zod";
 
 type ProfileFormData = z.infer<typeof profileSchema>;

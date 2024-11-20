@@ -1,11 +1,11 @@
-import { User } from "next-auth";
 import {
   LoginRequest,
   LoginResponse,
   RegisterRequest,
   RegisterResponse,
+  User,
   VerifyLoginResponse,
-} from "./interfaces/interfaces";
+} from "../interfaces/interfaces";
 
 const API_BASE_URL = process.env.BACKEND_URL;
 

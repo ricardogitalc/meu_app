@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
-import { updateSession } from "./lib/lib";
-import { isAuthRoute, isProtectedRoute } from "./routes/routes";
+import { updateSession } from "./auth/session";
+import { isAuthRoute, isProtectedRoute } from "./auth/routes/routes";
 
 export async function middleware(request: NextRequest) {
   const session = await updateSession(request);
