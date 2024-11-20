@@ -1,0 +1,95 @@
+# Documentação das Rotas da API
+
+## Autenticação (/auth)
+
+### Login
+- POST /auth/login
+  - Body: { email: string }
+  - Retorno: { login_token: string, verify_url: string }
+
+- POST /auth/verify-login
+  - Body: { login_token: string }
+  - Retorno: { jwt_token: string }
+
+### Google OAuth
+- GET /auth/google
+  - Inicia fluxo de autenticação Google
+
+- GET /auth/google/callback
+  - Callback do Google OAuth
+  - Retorno: { jwt_token: string }
+
+## Usuários (/users)
+
+### Registro
+- POST /users/register
+  - Body: { 
+      email: string,
+      firstName: string, 
+      lastName: string,
+      whatsappNumber?: string 
+    }
+  - Retorno: { 
+      message: string,
+      register_token: string,
+      verify_url: string 
+    }
+- POST /auth/verify-register
+  - Body: { register_token: string }
+  - Retorno: { jwt_token: string }
+
+### Listar Usuários (Admin)
+- GET /users/all
+  - Query: 
+    - skip?: number
+    - take?: number
+  - Headers: Authorization: Bearer {jwt_token}
+  - Retorno: Users[]
+
+### Buscar Usuário
+- GET /users/:id
+  - Params: id: number
+  - Headers: Authorization: Bearer {jwt_token}
+  - Retorno: User
+
+### Atualizar Usuário
+- PATCH /users/:id
+  - Params: id: number 
+  - Body: {
+      firstName?: string,
+      lastName?: string,
+      whatsappNumber?: string,
+      imageUrl?: string
+    }
+  - Headers: Authorization: Bearer {jwt_token}
+  - Retorno: { message: string, User }
+
+## Status (/status)
+- GET /
+  - Retorno: string (status do servidor)
+
+## Proteção de Rotas
+
+- Guard JWT aplicado nas rotas:
+  - GET /users/:id
+  - PATCH /users/:id
+
+- Guard Admin aplicado nas rotas:
+  - GET /users/all
+
+## Modelos
+
+### User
+```prisma
+model User {
+  role           Role     @default(USER)
+  id             Int      @id @default(autoincrement())
+  email          String   @unique
+  firstName      String
+  lastName       String
+  whatsappNumber String?
+  imageUrl       String?
+  verified       Boolean  @default(false)
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+}

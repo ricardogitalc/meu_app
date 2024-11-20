@@ -14,16 +14,18 @@ export default function LoginPage() {
   const error = searchParams.get("error");
 
   return (
-    <div className="flex flex-col justify-center items-center gap-10">
-      {error && (
-        <div>
-          <div className="bg-red-50 border-red-200 text-red-600 dark:bg-red-500/10 dark:border-red-200/20 dark:text-red-400 border rounded-lg p-4 text-sm">
-            {errorMessages[error as keyof typeof errorMessages] ||
-              "Ocorreu um erro durante o login."}
+    <>
+      <div className="flex flex-col justify-center items-center gap-10">
+        {error && (
+          <div>
+            <div className="bg-red-50 border-red-200 text-red-600 dark:bg-red-500/10 dark:border-red-200/20 dark:text-red-400 border rounded-lg p-4 text-sm">
+              {errorMessages[error as keyof typeof errorMessages] ||
+                "Ocorreu um erro durante o login."}
+            </div>
           </div>
-        </div>
-      )}
+        )}
+      </div>
       <LoginForm />
-    </div>
+    </>
   );
 }

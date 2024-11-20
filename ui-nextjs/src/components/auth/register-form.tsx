@@ -15,7 +15,7 @@ import {
 } from "@/components/ui/card";
 import { Alert, AlertDescription } from "../ui/alert";
 import { AuthLinks } from "./auth-links";
-import { GoogleAuthButton } from "./google-button";
+import { GoogleButton } from "./google-button";
 
 export function RegisterForm() {
   return (
@@ -115,22 +115,12 @@ export function RegisterForm() {
               }
             />
           </div>
-          <Alert variant="destructive">
-            <AlertDescription>erro</AlertDescription>
-          </Alert>
-          <Alert variant="default">
-            <AlertDescription>sucesso</AlertDescription>
-          </Alert>
         </CardContent>
         <CardFooter className="flex flex-col gap-4">
           <Button className="w-full" type="submit">
-            <>
-              <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-              Criando conta...
-            </>
-            "Criar conta"
+            Criar conta
           </Button>
-          <GoogleAuthButton />
+          <GoogleButton />
           <AuthLinks type="register" />
         </CardFooter>
       </form>

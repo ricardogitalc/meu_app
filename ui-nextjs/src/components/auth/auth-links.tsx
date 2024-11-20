@@ -5,16 +5,16 @@ export function AuthLinks({ type }: { type: "login" | "register" }) {
   return (
     <div className="text-center">
       {type === "login" ? (
-        <p className="text-sm text-muted-foreground">
+        <p className="text-sm text-muted-foreground/80">
           Não tem uma conta?{" "}
-          <Button variant="link" asChild className="p-0">
+          <Button variant="link" asChild className="p-1">
             <Link href="/register">Criar conta</Link>
           </Button>
         </p>
       ) : (
-        <p className="text-sm text-muted-foreground">
+        <p className="text-sm text-muted-foreground/80">
           Já tem uma conta?{" "}
-          <Button variant="link" asChild className="p-0">
+          <Button variant="link" asChild className="p-1">
             <Link href="/login">Entrar</Link>
           </Button>
         </p>

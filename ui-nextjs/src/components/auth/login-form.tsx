@@ -1,6 +1,5 @@
 "use client";
 
-import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -12,10 +11,8 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
-import { Alert, AlertDescription } from "../ui/alert";
-import { Loader2 } from "lucide-react";
 import { GoogleButton } from "./google-button";
-import { Separator } from "../ui/separator";
+import { AuthLinks } from "./auth-links";
 
 export function LoginForm() {
   return (
@@ -51,8 +48,8 @@ export function LoginForm() {
           <Button className="w-full" type="submit">
             Fazer login
           </Button>
-          <Separator className="my-2" />
           <GoogleButton />
+          <AuthLinks type="login" />
         </CardFooter>
       </form>
     </Card>
