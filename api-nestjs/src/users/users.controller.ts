@@ -84,7 +84,7 @@ export class UsersController {
   async update(
     @Param('id', ParseIntPipe) id: number,
     @Body() updateUserDto: UpdateUserDto,
-  ): Promise<{ message: string; User: User }> {
+  ): Promise<{ message: string; user: User }> {
     const user = await this.usersService.UserFindUnique({ id });
 
     if (!user) {
@@ -98,7 +98,7 @@ export class UsersController {
 
     return {
       message: CONFIG_MESSAGES.UpdateUserSucess,
-      User: User,
+      user: User,
     };
   }
 

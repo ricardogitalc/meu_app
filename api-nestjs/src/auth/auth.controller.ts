@@ -8,6 +8,7 @@ import {
   UseGuards,
   UseFilters,
   UnauthorizedException,
+  Headers,
 } from '@nestjs/common';
 import { AuthService } from './auth.service';
 import { AuthGuard } from '@nestjs/passport';
@@ -46,12 +47,12 @@ export class AuthController {
     return { message: 'Link de acesso enviado.', tokens: tokens };
   }
 
-  @Post('verify-login')
+  @Get('verify-login')
   async verifyMagicLink(
-    @Body() body: { login_token: string },
+    @Headers('login-token') loginToken: string,
     @Res({ passthrough: true }) response: Response,
   ) {
-    const user = await this.authService.verifyMagicLinkToken(body.login_token);
+    const user = await this.authService.verifyMagicLinkToken(loginToken);
     const { jwt_token } = this.authService.generateTokens(user);
     const refresh_token = this.authService.generateRefreshToken(user);
 
@@ -63,11 +64,9 @@ export class AuthController {
     };
   }
 
-  @Post('verify-register')
-  async verifyRegister(@Body() body: { register_token: string }) {
-    const userData = await this.authService.verifyRegisterToken(
-      body.register_token,
-    );
+  @Get('verify-register')
+  async verifyRegister(@Headers('register-token') registerToken: string) {
+    const userData = await this.authService.verifyRegisterToken(registerToken);
 
     const user = await this.usersService.updateUser({
       where: { email: userData.email },
@@ -75,11 +74,13 @@ export class AuthController {
     });
 
     const { jwt_token } = this.authService.generateTokens(user);
+    const refresh_token = this.authService.generateRefreshToken(user);
 
     return {
       message: CONFIG_MESSAGES.UserCreatedVerified,
       user: user,
       jwt_token: jwt_token,
+      refresh_token: refresh_token,
     };
   }
 
@@ -90,7 +91,14 @@ export class AuthController {
   @Get('google/callback')
   @UseGuards(AuthGuard('google'))
   async googleAuthCallback(@Req() req) {
-    return this.authService.generateTokens(req.user);
+    const { jwt_token } = this.authService.generateTokens(req.user);
+    const refresh_token = this.authService.generateRefreshToken(req.user);
+    return {
+      message: 'Login com google efeutado com sucesso',
+      user: req.user,
+      jwt_token,
+      refresh_token,
+    };
   }
 
   @Get('me')
@@ -99,14 +107,14 @@ export class AuthController {
     return req.user;
   }
 
-  @Post('refresh-token')
+  @Get('refresh-token')
   async refreshToken(
-    @Body() body: { refresh_token: string },
+    @Headers('refresh-token') refreshToken: string,
     @Res({ passthrough: true }) response: Response,
   ) {
     try {
       const { user, jwt_token } = await this.authService.refreshToken(
-        body.refresh_token,
+        refreshToken,
       );
       return {
         message: 'Token atualizado com sucesso',
