@@ -5,7 +5,6 @@ import { isAuthRoute, isProtectedRoute } from "./auth/routes/routes";
 export async function middleware(request: NextRequest) {
   const session = await updateSession(request);
   const path = request.nextUrl.pathname;
-  console.log("path:", path);
 
   // Usuário autenticado tentando acessar rotas de auth
   if (session && isAuthRoute(path)) {

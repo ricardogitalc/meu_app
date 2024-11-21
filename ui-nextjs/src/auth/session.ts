@@ -1,3 +1,4 @@
+import { console } from "inspector";
 import { SignJWT, jwtVerify } from "jose";
 import { cookies } from "next/headers";
 import { NextRequest, NextResponse } from "next/server";
@@ -53,7 +54,7 @@ export async function getSession() {
 }
 
 export async function updateSession(request: NextRequest) {
-  const session = request.cookies.get("session")?.value; // Recupera o valor do cookie de sessão da requisição
+  const session = request.cookies.get("session")?.value;
   if (!session) return; // Se a sessão não for encontrada, retorna
 
   // Atualiza o tempo de expiração da sessão

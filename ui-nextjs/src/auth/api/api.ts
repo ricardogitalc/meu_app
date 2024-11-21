@@ -1,3 +1,5 @@
+"use server";
+
 import {
   LoginRequest,
   LoginResponse,
@@ -7,7 +9,8 @@ import {
   VerifyLoginResponse,
 } from "../interfaces/interfaces";
 
-const API_BASE_URL = process.env.BACKEND_URL;
+const API_BASE_URL =
+  process.env.NEXT_PUBLIC_BACKEND_URL || "http://localhost:3003";
 
 // Funções de Autenticação
 export const login = async (data: LoginRequest): Promise<LoginResponse> => {
@@ -16,7 +19,12 @@ export const login = async (data: LoginRequest): Promise<LoginResponse> => {
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify(data),
   });
-  if (!response.ok) throw new Error("Falha no login");
+
+  if (!response.ok) {
+    const errorData = await response.json();
+    throw new Error(errorData.message);
+  }
+
   return response.json();
 };
 
@@ -28,8 +36,9 @@ export const verifyLogin = async (
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify({ login_token: loginToken }),
   });
-  if (!response.ok) throw new Error("Falha na verificação do login");
-  return response.json();
+  const responseData = await response.json();
+  if (!response.ok) throw new Error(responseData.message);
+  return responseData;
 };
 
 // Funções de Usuário
@@ -41,8 +50,9 @@ export const registerUser = async (
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify(data),
   });
-  if (!response.ok) throw new Error("Falha no registro");
-  return response.json();
+  const responseData = await response.json();
+  if (!response.ok) throw new Error(responseData.message);
+  return responseData;
 };
 
 export const verifyRegister = async (
@@ -53,8 +63,9 @@ export const verifyRegister = async (
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify({ register_token: registerToken }),
   });
-  if (!response.ok) throw new Error("Falha na verificação do registro");
-  return response.json();
+  const responseData = await response.json();
+  if (!response.ok) throw new Error(responseData.message);
+  return responseData;
 };
 
 export const getAllUsers = async (
@@ -69,16 +80,18 @@ export const getAllUsers = async (
   const response = await fetch(`${API_BASE_URL}/users/all?${params}`, {
     headers: { Authorization: `Bearer ${token}` },
   });
-  if (!response.ok) throw new Error("Falha ao buscar usuários");
-  return response.json();
+  const responseData = await response.json();
+  if (!response.ok) throw new Error(responseData.message);
+  return responseData;
 };
 
 export const getUser = async (token: string, id: number): Promise<User> => {
   const response = await fetch(`${API_BASE_URL}/users/${id}`, {
     headers: { Authorization: `Bearer ${token}` },
   });
-  if (!response.ok) throw new Error("Falha ao buscar usuário");
-  return response.json();
+  const responseData = await response.json();
+  if (!response.ok) throw new Error(responseData.message);
+  return responseData;
 };
 
 export const updateUser = async (
@@ -94,13 +107,15 @@ export const updateUser = async (
     },
     body: JSON.stringify(data),
   });
-  if (!response.ok) throw new Error("Falha ao atualizar usuário");
-  return response.json();
+  const responseData = await response.json();
+  if (!response.ok) throw new Error(responseData.message);
+  return responseData;
 };
 
 // Status do servidor
 export const getServerStatus = async (): Promise<string> => {
   const response = await fetch(`${API_BASE_URL}/`);
-  if (!response.ok) throw new Error("Falha ao verificar status do servidor");
-  return response.text();
+  const responseData = await response.json();
+  if (!response.ok) throw new Error(responseData.message);
+  return responseData;
 };

@@ -43,7 +43,7 @@ export class AuthController {
     const tokens = await this.authService.generateMagicLinkToken(
       body.destination,
     );
-    return { tokens: tokens };
+    return { message: 'Link de acesso enviado.', tokens: tokens };
   }
 
   @Post('verify-login')

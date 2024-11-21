@@ -1,10 +1,11 @@
 interface LoginRequest {
-  email: string;
+  destination: string;
 }
 
 interface LoginResponse {
   login_token: string;
   verify_url: string;
+  message: string;
 }
 
 interface VerifyLoginResponse {

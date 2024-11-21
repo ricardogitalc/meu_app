@@ -17,6 +17,9 @@ import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { registerSchema, type RegisterFormOutput } from "@/auth/zod/schema";
 import type { z } from "zod";
+import { AlertMessage } from "@/components/ui/alert-message";
+import { registerUser } from "@/auth/api/api";
+import { useState } from "react";
 
 type RegisterFormData = z.infer<typeof registerSchema>;
 
@@ -29,15 +32,32 @@ export function RegisterForm() {
     resolver: zodResolver(registerSchema),
   });
 
-  const onSubmit = (data: RegisterFormData) => {
-    // Removendo confirmEmail dos dados antes de enviar
-    const outputData: RegisterFormOutput = {
-      email: data.email,
-      firstName: data.firstName,
-      lastName: data.lastName,
-      whatsappNumber: data.whatsappNumber,
-    };
-    console.log("Dados do registro:", outputData);
+  const [isLoading, setIsLoading] = useState(false);
+  const [apiResponse, setApiResponse] = useState<{
+    message: string;
+    type: "success" | "error";
+  } | null>(null);
+
+  const onSubmit = async (data: RegisterFormData) => {
+    try {
+      setIsLoading(true);
+      setApiResponse(null);
+      const outputData: RegisterFormOutput = {
+        email: data.email,
+        firstName: data.firstName,
+        lastName: data.lastName,
+        whatsappNumber: data.whatsappNumber,
+      };
+      const response = await registerUser(outputData);
+      setApiResponse({ message: response.message, type: "success" });
+    } catch (error: any) {
+      setApiResponse({
+        message: error.message,
+        type: "error",
+      });
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   return (
@@ -53,9 +73,11 @@ export function RegisterForm() {
               <Label htmlFor="firstName">Nome</Label>
               <Input {...register("firstName")} placeholder="Digite seu nome" />
               {errors.firstName && (
-                <span className="text-sm text-red-500">
-                  {errors.firstName.message}
-                </span>
+                <AlertMessage
+                  type="error"
+                  message={errors.firstName.message}
+                  variant="subtle"
+                />
               )}
             </div>
             <div className="space-y-2 flex-1">
@@ -65,9 +87,11 @@ export function RegisterForm() {
                 placeholder="Digite seu sobrenome"
               />
               {errors.lastName && (
-                <span className="text-sm text-red-500">
-                  {errors.lastName.message}
-                </span>
+                <AlertMessage
+                  type="error"
+                  message={errors.lastName.message}
+                  variant="subtle"
+                />
               )}
             </div>
           </div>
@@ -79,9 +103,11 @@ export function RegisterForm() {
               placeholder="Digite seu email"
             />
             {errors.email && (
-              <span className="text-sm text-red-500">
-                {errors.email.message}
-              </span>
+              <AlertMessage
+                type="error"
+                message={errors.email.message}
+                variant="subtle"
+              />
             )}
           </div>
           <div className="space-y-2">
@@ -92,9 +118,11 @@ export function RegisterForm() {
               placeholder="Confirme seu email"
             />
             {errors.confirmEmail && (
-              <span className="text-sm text-red-500">
-                {errors.confirmEmail.message}
-              </span>
+              <AlertMessage
+                type="error"
+                message={errors.confirmEmail.message}
+                variant="subtle"
+              />
             )}
           </div>
           <div className="space-y-2">
@@ -106,15 +134,24 @@ export function RegisterForm() {
               maxLength={11}
             />
             {errors.whatsappNumber && (
-              <span className="text-sm text-red-500">
-                {errors.whatsappNumber.message}
-              </span>
+              <AlertMessage
+                type="error"
+                message={errors.whatsappNumber.message}
+                variant="subtle"
+              />
             )}
           </div>
+          {apiResponse && (
+            <AlertMessage
+              type={apiResponse.type}
+              message={apiResponse.message}
+              variant="default"
+            />
+          )}
         </CardContent>
         <CardFooter className="flex flex-col gap-4">
-          <Button className="w-full" type="submit">
-            Criar conta
+          <Button className="w-full" type="submit" disabled={isLoading}>
+            {isLoading ? "Criando conta..." : "Criar conta"}
           </Button>
           <GoogleButton />
           <AuthLinks type="register" />

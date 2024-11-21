@@ -1,5 +1,3 @@
-"use client";
-
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -17,6 +15,9 @@ import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { loginSchema } from "@/auth/zod/schema";
 import type { z } from "zod";
+import { login } from "@/auth/api/api";
+import { useState } from "react";
+import { AlertMessage } from "@/components/ui/alert-message";
 
 type LoginFormData = z.infer<typeof loginSchema>;
 
@@ -28,9 +29,26 @@ export function LoginForm() {
   } = useForm<LoginFormData>({
     resolver: zodResolver(loginSchema),
   });
+  const [isLoading, setIsLoading] = useState(false);
+  const [apiResponse, setApiResponse] = useState<{
+    message: string;
+    type: "success" | "error";
+  } | null>(null);
 
-  const onSubmit = (data: LoginFormData) => {
-    console.log("Dados do login:", data);
+  const onSubmit = async (data: LoginFormData) => {
+    try {
+      setIsLoading(true);
+      setApiResponse(null);
+      const response = await login({ destination: data.destination });
+      setApiResponse({ message: response.message, type: "success" });
+    } catch (error: any) {
+      setApiResponse({
+        message: error.message,
+        type: "error",
+      });
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   return (
@@ -51,15 +69,24 @@ export function LoginForm() {
               placeholder="seu@email.com"
             />
             {errors.destination && (
-              <span className="text-sm text-red-500">
-                {errors.destination.message}
-              </span>
+              <AlertMessage
+                type="error"
+                message={errors.destination.message}
+                variant="subtle"
+              />
             )}
           </div>
+          {apiResponse && (
+            <AlertMessage
+              type={apiResponse.type}
+              message={apiResponse.message}
+              variant="default"
+            />
+          )}
         </CardContent>
         <CardFooter className="flex flex-col gap-4">
-          <Button className="w-full" type="submit">
-            Fazer login
+          <Button className="w-full" type="submit" disabled={isLoading}>
+            {isLoading ? "Enviando..." : "Fazer login"}
           </Button>
           <GoogleButton />
           <AuthLinks type="login" />
