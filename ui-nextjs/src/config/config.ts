@@ -1,4 +1,7 @@
-export const COOKIE_EXPIRATION_TIME = 60; // 60 SEGUNDOS
+export const AUTH_TIMES = {
+  authToken: 6 * 1000,
+  refreshToken: 60 * 1000,
+};
 
 export const AUHT_MENSSAGES = {
   invalidEmail: "Por favor, insira um email válido",

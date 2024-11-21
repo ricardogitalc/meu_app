@@ -1,6 +1,7 @@
 export const CONFIG_TIMES = {
   JWT_TOKEN: '5m',
-  LOGIN_TOKEN: '1m',
+  LOGIN_TOKEN: '5m',
+  REFRESH_TOKEN: '1d',
 };
 
 export const CONFIG_MESSAGES = {
@@ -19,4 +20,5 @@ export const CONFIG_MESSAGES = {
     'Usuário criado. Verifique seu email para ativar a conta.',
   TooManyRequests:
     'Muitas tentativas realizadas. Aguarde um momento e tente novamente.',
+  RefreshTokenExpired: 'O refresh token expirou. Faça login novamente.',
 };

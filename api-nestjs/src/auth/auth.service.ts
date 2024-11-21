@@ -82,4 +82,37 @@ export class AuthService {
       expiresIn: CONFIG_TIMES.LOGIN_TOKEN,
     });
   }
+
+  async refreshToken(refreshToken: string) {
+    try {
+      // Verifica se o refresh token é válido
+      const payload = this.jwtService.verify(refreshToken, {
+        secret: this.configService.get<string>('REFRESH_TOKEN_SECRET'),
+      });
+
+      // Busca o usuário
+      const user = await this.validateUser(payload.email);
+      if (!user) {
+        throw new UnauthorizedException(CONFIG_MESSAGES.UserNotFound);
+      }
+
+      // Gera novo token JWT
+      const jwt_token = this.generateTokens(user);
+
+      return { user, ...jwt_token };
+    } catch (error) {
+      throw new UnauthorizedException(CONFIG_MESSAGES.JwtTokenExpired);
+    }
+  }
+
+  generateRefreshToken(user: UserEntity) {
+    const payload = {
+      email: user.email,
+    };
+
+    return this.jwtService.sign(payload, {
+      secret: this.configService.get<string>('REFRESH_TOKEN_SECRET'),
+      expiresIn: CONFIG_TIMES.REFRESH_TOKEN,
+    });
+  }
 }

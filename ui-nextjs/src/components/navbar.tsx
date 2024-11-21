@@ -32,6 +32,11 @@ export default async function Navbar() {
             </Link>
           </div>
           <div className="flex items-center space-x-2 sm:space-x-4">
+            <Link href="/session">
+              <Button variant={"outline"}>
+                <p>session</p>
+              </Button>
+            </Link>
             <ModeToggle />
             <Link href="/planos">
               <Button>

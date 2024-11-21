@@ -53,11 +53,13 @@ export class AuthController {
   ) {
     const user = await this.authService.verifyMagicLinkToken(body.login_token);
     const { jwt_token } = this.authService.generateTokens(user);
+    const refresh_token = this.authService.generateRefreshToken(user);
 
     return {
       message: 'Login verificado com sucesso',
       user,
       jwt_token,
+      refresh_token,
     };
   }
 
@@ -95,5 +97,24 @@ export class AuthController {
   @UseGuards(JwtGuard)
   async verifyToken(@Req() req) {
     return req.user;
+  }
+
+  @Post('refresh-token')
+  async refreshToken(
+    @Body() body: { refresh_token: string },
+    @Res({ passthrough: true }) response: Response,
+  ) {
+    try {
+      const { user, jwt_token } = await this.authService.refreshToken(
+        body.refresh_token,
+      );
+      return {
+        message: 'Token atualizado com sucesso',
+        user,
+        jwt_token,
+      };
+    } catch (error) {
+      throw new UnauthorizedException(CONFIG_MESSAGES.JwtTokenExpired);
+    }
   }
 }
