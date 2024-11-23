@@ -1,8 +1,6 @@
 export const AUTH_TIMES = {
-  access_token_duration: "1m",
-  access_token_ms: 60 * 1000, // 1 minuto em milissegundos
-  refresh_token_duration: "5m",
-  refresh_token_ms: 5 * 60 * 1000, // 5 minutos em milissegundos (corrigido)
+  access_token_duration: 10, // duração em segundos
+  refresh_token_duration: 120, // duração em segundos
 } as const;
 
 export const AUHT_MENSSAGES = {
