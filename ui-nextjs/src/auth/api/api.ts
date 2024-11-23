@@ -1,120 +1,120 @@
 "use server";
 
 import {
-  LoginRequest,
+  AuthResponse,
   LoginResponse,
-  RegisterRequest,
   RegisterResponse,
   User,
-  VerifyLoginResponse,
 } from "../interfaces/interfaces";
 
 const API_BASE_URL = process.env.BACKEND_URL || "http://localhost:3003";
 
 // Funções de Autenticação
-export const login = async (data: LoginRequest): Promise<LoginResponse> => {
+export async function sendMagicLink(
+  destination: string
+): Promise<LoginResponse & { status: number }> {
   const response = await fetch(`${API_BASE_URL}/auth/login`, {
     method: "POST",
     headers: { "Content-Type": "application/json" },
-    body: JSON.stringify(data),
+    body: JSON.stringify({ destination }),
   });
 
-  if (!response.ok) {
-    const errorData = await response.json();
-    throw new Error(errorData.message);
-  }
+  const data = await response.json();
+  return { ...data, status: response.status };
+}
 
-  return response.json();
-};
-
-export const verifyLogin = async (
-  loginToken: string
-): Promise<VerifyLoginResponse> => {
+export async function verifyLogin(loginToken: string): Promise<AuthResponse> {
   const response = await fetch(`${API_BASE_URL}/auth/verify-login`, {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({ login_token: loginToken }),
+    headers: { "login-token": loginToken },
   });
-  const responseData = await response.json();
-  if (!response.ok) throw new Error(responseData.message);
-  return responseData;
-};
+  return response.json();
+}
+
+export async function verifyRegister(
+  registerToken: string
+): Promise<AuthResponse> {
+  const response = await fetch(`${API_BASE_URL}/auth/verify-register`, {
+    headers: { "register-token": registerToken },
+  });
+  return response.json();
+}
+
+export async function refreshToken(
+  refreshToken: string
+): Promise<AuthResponse> {
+  const response = await fetch(`${API_BASE_URL}/auth/refresh-token`, {
+    headers: { "refresh-token": refreshToken },
+  });
+  return response.json();
+}
 
 // Funções de Usuário
-export const registerUser = async (
-  data: RegisterRequest
-): Promise<RegisterResponse> => {
+export async function registerUser(userData: {
+  email: string;
+  firstName: string;
+  lastName: string;
+  whatsappNumber?: string;
+}): Promise<RegisterResponse & { status: number }> {
   const response = await fetch(`${API_BASE_URL}/users/register`, {
     method: "POST",
     headers: { "Content-Type": "application/json" },
-    body: JSON.stringify(data),
+    body: JSON.stringify(userData),
   });
-  const responseData = await response.json();
-  if (!response.ok) throw new Error(responseData.message);
-  return responseData;
-};
 
-export const verifyRegister = async (
-  registerToken: string
-): Promise<VerifyLoginResponse> => {
-  const response = await fetch(`${API_BASE_URL}/auth/verify-register`, {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({ register_token: registerToken }),
+  const data = await response.json();
+  return { ...data, status: response.status };
+}
+
+export async function listUsers(params: {
+  skip?: number;
+  take?: number;
+  jwt_token: string;
+}): Promise<User[]> {
+  const queryParams = new URLSearchParams();
+  if (params.skip) queryParams.append("skip", params.skip.toString());
+  if (params.take) queryParams.append("take", params.take.toString());
+
+  const response = await fetch(`${API_BASE_URL}/users/all?${queryParams}`, {
+    headers: { Authorization: `Bearer ${params.jwt_token}` },
   });
-  const responseData = await response.json();
-  if (!response.ok) throw new Error(responseData.message);
-  return responseData;
-};
+  return response.json();
+}
 
-export const getAllUsers = async (
-  token: string,
-  skip?: number,
-  take?: number
-): Promise<User[]> => {
-  const params = new URLSearchParams();
-  if (skip !== undefined) params.append("skip", skip.toString());
-  if (take !== undefined) params.append("take", take.toString());
-
-  const response = await fetch(`${API_BASE_URL}/users/all?${params}`, {
-    headers: { Authorization: `Bearer ${token}` },
-  });
-  const responseData = await response.json();
-  if (!response.ok) throw new Error(responseData.message);
-  return responseData;
-};
-
-export const getUser = async (token: string, id: number): Promise<User> => {
+export async function getUser(id: number, jwt_token: string): Promise<User> {
   const response = await fetch(`${API_BASE_URL}/users/${id}`, {
-    headers: { Authorization: `Bearer ${token}` },
+    headers: { Authorization: `Bearer ${jwt_token}` },
   });
-  const responseData = await response.json();
-  if (!response.ok) throw new Error(responseData.message);
-  return responseData;
-};
+  return response.json();
+}
 
-export const updateUser = async (
-  token: string,
+export async function updateUser(
   id: number,
-  data: Partial<User>
-): Promise<{ message: string; user: User }> => {
+  jwt_token: string,
+  userData: {
+    firstName?: string;
+    lastName?: string;
+    whatsappNumber?: string;
+    imageUrl?: string;
+  }
+): Promise<AuthResponse> {
   const response = await fetch(`${API_BASE_URL}/users/${id}`, {
     method: "PATCH",
     headers: {
       "Content-Type": "application/json",
-      Authorization: `Bearer ${token}`,
+      Authorization: `Bearer ${jwt_token}`,
     },
-    body: JSON.stringify(data),
+    body: JSON.stringify(userData),
   });
-  const responseData = await response.json();
-  if (!response.ok) throw new Error(responseData.message);
-  return responseData;
-};
+  return response.json();
+}
 
-// Status do servidor
-export const getServerStatus = async (): Promise<string> => {
-  const response = await fetch(`${API_BASE_URL}/`);
-  const responseData = await response.json();
-  if (!response.ok) throw new Error(responseData.message);
-  return responseData;
-};
+export async function deleteUser(
+  id: number,
+  jwt_token: string
+): Promise<AuthResponse> {
+  const response = await fetch(`${API_BASE_URL}/users/${id}`, {
+    method: "DELETE",
+    headers: { Authorization: `Bearer ${jwt_token}` },
+  });
+  return response.json();
+}

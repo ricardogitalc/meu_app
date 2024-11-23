@@ -13,15 +13,18 @@ import { GoogleButton } from "./google-button";
 import { AuthLinks } from "./auth-links";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { loginSchema } from "@/auth/zod/schema";
+import { loginSchema } from "@/auth/schema/schema";
 import type { z } from "zod";
-import { login } from "@/auth/api/api";
 import { useState } from "react";
-import { AlertMessage } from "@/components/ui/alert-message";
+import { useToast } from "@/hooks/use-toast";
+import { sendMagicLink } from "@/auth/api/api";
+import { AlertMessage } from "../ui/alert-message";
+import { Loader2 } from "lucide-react";
 
 type LoginFormData = z.infer<typeof loginSchema>;
 
 export function LoginForm() {
+  const { toast } = useToast();
   const {
     register,
     handleSubmit,
@@ -30,21 +33,34 @@ export function LoginForm() {
     resolver: zodResolver(loginSchema),
   });
   const [isLoading, setIsLoading] = useState(false);
-  const [apiResponse, setApiResponse] = useState<{
-    message: string;
-    type: "success" | "error";
-  } | null>(null);
 
   const onSubmit = async (data: LoginFormData) => {
     try {
       setIsLoading(true);
-      setApiResponse(null);
-      const response = await login({ destination: data.destination });
-      setApiResponse({ message: response.message, type: "success" });
+      const response = await sendMagicLink(data.destination);
+
+      // Adiciona delay de 2 segundos
+      await new Promise((resolve) => setTimeout(resolve, 2000));
+
+      if (response.status === 401) {
+        toast({
+          title: "Erro",
+          description: response.message,
+          variant: "destructive",
+        });
+        return;
+      }
+
+      toast({
+        title: "Sucesso!",
+        description: response.message,
+        variant: "success",
+      });
     } catch (error: any) {
-      setApiResponse({
-        message: error.message,
-        type: "error",
+      toast({
+        title: "Erro",
+        description: error.message || "Erro ao enviar link de acesso",
+        variant: "destructive",
       });
     } finally {
       setIsLoading(false);
@@ -76,17 +92,17 @@ export function LoginForm() {
               />
             )}
           </div>
-          {apiResponse && (
-            <AlertMessage
-              type={apiResponse.type}
-              message={apiResponse.message}
-              variant="default"
-            />
-          )}
         </CardContent>
         <CardFooter className="flex flex-col gap-4">
           <Button className="w-full" type="submit" disabled={isLoading}>
-            {isLoading ? "Enviando..." : "Fazer login"}
+            {isLoading ? (
+              <>
+                <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                Enviando...
+              </>
+            ) : (
+              "Fazer login"
+            )}
           </Button>
           <GoogleButton />
           <AuthLinks type="login" />

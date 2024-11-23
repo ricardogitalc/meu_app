@@ -4,8 +4,8 @@ import { cookies } from "next/headers";
 import { NextRequest, NextResponse } from "next/server";
 
 // Chaves secretas
-const secretKey = "secret";
-const refreshKey = "refresh-secret";
+const secretKey = process.env.JWT_SECRET_KEY;
+const refreshKey = process.env.REFRESH_SECRET_KEY;
 const key = new TextEncoder().encode(secretKey);
 const refreshTokenKey = new TextEncoder().encode(refreshKey);
 
