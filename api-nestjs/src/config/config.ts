@@ -1,7 +1,7 @@
-export const CONFIG_TIMES = {
-  JWT_TOKEN: '5m',
-  LOGIN_TOKEN: '5m',
-  REFRESH_TOKEN: '1d',
+export const AUTH_TIMES = {
+  JWT_TOKEN: '30s',
+  LOGIN_TOKEN: '3m',
+  REFRESH_TOKEN: '10m',
 } as const;
 
 export const CONFIG_MESSAGES = {

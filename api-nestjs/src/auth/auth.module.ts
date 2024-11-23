@@ -8,7 +8,7 @@ import { JwtModule } from '@nestjs/jwt';
 import { JwtStrategy } from './strategy/jwt.strategy';
 import { GoogleStrategy } from './strategy/google.strategy';
 import { MagicLoginStrategy } from './strategy/magic-login.strategy';
-import { CONFIG_TIMES } from 'src/config/config';
+import { AUTH_TIMES } from 'src/config/config';
 
 @Module({
   imports: [
@@ -19,7 +19,7 @@ import { CONFIG_TIMES } from 'src/config/config';
       useFactory: async (configService: ConfigService) => ({
         secret: configService.get<string>('JWT_SECRET_KEY'),
         signOptions: {
-          expiresIn: CONFIG_TIMES.JWT_TOKEN,
+          expiresIn: AUTH_TIMES.JWT_TOKEN,
           algorithm: 'HS256',
           encoding: 'UTF8',
         },

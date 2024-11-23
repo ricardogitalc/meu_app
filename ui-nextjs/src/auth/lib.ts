@@ -1,73 +1,61 @@
-import { AUTH_TIMES } from "@/config/config";
-import { SignJWT, jwtVerify } from "jose";
+import { jwtVerify } from "jose";
 import { cookies } from "next/headers";
 import { NextRequest, NextResponse } from "next/server";
+import { refreshToken as refreshTokenRequest } from "./api/api";
 
-// Chaves secretas
-const secretKey = process.env.JWT_SECRET_KEY;
-const refreshKey = process.env.REFRESH_SECRET_KEY;
+const secretKey =
+  "986c0859540006e4aa01aea281858ec3a8e673aa311b112bc87f5d6de0e2389b";
 const key = new TextEncoder().encode(secretKey);
-const refreshTokenKey = new TextEncoder().encode(refreshKey);
 
-export async function encrypt(payload: any) {
-  return await new SignJWT(payload)
-    .setProtectedHeader({ alg: "HS256" }) // Define o algoritmo para assinatura JWT
-    .setIssuedAt() // Define o horário de emissão do JWT
-    .setExpirationTime(`${AUTH_TIMES.access_token_duration} sec from now`) // Define o tempo de expiração do JWT
-    .sign(key); // Assina o JWT usando a chave secreta
-}
-
-export async function decrypt(input: string): Promise<any> {
-  const { payload } = await jwtVerify(input, key, {
-    algorithms: ["HS256"], // Especifica os algoritmos permitidos para verificação JWT
+export async function verifyJWT(
+  token: string,
+  secretKey: Uint8Array
+): Promise<any> {
+  const { payload } = await jwtVerify(token, secretKey, {
+    algorithms: ["HS256"],
   });
-  return payload; // Retorna o payload descriptografado
+  return payload;
 }
 
-export async function generateRefreshToken(payload: any) {
-  const refreshTokenExpires = new Date(
-    Date.now() + AUTH_TIMES.refresh_token_duration * 1000
-  );
-  return await new SignJWT({ ...payload, expires: refreshTokenExpires })
-    .setProtectedHeader({ alg: "HS256" })
-    .setIssuedAt()
-    .setExpirationTime(`${AUTH_TIMES.refresh_token_duration}s`)
-    .sign(refreshTokenKey);
+interface LoginResponse {
+  jwt_token: string;
+  refresh_token: string;
+  user: {
+    id: number;
+    email: string;
+    firstName: string;
+    lastName: string;
+    whatsappNumber?: string;
+    imageUrl?: string;
+  };
+  message: string;
 }
 
-export async function verifyRefreshToken(token: string) {
-  try {
-    const { payload } = await jwtVerify(token, refreshTokenKey, {
-      algorithms: ["HS256"],
-    });
-    return payload;
-  } catch {
-    return null;
+export async function login(response: LoginResponse) {
+  if (!response.jwt_token || !response.refresh_token || !response.user) {
+    throw new Error("Dados de login inválidos");
   }
-}
-
-export async function login(formData: FormData) {
-  const user = { email: formData.get("email"), name: "John" };
-
-  const accessTokenExpires = new Date(
-    Date.now() + AUTH_TIMES.access_token_duration * 1000
-  );
-  const accessToken = await encrypt({ user, expires: accessTokenExpires });
-
-  const refreshToken = await generateRefreshToken({ user });
-  const refreshTokenExpires = new Date(
-    Date.now() + AUTH_TIMES.refresh_token_duration * 1000
-  );
 
   const cookieStore = await cookies();
-  cookieStore.set("accessToken", accessToken, {
-    expires: accessTokenExpires,
-    httpOnly: true,
-  });
-  cookieStore.set("refreshToken", refreshToken, {
-    expires: refreshTokenExpires, // Novo tempo de expiração
-    httpOnly: true,
-  });
+
+  try {
+    await verifyJWT(response.jwt_token, key);
+
+    cookieStore.set("accessToken", response.jwt_token, {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === "production",
+      sameSite: "lax",
+    });
+    cookieStore.set("refreshToken", response.refresh_token, {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === "production",
+      sameSite: "lax",
+    });
+
+    return response.user;
+  } catch (error) {
+    throw new Error("Falha ao processar login");
+  }
 }
 
 export async function logout() {
@@ -76,63 +64,114 @@ export async function logout() {
   cookieStore.set("refreshToken", "", { expires: new Date(0) });
 }
 
+// Função auxiliar para pegar tokens
+async function getTokens() {
+  const cookieStore = await cookies();
+  return {
+    accessToken: cookieStore.get("accessToken")?.value,
+    refreshToken: cookieStore.get("refreshToken")?.value,
+  };
+}
+
 export async function getSession() {
-  const accessToken = (await cookies()).get("accessToken")?.value;
-  if (!accessToken) return null;
-  return await decrypt(accessToken);
+  const { accessToken, refreshToken } = await getTokens();
+
+  if (!accessToken && !refreshToken) return null;
+
+  try {
+    if (accessToken) {
+      try {
+        const payload = await verifyJWT(accessToken, key);
+        return {
+          id: payload.sub,
+          email: payload.email,
+          firstName: payload.firstName,
+          lastName: payload.lastName,
+          whatsappNumber: payload.whatsappNumber,
+          imageUrl: payload.imageUrl,
+          verified: payload.verified,
+        };
+      } catch {
+        // Token expirado, continua para refresh
+      }
+    }
+
+    if (refreshToken) {
+      const refreshResponse = await refreshTokenRequest(refreshToken);
+      if (refreshResponse.jwt_token && refreshResponse.user) {
+        const cookieStore = await cookies();
+        cookieStore.set("accessToken", refreshResponse.jwt_token, {
+          httpOnly: true,
+          secure: process.env.NODE_ENV === "production",
+          sameSite: "lax",
+        });
+        return refreshResponse.user;
+      }
+    }
+
+    return null;
+  } catch {
+    return null;
+  }
 }
 
 export async function updateSession(request: NextRequest) {
-  const accessToken = request.cookies.get("accessToken")?.value;
-  const refreshToken = request.cookies.get("refreshToken")?.value;
+  const { accessToken, refreshToken } = await getTokens();
 
   if (!accessToken && !refreshToken) {
     return { session: null, response: NextResponse.next() };
   }
 
   try {
-    // Verificar access token atual
     if (accessToken) {
       try {
-        const parsed = await decrypt(accessToken);
-        return { session: parsed, response: NextResponse.next() };
+        const payload = await verifyJWT(accessToken, key);
+        return {
+          session: {
+            user: {
+              id: payload.sub,
+              email: payload.email,
+              firstName: payload.firstName,
+              lastName: payload.lastName,
+              whatsappNumber: payload.whatsappNumber,
+              imageUrl: payload.imageUrl,
+              verified: payload.verified,
+            },
+          },
+          response: NextResponse.next(),
+        };
       } catch {
-        // Se houver erro na decodificação, tentamos o refresh token
+        // Token expirado, continua para refresh
       }
     }
 
-    // Tentar refresh token
     if (refreshToken) {
-      const refreshData = await verifyRefreshToken(refreshToken);
-      if (refreshData) {
-        const newExpires = new Date(
-          Date.now() + AUTH_TIMES.access_token_duration * 1000
-        );
-        const newAccessToken = await encrypt({
-          user: refreshData.user,
-          expires: newExpires,
-        });
-
+      const refreshResponse = await refreshTokenRequest(refreshToken);
+      if (refreshResponse.jwt_token && refreshResponse.user) {
         const response = NextResponse.next();
         response.cookies.set({
           name: "accessToken",
-          value: newAccessToken,
+          value: refreshResponse.jwt_token,
           httpOnly: true,
-          expires: newExpires,
+          secure: process.env.NODE_ENV === "production",
+          sameSite: "lax",
         });
-        return { session: refreshData, response };
+        return {
+          session: { user: refreshResponse.user },
+          response,
+        };
       }
     }
 
-    // Falha na autenticação
-    const response = NextResponse.redirect(new URL("/login", request.url));
-    response.cookies.set("accessToken", "", { expires: new Date(0) });
-    response.cookies.set("refreshToken", "", { expires: new Date(0) });
-    return { session: null, response };
-  } catch (error) {
-    const response = NextResponse.redirect(new URL("/login", request.url));
-    response.cookies.set("accessToken", "", { expires: new Date(0) });
-    response.cookies.set("refreshToken", "", { expires: new Date(0) });
-    return { session: null, response };
+    return await handleAuthFailure(request);
+  } catch {
+    return await handleAuthFailure(request);
   }
+}
+
+async function handleAuthFailure(request: NextRequest) {
+  const response = NextResponse.redirect(new URL("/login", request.url));
+  response.cookies.set("accessToken", "", { expires: new Date(0) });
+  response.cookies.set("refreshToken", "", { expires: new Date(0) });
+  return { session: null, response };
 }

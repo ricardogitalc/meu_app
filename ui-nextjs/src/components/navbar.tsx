@@ -30,10 +30,15 @@ export default async function Navbar() {
     <header className="w-full border-b bg-card">
       <div className="mx-auto max-w-[1440px] px-4 sm:px-6 lg:px-8">
         <div className="flex h-16 items-center justify-between">
-          <div className="flex items-center">
+          <div className="flex items-center gap-4">
             <Link href="/">
               <LogoIcon />
             </Link>
+            {session && (
+              <p className="text-sm font-medium hidden md:block">
+                Olá, {session.firstName}!
+              </p>
+            )}
           </div>
           <div className="flex items-center space-x-2 sm:space-x-4">
             <Link href="/test-auth">
@@ -67,11 +72,18 @@ export default async function Navbar() {
                   >
                     <Avatar className="w-8 h-8">
                       <AvatarImage
-                        src={"/placeholder.svg?height=96&width=96"}
-                        alt="Profile picture"
+                        src={
+                          session?.imageUrl ||
+                          "/placeholder.svg?height=96&width=96"
+                        }
+                        alt={`${
+                          session?.firstName || "User"
+                        }'s profile picture`}
                       />
                       <AvatarFallback>
-                        <User className="w-12 h-12" />
+                        {session?.firstName?.[0] || (
+                          <User className="w-4 h-4" />
+                        )}
                       </AvatarFallback>
                     </Avatar>
                   </Button>
@@ -80,10 +92,10 @@ export default async function Navbar() {
                   <DropdownMenuLabel className="flex m-2">
                     <div className="flex flex-col space-y-1">
                       <p className="text-sm font-medium leading-none">
-                        {session.user.name}
+                        {session?.firstName} {session?.lastName}
                       </p>
                       <p className="text-xs leading-none text-muted-foreground">
-                        {session.user.email}
+                        {session?.email}
                       </p>
                     </div>
                   </DropdownMenuLabel>

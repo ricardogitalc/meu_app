@@ -9,7 +9,6 @@ import {
 
 const API_BASE_URL = process.env.BACKEND_URL || "http://localhost:3003";
 
-// Funções de Autenticação
 export async function sendMagicLink(
   destination: string
 ): Promise<LoginResponse & { status: number }> {
@@ -27,7 +26,8 @@ export async function verifyLogin(loginToken: string): Promise<AuthResponse> {
   const response = await fetch(`${API_BASE_URL}/auth/verify-login`, {
     headers: { "login-token": loginToken },
   });
-  return response.json();
+  const data = await response.json();
+  return { ...data, status: response.status };
 }
 
 export async function verifyRegister(
@@ -48,7 +48,6 @@ export async function refreshToken(
   return response.json();
 }
 
-// Funções de Usuário
 export async function registerUser(userData: {
   email: string;
   firstName: string;

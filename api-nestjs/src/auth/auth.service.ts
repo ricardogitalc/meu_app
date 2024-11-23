@@ -2,7 +2,7 @@ import { Injectable, UnauthorizedException } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import { ConfigService } from '@nestjs/config';
 import { UsersService } from 'src/users/users.service';
-import { CONFIG_MESSAGES, CONFIG_TIMES } from 'src/config/config';
+import { AUTH_TIMES, CONFIG_MESSAGES } from 'src/config/config';
 import { CreateUserDto } from 'src/users/dto/users.dto';
 import { UserEntity } from 'src/users/entity/users.entity';
 
@@ -48,7 +48,7 @@ export class AuthService {
   generateMagicLinkToken(destination: string) {
     const payload = { destination };
     const login_token = this.jwtService.sign(payload, {
-      expiresIn: CONFIG_TIMES.LOGIN_TOKEN,
+      expiresIn: AUTH_TIMES.LOGIN_TOKEN,
     });
     const verify_url = `${this.configService.get<string>(
       'FRONTEND_URL',
@@ -79,7 +79,7 @@ export class AuthService {
   generateRegisterToken(userData: CreateUserDto) {
     const payload = { userData };
     return this.jwtService.sign(payload, {
-      expiresIn: CONFIG_TIMES.LOGIN_TOKEN,
+      expiresIn: AUTH_TIMES.LOGIN_TOKEN,
     });
   }
 
@@ -112,7 +112,7 @@ export class AuthService {
 
     return this.jwtService.sign(payload, {
       secret: this.configService.get<string>('REFRESH_TOKEN_SECRET'),
-      expiresIn: CONFIG_TIMES.REFRESH_TOKEN,
+      expiresIn: AUTH_TIMES.REFRESH_TOKEN,
     });
   }
 }

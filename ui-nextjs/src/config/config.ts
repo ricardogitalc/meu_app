@@ -1,6 +1,7 @@
 export const AUTH_TIMES = {
-  access_token_duration: 10, // duração em segundos
-  refresh_token_duration: 120, // duração em segundos
+  JWT_TOKEN: "3m",
+  LOGIN_TOKEN: "3m",
+  REFRESH_TOKEN: "10m",
 } as const;
 
 export const AUHT_MENSSAGES = {

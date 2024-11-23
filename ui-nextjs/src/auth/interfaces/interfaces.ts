@@ -20,6 +20,7 @@ interface LoginResponse {
 
 interface AuthResponse {
   message: string;
+  status: number;
   user: User;
   jwt_token: string;
   refresh_token?: string;
