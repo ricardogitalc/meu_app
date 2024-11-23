@@ -1,20 +1,8 @@
 export const publicRoutes = ["/", "/planos"];
 
-export const protectedRoutes = [
-  "/assinatura",
-  "/dashboard",
-  "/downloads",
-  "/favoritos",
-  "/perfil",
-  "/seguindo",
-];
+export const protectedRoutes = ["/dashboard", "/profile", "/test-auth"];
 
-export const authRoutes = [
-  "/login",
-  "/register",
-  "/verify-login",
-  "/verify-register",
-];
+export const authRoutes = ["/login", "/register"];
 
 export const isPublicRoute = (path: string) =>
   publicRoutes.some((route) => path.startsWith(route));

@@ -1,20 +1,34 @@
 import { NextRequest, NextResponse } from "next/server";
-import { updateSession } from "./auth/session-actions";
+import { updateSession } from "./auth/lib";
 import { isAuthRoute, isProtectedRoute } from "./auth/routes/routes";
 
 export async function middleware(request: NextRequest) {
-  const session = await updateSession(request);
-  const path = request.nextUrl.pathname;
+  console.log("⭐ Middleware - Iniciando...");
+  console.log("📍 Path:", request.nextUrl.pathname);
+  console.log("🍪 Cookies:", {
+    accessToken: request.cookies.get("accessToken")?.value
+      ? "Presente"
+      : "Ausente",
+    refreshToken: request.cookies.get("refreshToken")?.value
+      ? "Presente"
+      : "Ausente",
+  });
 
-  // Usuário autenticado tentando acessar rotas de auth
-  if (session && isAuthRoute(path)) {
+  const response = await updateSession(request);
+
+  console.log("🔄 Resposta do updateSession:", !!response);
+
+  if (!response) {
+    // Sem sessão e sem refresh token
+    if (isProtectedRoute(request.nextUrl.pathname)) {
+      return NextResponse.redirect(new URL("/login", request.url));
+    }
+    return NextResponse.next();
+  }
+
+  if (isAuthRoute(request.nextUrl.pathname)) {
     return NextResponse.redirect(new URL("/", request.url));
   }
 
-  // Usuário não autenticado tentando acessar rotas protegidas
-  if (!session && isProtectedRoute(path)) {
-    return NextResponse.redirect(new URL("/login", request.url));
-  }
-
-  return session;
+  return response;
 }

@@ -1,6 +1,6 @@
 # Rotas da API
 
-### LOGIN
+# LOGIN
 ENVIAR MÁGIC LINK
 - POST /auth/login
   - Body: { destination: string }
@@ -12,7 +12,6 @@ VERIFICAR MÁGIC LINK
   - Retorno: { message: string, user: user, jwt_token: string, refresh_token: string }
 
 LOGIN GOOGLE OAUTH
-### Google OAuth
 - GET /auth/google
   - Inicia fluxo de autenticação Google
 

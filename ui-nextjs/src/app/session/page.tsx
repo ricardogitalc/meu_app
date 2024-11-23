@@ -1,4 +1,4 @@
-import { getSession, login, logout } from "@/auth/session-actions";
+import { getSession, login, logout } from "@/auth/lib";
 import { redirect } from "next/navigation";
 
 export default async function SessionPage() {
