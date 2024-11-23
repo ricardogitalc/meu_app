@@ -1,7 +1,7 @@
+import { AUTH_TIMES } from "@/config/config";
 import { SignJWT, jwtVerify } from "jose";
 import { cookies } from "next/headers";
 import { NextRequest, NextResponse } from "next/server";
-import { AUTH_TIMES } from "../config/config";
 
 const secretKey = "secret";
 const refreshKey = "refresh-secret";
@@ -12,7 +12,7 @@ export async function encrypt(payload: any) {
   return await new SignJWT(payload)
     .setProtectedHeader({ alg: "HS256" }) // Define o algoritmo para assinatura JWT
     .setIssuedAt() // Define o horário de emissão do JWT
-    .setExpirationTime(AUTH_TIMES.JwtExpiration) // Define o tempo de expiração do JWT
+    .setExpirationTime(AUTH_TIMES.access_token_duration) // Define o tempo de expiração do JWT
     .sign(key); // Assina o JWT usando a chave secreta
 }
 
@@ -23,12 +23,14 @@ export async function decrypt(input: string): Promise<any> {
   return payload; // Retorna o payload descriptografado
 }
 
-async function generateRefreshToken(payload: any) {
-  const refreshTokenExpires = new Date(Date.now() + AUTH_TIMES.refreshToken); // 1 minuto
+export async function generateRefreshToken(payload: any) {
+  const refreshTokenExpires = new Date(
+    Date.now() + AUTH_TIMES.refresh_token_ms
+  ); // 1 minuto
   return await new SignJWT({ ...payload, expires: refreshTokenExpires })
     .setProtectedHeader({ alg: "HS256" })
     .setIssuedAt()
-    .setExpirationTime("1m")
+    .setExpirationTime(AUTH_TIMES.refresh_token_duration)
     .sign(refreshTokenKey);
 }
 
@@ -46,11 +48,13 @@ export async function verifyRefreshToken(token: string) {
 export async function login(formData: FormData) {
   const user = { email: formData.get("email"), name: "John" };
 
-  const accessTokenExpires = new Date(Date.now() + AUTH_TIMES.accessToken);
+  const accessTokenExpires = new Date(Date.now() + AUTH_TIMES.access_token_ms);
   const accessToken = await encrypt({ user, expires: accessTokenExpires });
 
   const refreshToken = await generateRefreshToken({ user });
-  const refreshTokenExpires = new Date(Date.now() + AUTH_TIMES.refreshToken); // 1 minuto
+  const refreshTokenExpires = new Date(
+    Date.now() + AUTH_TIMES.refresh_token_ms
+  ); // 1 minuto
 
   const cookieStore = await cookies();
   cookieStore.set("accessToken", accessToken, {
@@ -96,7 +100,7 @@ export async function updateSession(request: NextRequest) {
     if (refreshToken) {
       const refreshData = await verifyRefreshToken(refreshToken);
       if (refreshData) {
-        const newExpires = new Date(Date.now() + AUTH_TIMES.accessToken);
+        const newExpires = new Date(Date.now() + AUTH_TIMES.access_token_ms);
         const newAccessToken = await encrypt({
           user: refreshData.user,
           expires: newExpires,

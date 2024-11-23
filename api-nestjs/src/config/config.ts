@@ -2,7 +2,7 @@ export const CONFIG_TIMES = {
   JWT_TOKEN: '5m',
   LOGIN_TOKEN: '5m',
   REFRESH_TOKEN: '1d',
-};
+} as const;
 
 export const CONFIG_MESSAGES = {
   JwtTokenExpired: 'O token é inválido ou expirou.',
@@ -21,4 +21,4 @@ export const CONFIG_MESSAGES = {
   TooManyRequests:
     'Muitas tentativas realizadas. Aguarde um momento e tente novamente.',
   RefreshTokenExpired: 'O refresh token expirou. Faça login novamente.',
-};
+} as const;
