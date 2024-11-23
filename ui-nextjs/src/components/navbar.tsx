@@ -20,7 +20,8 @@ import Link from "next/link";
 import { Avatar, AvatarFallback, AvatarImage } from "./ui/avatar";
 import { ModeToggle } from "./theme/ModeToggle";
 import LogoIcon from "./icons/logoIcon";
-import { getSession } from "@/auth/lib";
+import { getSession, logout } from "@/auth/lib";
+import { redirect } from "next/navigation";
 
 export default async function Navbar() {
   const session = await getSession();
@@ -35,14 +36,14 @@ export default async function Navbar() {
             </Link>
           </div>
           <div className="flex items-center space-x-2 sm:space-x-4">
-            <Link href="/session">
-              <Button variant={"outline"}>
-                <p>session</p>
-              </Button>
-            </Link>
             <Link href="/test-auth">
               <Button variant={"outline"}>
-                <p>test</p>
+                <p>test auth</p>
+              </Button>
+            </Link>
+            <Link href="/test-info">
+              <Button variant={"outline"}>
+                <p>test info</p>
               </Button>
             </Link>
             <ModeToggle />
@@ -118,10 +119,20 @@ export default async function Navbar() {
                     </DropdownMenuItem>
                   </Link>
                   <DropdownMenuSeparator />
-                  <DropdownMenuItem>
-                    <LogOutIcon />
-                    <span>Sair</span>
-                  </DropdownMenuItem>
+                  <form
+                    action={async () => {
+                      "use server";
+                      await logout();
+                      redirect("/");
+                    }}
+                  >
+                    <DropdownMenuItem asChild>
+                      <button className="w-full flex cursor-pointer items-center">
+                        <LogOutIcon className="mr-2 h-4 w-4" />
+                        <span>Sair</span>
+                      </button>
+                    </DropdownMenuItem>
+                  </form>
                 </DropdownMenuContent>
               </DropdownMenu>
             )}

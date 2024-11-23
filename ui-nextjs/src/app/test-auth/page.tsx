@@ -1,39 +1,31 @@
-import { cookies } from "next/headers";
-import { getSession, verifyRefreshToken } from "@/auth/lib";
+import { getSession, login, logout } from "@/auth/lib";
+import { redirect } from "next/navigation";
 
 export default async function TestAuthPage() {
   const session = await getSession();
-  const refreshToken = (await cookies()).get("refreshToken")?.value;
-  const refreshTokenData = refreshToken
-    ? await verifyRefreshToken(refreshToken)
-    : null;
-
   return (
-    <div className="p-4">
-      <div className="space-y-4">
-        <div className="p-4 bg-gray-100 rounded">
-          <h2 className="font-bold">Dados do Access Token:</h2>
-          <pre className="mt-2">{JSON.stringify(session, null, 2)}</pre>
-        </div>
-
-        <div className="p-4 bg-gray-100 rounded">
-          <h2 className="font-bold">Status da Autenticação:</h2>
-          {session && (
-            <p>
-              Access Token Expira em:{" "}
-              {new Date(session.expires).toLocaleString()}
-            </p>
-          )}
-          {refreshTokenData && (
-            <>
-              <p>
-                Refresh Token Expira em:{" "}
-                {new Date(refreshTokenData.expires).toLocaleString()}
-              </p>
-            </>
-          )}
-        </div>
-      </div>
-    </div>
+    <section>
+      <form
+        action={async (formData) => {
+          "use server";
+          await login(formData);
+          redirect("/");
+        }}
+      >
+        <input type="email" name="email" placeholder="Email" />
+        <br />
+        <button type="submit">Login</button>
+      </form>
+      <form
+        action={async () => {
+          "use server";
+          await logout();
+          redirect("/");
+        }}
+      >
+        <button type="submit">Logout</button>
+      </form>
+      <pre>{JSON.stringify(session, null, 2)}</pre>
+    </section>
   );
 }

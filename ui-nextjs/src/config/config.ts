@@ -1,6 +1,7 @@
 export const AUTH_TIMES = {
-  authToken: 6 * 1000,
-  refreshToken: 60 * 1000,
+  accessToken: 1 * 60 * 1000,
+  refreshToken: 5 * 60 * 1000,
+  JwtExpiration: "1m",
 };
 
 export const AUHT_MENSSAGES = {

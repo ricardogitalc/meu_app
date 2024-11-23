@@ -1,6 +1,7 @@
 import { SignJWT, jwtVerify } from "jose";
 import { cookies } from "next/headers";
 import { NextRequest, NextResponse } from "next/server";
+import { AUTH_TIMES } from "../config/config";
 
 const secretKey = "secret";
 const refreshKey = "refresh-secret";
@@ -11,7 +12,7 @@ export async function encrypt(payload: any) {
   return await new SignJWT(payload)
     .setProtectedHeader({ alg: "HS256" }) // Define o algoritmo para assinatura JWT
     .setIssuedAt() // Define o horário de emissão do JWT
-    .setExpirationTime("30 sec from now") // Define o tempo de expiração do JWT
+    .setExpirationTime(AUTH_TIMES.JwtExpiration) // Define o tempo de expiração do JWT
     .sign(key); // Assina o JWT usando a chave secreta
 }
 
@@ -23,7 +24,7 @@ export async function decrypt(input: string): Promise<any> {
 }
 
 async function generateRefreshToken(payload: any) {
-  const refreshTokenExpires = new Date(Date.now() + 60 * 1000); // 1 minuto
+  const refreshTokenExpires = new Date(Date.now() + AUTH_TIMES.refreshToken); // 1 minuto
   return await new SignJWT({ ...payload, expires: refreshTokenExpires })
     .setProtectedHeader({ alg: "HS256" })
     .setIssuedAt()
@@ -45,11 +46,11 @@ export async function verifyRefreshToken(token: string) {
 export async function login(formData: FormData) {
   const user = { email: formData.get("email"), name: "John" };
 
-  const accessTokenExpires = new Date(Date.now() + 10 * 1000);
+  const accessTokenExpires = new Date(Date.now() + AUTH_TIMES.accessToken);
   const accessToken = await encrypt({ user, expires: accessTokenExpires });
 
   const refreshToken = await generateRefreshToken({ user });
-  const refreshTokenExpires = new Date(Date.now() + 60 * 1000); // 1 minuto
+  const refreshTokenExpires = new Date(Date.now() + AUTH_TIMES.refreshToken); // 1 minuto
 
   const cookieStore = await cookies();
   cookieStore.set("accessToken", accessToken, {
@@ -78,41 +79,49 @@ export async function updateSession(request: NextRequest) {
   const accessToken = request.cookies.get("accessToken")?.value;
   const refreshToken = request.cookies.get("refreshToken")?.value;
 
-  if (!accessToken && !refreshToken) return;
+  if (!accessToken && !refreshToken) {
+    return { session: null, response: NextResponse.next() };
+  }
 
   try {
+    // Verificar access token atual
     if (accessToken) {
       const parsed = await decrypt(accessToken);
       if (new Date(parsed.expires) > new Date()) {
-        return NextResponse.next();
+        return { session: parsed, response: NextResponse.next() };
       }
     }
 
+    // Tentar refresh token
     if (refreshToken) {
       const refreshData = await verifyRefreshToken(refreshToken);
       if (refreshData) {
-        const newExpires = new Date(Date.now() + 10 * 1000);
+        const newExpires = new Date(Date.now() + AUTH_TIMES.accessToken);
         const newAccessToken = await encrypt({
           user: refreshData.user,
           expires: newExpires,
         });
 
-        const res = NextResponse.next();
-        res.cookies.set({
+        const response = NextResponse.next();
+        response.cookies.set({
           name: "accessToken",
           value: newAccessToken,
           httpOnly: true,
           expires: newExpires,
         });
-        return res;
+        return { session: refreshData, response };
       }
     }
-  } catch {
-    const res = NextResponse.redirect(new URL("/login", request.url));
-    res.cookies.set("accessToken", "", { expires: new Date(0) });
-    res.cookies.set("refreshToken", "", { expires: new Date(0) });
-    return res;
-  }
 
-  return NextResponse.redirect(new URL("/login", request.url));
+    // Falha na autenticação
+    const response = NextResponse.redirect(new URL("/login", request.url));
+    response.cookies.set("accessToken", "", { expires: new Date(0) });
+    response.cookies.set("refreshToken", "", { expires: new Date(0) });
+    return { session: null, response };
+  } catch (error) {
+    const response = NextResponse.redirect(new URL("/login", request.url));
+    response.cookies.set("accessToken", "", { expires: new Date(0) });
+    response.cookies.set("refreshToken", "", { expires: new Date(0) });
+    return { session: null, response };
+  }
 }
