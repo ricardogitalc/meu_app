@@ -1,37 +1,15 @@
 "use client";
-import { useEffect } from "react";
-import { useRouter, useSearchParams } from "next/navigation";
-import { verifyLogin } from "@/auth/api/api";
-import { useSession } from "@/auth/session-provider";
+import { useSearchParams } from "next/navigation";
 
 export default function VerifyLoginPage() {
-  const router = useRouter();
   const searchParams = useSearchParams();
-  const { login } = useSession();
+  const login_token = searchParams.get("login_token");
 
-  useEffect(() => {
-    async function verifyLoginToken() {
-      try {
-        const loginToken = searchParams.get("login_token");
-        if (!loginToken) {
-          router.replace("/login?error=token-invalido-ou-expirado");
-          return;
-        }
-
-        const { jwt_token } = await verifyLogin(loginToken);
-        await login(jwt_token); // Salva o token JWT na sessão
-        router.replace("/"); // Redireciona para página inicial após login
-      } catch (error) {
-        router.replace("/login?error=falha-autenticacao");
-      }
-    }
-
-    verifyLoginToken();
-  }, [searchParams, router, login]);
+  console.log(login_token);
 
   return (
-    <div className="flex items-center justify-center h-screen">
-      <p>Verificando login...</p>
+    <div>
+      <h1>Verify Login</h1>
     </div>
   );
 }

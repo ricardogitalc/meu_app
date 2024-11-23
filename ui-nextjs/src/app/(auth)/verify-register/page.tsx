@@ -3,9 +3,9 @@ import { useSearchParams } from "next/navigation";
 
 export default function VerifyRegisterPage() {
   const searchParams = useSearchParams();
-  const registerToken = searchParams.get("register_token");
+  const register_token = searchParams.get("register_token");
 
-  console.log(registerToken);
+  console.log(register_token);
 
   return (
     <div>
