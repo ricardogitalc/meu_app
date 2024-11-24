@@ -38,9 +38,7 @@ export default function RootLayout({
           disableTransitionOnChange
         >
           <Navbar />
-          <div className="flex justify-center items-center mt-16">
-            {children}
-          </div>
+          <div className="flex justify-center items-center">{children}</div>
           <Toaster />
         </ThemeProvider>
       </body>
