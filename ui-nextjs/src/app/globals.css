@@ -79,3 +79,12 @@ body {
     @apply bg-background text-foreground;
   }
 }
+
+@keyframes slideRight {
+  from {
+    transform: translateX(-100%);
+  }
+  to {
+    transform: translateX(400%);
+  }
+}
