@@ -117,3 +117,21 @@ export async function deleteUser(
   });
   return response.json();
 }
+
+export async function handleGoogleCallback(
+  code: string
+): Promise<LoginResponse> {
+  const response = await fetch(
+    `${API_BASE_URL}/auth/google/callback?code=${code}`,
+    {
+      method: "GET",
+    }
+  );
+  const data = await response.json();
+
+  if (!data.jwt_token || !data.refresh_token || !data.user) {
+    throw new Error("Resposta inválida do servidor");
+  }
+
+  return data as LoginResponse;
+}

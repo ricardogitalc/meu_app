@@ -90,15 +90,15 @@ export class AuthController {
 
   @Get('google/callback')
   @UseGuards(AuthGuard('google'))
-  async googleAuthCallback(@Req() req) {
+  async googleAuthCallback(@Req() req, @Res() res) {
     const { jwt_token } = this.authService.generateTokens(req.user);
     const refresh_token = this.authService.generateRefreshToken(req.user);
-    return {
-      message: 'Login com google efeutado com sucesso',
-      user: req.user,
-      jwt_token,
-      refresh_token,
-    };
+
+    const frontendUrl = process.env.FRONTEND_URL || 'http://localhost:3000';
+    const userStr = encodeURIComponent(JSON.stringify(req.user));
+    const callbackUrl = `${frontendUrl}/auth/callback?token=${jwt_token}&refresh_token=${refresh_token}&user=${userStr}`;
+
+    return res.redirect(callbackUrl);
   }
 
   @Get('me')

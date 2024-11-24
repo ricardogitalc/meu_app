@@ -71,19 +71,8 @@ export default async function Navbar() {
                     className="relative h-8 w-8 rounded-full"
                   >
                     <Avatar className="w-8 h-8">
-                      <AvatarImage
-                        src={
-                          session?.imageUrl ||
-                          "/placeholder.svg?height=96&width=96"
-                        }
-                        alt={`${
-                          session?.firstName || "User"
-                        }'s profile picture`}
-                      />
                       <AvatarFallback>
-                        {session?.firstName?.[0] || (
-                          <User className="w-4 h-4" />
-                        )}
+                        <User className="w-4 h-4" />
                       </AvatarFallback>
                     </Avatar>
                   </Button>
