@@ -41,16 +41,6 @@ export default async function Navbar() {
             )}
           </div>
           <div className="flex items-center space-x-2 sm:space-x-4">
-            <Link href="/test-auth">
-              <Button variant={"outline"}>
-                <p>test auth</p>
-              </Button>
-            </Link>
-            <Link href="/test-info">
-              <Button variant={"outline"}>
-                <p>test info</p>
-              </Button>
-            </Link>
             <ModeToggle />
             <Link href="/planos">
               <Button>

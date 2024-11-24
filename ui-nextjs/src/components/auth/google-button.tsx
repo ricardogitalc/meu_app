@@ -3,8 +3,7 @@ import { FcGoogle } from "react-icons/fc";
 
 export function GoogleButton() {
   const handleGoogleLogin = () => {
-    const backendUrl =
-      process.env.NEXT_PUBLIC_BACKEND_URL || "http://localhost:3003";
+    const backendUrl = process.env.BACKEND_URL || "http://localhost:3003";
     window.location.href = `${backendUrl}/auth/google`;
   };
 

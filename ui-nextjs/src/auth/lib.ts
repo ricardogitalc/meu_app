@@ -1,6 +1,7 @@
 import { jwtVerify } from "jose";
 import { cookies } from "next/headers";
 import { NextRequest, NextResponse } from "next/server";
+import { redirect } from "next/navigation";
 import {
   handleGoogleCallback,
   refreshToken as refreshTokenRequest,
@@ -70,6 +71,7 @@ export async function logout() {
     cookieStore.set("accessToken", "", { expires: new Date(0), path: "/" }),
     cookieStore.set("refreshToken", "", { expires: new Date(0), path: "/" }),
   ]);
+  redirect("/login");
 }
 
 // Função auxiliar para pegar tokens

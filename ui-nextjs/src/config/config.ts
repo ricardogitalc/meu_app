@@ -12,3 +12,13 @@ export const AUHT_MENSSAGES = {
   minWhatsappError: "WhatsApp é obrigatório",
   regexWhatsappError: "WhatsApp deve estar no formato: 11999999999",
 } as const;
+
+export const AUTH_GOOGLE = {
+  backendUrl: process.env.NEXT_PUBLIC_BACKEND_URL || "http://localhost:3003",
+  defaultRedirect: "/",
+  loginPath: "/login",
+  errors: {
+    invalidToken: "Token inválido ou expirado",
+    authFailed: "Falha na autenticação",
+  },
+} as const;
