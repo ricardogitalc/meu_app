@@ -1,4 +1,4 @@
-import { jwtVerify } from "jose";
+import { jwtVerify, JWTVerifyResult } from "jose";
 import { cookies } from "next/headers";
 import { NextRequest, NextResponse } from "next/server";
 import { redirect } from "next/navigation";
@@ -40,29 +40,34 @@ export async function login(response: LoginResponse) {
     throw new Error("Dados de login inválidos");
   }
 
+  let verified: JWTVerifyResult;
   try {
-    await verifyJWT(response.jwt_token, key);
-    const cookieStore = await cookies();
-
-    await Promise.all([
-      cookieStore.set("accessToken", response.jwt_token, {
-        httpOnly: true,
-        secure: process.env.NODE_ENV === "production",
-        sameSite: "lax",
-        path: "/",
-      }),
-      cookieStore.set("refreshToken", response.refresh_token, {
-        httpOnly: true,
-        secure: process.env.NODE_ENV === "production",
-        sameSite: "lax",
-        path: "/",
-      }),
-    ]);
-
-    return response.user;
+    verified = await verifyJWT(response.jwt_token, key);
   } catch (error) {
-    throw new Error("Falha ao processar login");
+    if (error instanceof Error) {
+      throw new Error(`Erro na verificação do token: ${error.message}`);
+    }
+    throw error;
   }
+
+  const cookieStore = await cookies();
+
+  await Promise.all([
+    cookieStore.set("accessToken", response.jwt_token, {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === "production",
+      sameSite: "lax",
+      path: "/",
+    }),
+    cookieStore.set("refreshToken", response.refresh_token, {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === "production",
+      sameSite: "lax",
+      path: "/",
+    }),
+  ]);
+
+  return response.user;
 }
 
 export async function logout() {
@@ -88,41 +93,41 @@ export async function getSession() {
 
   if (!accessToken && !refreshToken) return null;
 
-  try {
-    if (accessToken) {
-      try {
-        const payload = await verifyJWT(accessToken, key);
-        return {
-          id: payload.sub,
-          email: payload.email,
-          firstName: payload.firstName,
-          lastName: payload.lastName,
-          whatsappNumber: payload.whatsappNumber,
-          imageUrl: payload.imageUrl,
-          verified: payload.verified,
-        };
-      } catch {
-        // Token expirado, continua para refresh
-      }
+  if (accessToken) {
+    try {
+      const payload = await verifyJWT(accessToken, key);
+      return {
+        id: payload.sub,
+        email: payload.email,
+        firstName: payload.firstName,
+        lastName: payload.lastName,
+        whatsappNumber: payload.whatsappNumber,
+        imageUrl: payload.imageUrl,
+        verified: payload.verified,
+      };
+    } catch (error) {
+      // Silenciosamente falha e tenta refresh token
     }
+  }
 
-    if (refreshToken) {
+  if (refreshToken) {
+    try {
       const refreshResponse = await refreshTokenRequest(refreshToken);
       if (refreshResponse.jwt_token && refreshResponse.user) {
         const cookieStore = await cookies();
-        cookieStore.set("accessToken", refreshResponse.jwt_token, {
+        await cookieStore.set("accessToken", refreshResponse.jwt_token, {
           httpOnly: true,
           secure: process.env.NODE_ENV === "production",
           sameSite: "lax",
         });
         return refreshResponse.user;
       }
+    } catch (error) {
+      console.error("Erro ao atualizar token:", error);
     }
-
-    return null;
-  } catch {
-    return null;
   }
+
+  return null;
 }
 
 export async function updateSession(request: NextRequest) {
@@ -132,30 +137,30 @@ export async function updateSession(request: NextRequest) {
     return { session: null, response: NextResponse.next() };
   }
 
-  try {
-    if (accessToken) {
-      try {
-        const payload = await verifyJWT(accessToken, key);
-        return {
-          session: {
-            user: {
-              id: payload.sub,
-              email: payload.email,
-              firstName: payload.firstName,
-              lastName: payload.lastName,
-              whatsappNumber: payload.whatsappNumber,
-              imageUrl: payload.imageUrl,
-              verified: payload.verified,
-            },
+  if (accessToken) {
+    try {
+      const payload = await verifyJWT(accessToken, key);
+      return {
+        session: {
+          user: {
+            id: payload.sub,
+            email: payload.email,
+            firstName: payload.firstName,
+            lastName: payload.lastName,
+            whatsappNumber: payload.whatsappNumber,
+            imageUrl: payload.imageUrl,
+            verified: payload.verified,
           },
-          response: NextResponse.next(),
-        };
-      } catch {
-        // Token expirado, continua para refresh
-      }
+        },
+        response: NextResponse.next(),
+      };
+    } catch {
+      // Token expirado, continua para refresh
     }
+  }
 
-    if (refreshToken) {
+  if (refreshToken) {
+    try {
       const refreshResponse = await refreshTokenRequest(refreshToken);
       if (refreshResponse.jwt_token && refreshResponse.user) {
         const response = NextResponse.next();
@@ -171,12 +176,12 @@ export async function updateSession(request: NextRequest) {
           response,
         };
       }
+    } catch (error) {
+      console.error("Erro ao atualizar sessão:", error);
     }
-
-    return await handleAuthFailure(request);
-  } catch {
-    return await handleAuthFailure(request);
   }
+
+  return await handleAuthFailure(request);
 }
 
 async function handleAuthFailure(request: NextRequest) {
@@ -190,10 +195,13 @@ export async function handleGoogleLogin(code: string) {
   try {
     const response = await handleGoogleCallback(code);
     if (!response.jwt_token || !response.refresh_token || !response.user) {
-      throw new Error("Falha na autenticação com Google");
+      throw new Error("Resposta inválida do Google OAuth");
     }
     return await login(response);
   } catch (error) {
-    throw new Error("Erro ao processar login com Google");
+    if (error instanceof Error) {
+      throw new Error(`Erro na autenticação Google: ${error.message}`);
+    }
+    throw new Error("Erro desconhecido na autenticação Google");
   }
 }

@@ -1,5 +1,5 @@
 export const AUTH_TIMES = {
-  JWT_TOKEN: '30s',
+  JWT_TOKEN: '6s',
   LOGIN_TOKEN: '3m',
   REFRESH_TOKEN: '10m',
 } as const;

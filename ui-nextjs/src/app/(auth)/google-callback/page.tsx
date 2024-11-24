@@ -1,11 +1,13 @@
 "use client";
 
 import { useEffect } from "react";
-import { useSearchParams } from "next/navigation";
+import { useSearchParams, useRouter } from "next/navigation";
 import { serverLogin } from "@/auth/actions";
+import Loading from "@/app/loading";
 
 export default function CallbackPage() {
   const searchParams = useSearchParams();
+  const router = useRouter();
 
   useEffect(() => {
     async function handleCallback() {
@@ -15,19 +17,20 @@ export default function CallbackPage() {
         const userStr = searchParams.get("user");
 
         if (!token || !refreshToken) {
-          throw new Error("Tokens não encontrados");
+          router.push("/login");
+          return;
         }
 
         const user = userStr ? JSON.parse(userStr) : null;
         await serverLogin(token, refreshToken, user);
+        router.push("/");
       } catch (error) {
-        console.error("Erro no callback:", error);
-        window.location.href = "/login";
+        router.push("/login");
       }
     }
 
     handleCallback();
-  }, [searchParams]);
+  }, [searchParams, router]);
 
-  return null;
+  return <Loading />;
 }

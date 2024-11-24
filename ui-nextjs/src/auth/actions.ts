@@ -16,7 +16,6 @@ export async function serverLogin(
   try {
     await jwtVerify(token, key);
 
-    // Usando await com cookies()
     const cookieStore = await cookies();
 
     await Promise.all([
@@ -34,7 +33,7 @@ export async function serverLogin(
       }),
     ]);
 
-    redirect("/"); // Alterado de /dashboard para /
+    redirect("/");
   } catch (error) {
     console.error("Erro ao fazer login:", error);
     redirect("/login?error=auth");

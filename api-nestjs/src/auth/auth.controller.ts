@@ -96,7 +96,7 @@ export class AuthController {
 
     const frontendUrl = process.env.FRONTEND_URL || 'http://localhost:3000';
     const userStr = encodeURIComponent(JSON.stringify(req.user));
-    const callbackUrl = `${frontendUrl}/auth/callback?token=${jwt_token}&refresh_token=${refresh_token}&user=${userStr}`;
+    const callbackUrl = `${frontendUrl}/google-callback?token=${jwt_token}&refresh_token=${refresh_token}&user=${userStr}`;
 
     return res.redirect(callbackUrl);
   }
