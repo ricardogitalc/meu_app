@@ -1,41 +1,28 @@
 "use server";
 
 import { cookies } from "next/headers";
-import { redirect } from "next/navigation";
-import { jwtVerify } from "jose";
-
-const secretKey =
-  "986c0859540006e4aa01aea281858ec3a8e673aa311b112bc87f5d6de0e2389b";
-const key = new TextEncoder().encode(secretKey);
+import type { User } from "@/types/user";
 
 export async function serverLogin(
-  token: string,
-  refreshToken: string,
-  user: any
+  jwt_token: string,
+  refresh_token: string,
+  user: User
 ) {
-  try {
-    await jwtVerify(token, key);
+  const cookieStore = await cookies();
 
-    const cookieStore = await cookies();
+  cookieStore.set("accessToken", jwt_token, {
+    httpOnly: true,
+    secure: process.env.NODE_ENV === "production",
+    sameSite: "lax",
+    path: "/",
+  });
 
-    await Promise.all([
-      cookieStore.set("accessToken", token, {
-        httpOnly: true,
-        secure: process.env.NODE_ENV === "production",
-        sameSite: "lax",
-        path: "/",
-      }),
-      cookieStore.set("refreshToken", refreshToken, {
-        httpOnly: true,
-        secure: process.env.NODE_ENV === "production",
-        sameSite: "lax",
-        path: "/",
-      }),
-    ]);
+  cookieStore.set("refreshToken", refresh_token, {
+    httpOnly: true,
+    secure: process.env.NODE_ENV === "production",
+    sameSite: "lax",
+    path: "/",
+  });
 
-    redirect("/");
-  } catch (error) {
-    console.error("Erro ao fazer login:", error);
-    redirect("/login?error=auth");
-  }
+  return user;
 }

@@ -1,7 +1,7 @@
 export const AUTH_TIMES = {
-  JWT_TOKEN: '1m',
-  LOGIN_TOKEN: '3m',
-  REFRESH_TOKEN: '10m',
+  JWT_TOKEN: '10s', // 15 minutos a 1 hora.
+  LOGIN_TOKEN: '3m', // 15 minutos a 1 hora.
+  REFRESH_TOKEN: '1m', // 7 dias a 30 dias
 } as const;
 
 export const CONFIG_MESSAGES = {

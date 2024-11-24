@@ -2,8 +2,8 @@
 
 import { useEffect } from "react";
 import { useSearchParams, useRouter } from "next/navigation";
-import { serverLogin } from "@/auth/actions";
 import Loading from "@/app/loading";
+import { serverLogin } from "@/auth/actions";
 
 export default function CallbackPage() {
   const searchParams = useSearchParams();
