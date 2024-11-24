@@ -87,24 +87,46 @@ export async function getUser(id: number, jwt_token: string): Promise<User> {
 }
 
 export async function updateUser(
-  id: number,
-  jwt_token: string,
+  userId: number,
   userData: {
     firstName?: string;
     lastName?: string;
     whatsappNumber?: string;
-    imageUrl?: string;
   }
-): Promise<AuthResponse> {
-  const response = await fetch(`${API_BASE_URL}/users/${id}`, {
-    method: "PATCH",
-    headers: {
-      "Content-Type": "application/json",
-      Authorization: `Bearer ${jwt_token}`,
-    },
-    body: JSON.stringify(userData),
-  });
-  return response.json();
+): Promise<{ success: boolean; message?: string }> {
+  try {
+    const { cookies } = await import("next/headers");
+    const cookieStore = await cookies();
+    const accessToken = cookieStore.get("accessToken")?.value;
+
+    if (!accessToken) {
+      return { success: false, message: "Token não encontrado" };
+    }
+
+    const response = await fetch(`${API_BASE_URL}/users/${userId}`, {
+      method: "PATCH",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${accessToken}`,
+      },
+      body: JSON.stringify(userData),
+    });
+
+    const data = await response.json();
+
+    if (!response.ok) {
+      return {
+        success: false,
+        message: Array.isArray(data.message)
+          ? data.message[0]
+          : data.message || `Erro ${data.statusCode}: ${data.error}`,
+      };
+    }
+
+    return { success: true };
+  } catch (error) {
+    return { success: false, message: "Erro ao conectar com o servidor" };
+  }
 }
 
 export async function deleteUser(

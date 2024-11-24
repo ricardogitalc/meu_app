@@ -15,20 +15,70 @@ import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { profileSchema } from "@/auth/schema/schema";
 import type { z } from "zod";
+import type { User } from "@/types/user";
+import { updateUser } from "@/auth/api/api";
+import { useToast } from "@/hooks/use-toast";
+import { useState } from "react";
+import { Loader2 } from "lucide-react";
 
 type ProfileFormData = z.infer<typeof profileSchema>;
 
-export default function ProfileForm() {
+type ProfileFormProps = {
+  user: User;
+};
+
+export default function ProfileForm({ user }: ProfileFormProps) {
+  const { toast } = useToast();
+  const [isLoading, setIsLoading] = useState(false);
+
   const {
     register,
     handleSubmit,
-    formState: { errors },
+    reset,
+    formState: { errors, isDirty },
   } = useForm<ProfileFormData>({
     resolver: zodResolver(profileSchema),
+    defaultValues: {
+      firstName: user.firstName,
+      lastName: user.lastName,
+      whatsappNumber: user.whatsappNumber,
+    },
   });
 
-  const onSubmit = (data: ProfileFormData) => {
-    console.log("Dados do perfil:", data);
+  const onSubmit = async (data: ProfileFormData) => {
+    try {
+      setIsLoading(true);
+      const result = await updateUser(user.id, data);
+
+      // Adiciona delay de 2 segundos
+      await new Promise((resolve) => setTimeout(resolve, 2000));
+
+      if (!result.success) {
+        toast({
+          title: "Erro",
+          description: result.message || "Não foi possível atualizar o perfil",
+          variant: "destructive",
+        });
+        return;
+      }
+
+      toast({
+        title: "Sucesso!",
+        description: "Perfil atualizado com sucesso!",
+        variant: "success",
+      });
+
+      // Reseta o formulário com os novos valores
+      reset(data);
+    } catch (error: any) {
+      toast({
+        title: "Erro",
+        description: error.message || "Erro ao conectar com o servidor",
+        variant: "destructive",
+      });
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   return (
@@ -41,7 +91,13 @@ export default function ProfileForm() {
         <CardContent className="space-y-4">
           <div className="space-y-2">
             <Label htmlFor="email">Email</Label>
-            <Input id="email" type="email" disabled className="bg-muted" />
+            <Input
+              id="email"
+              type="email"
+              disabled
+              className="bg-muted"
+              value={user.email}
+            />
           </div>
           <div className="space-y-2">
             <Label htmlFor="firstName">Nome</Label>
@@ -77,8 +133,19 @@ export default function ProfileForm() {
           </div>
         </CardContent>
         <CardFooter>
-          <Button className="w-full" type="submit">
-            Atualizar perfil
+          <Button
+            className="w-full"
+            type="submit"
+            disabled={isLoading || !isDirty}
+          >
+            {isLoading ? (
+              <>
+                <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                Atualizando...
+              </>
+            ) : (
+              "Atualizar perfil"
+            )}
           </Button>
         </CardFooter>
       </form>

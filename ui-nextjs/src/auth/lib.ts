@@ -6,6 +6,7 @@ import {
   handleGoogleCallback,
   refreshToken as refreshTokenRequest,
 } from "./api/api";
+import type { User } from "@/types/user";
 
 const secretKey =
   "986c0859540006e4aa01aea281858ec3a8e673aa311b112bc87f5d6de0e2389b";
@@ -24,14 +25,7 @@ export async function verifyJWT(
 interface LoginResponse {
   jwt_token: string;
   refresh_token: string;
-  user: {
-    id: number;
-    email: string;
-    firstName: string;
-    lastName: string;
-    whatsappNumber?: string;
-    imageUrl?: string;
-  };
+  user: User;
   message: string;
 }
 
@@ -88,7 +82,7 @@ async function getTokens() {
   };
 }
 
-export async function getSession() {
+export async function getSession(): Promise<User | null> {
   const { accessToken, refreshToken } = await getTokens();
 
   if (!accessToken && !refreshToken) return null;
@@ -97,7 +91,7 @@ export async function getSession() {
     try {
       const payload = await verifyJWT(accessToken, key);
       return {
-        id: payload.sub,
+        id: Number(payload.sub), // Converter para número
         email: payload.email,
         firstName: payload.firstName,
         lastName: payload.lastName,
