@@ -84,21 +84,31 @@ export class UsersController {
   async update(
     @Param('id', ParseIntPipe) id: number,
     @Body() updateUserDto: UpdateUserDto,
-  ): Promise<{ message: string; user: User }> {
+  ): Promise<{
+    message: string;
+    user: User;
+    jwt_token: string;
+    refresh_token: string;
+  }> {
     const user = await this.usersService.UserFindUnique({ id });
 
     if (!user) {
       throw new UnauthorizedException(CONFIG_MESSAGES.UserNotFound);
     }
 
-    const User = await this.usersService.updateUser({
+    const updatedUser = await this.usersService.updateUser({
       where: { id },
       data: updateUserDto,
     });
 
+    const { jwt_token } = this.authService.generateTokens(updatedUser);
+    const refresh_token = this.authService.generateRefreshToken(updatedUser);
+
     return {
       message: CONFIG_MESSAGES.UpdateUserSucess,
-      user: User,
+      user: updatedUser,
+      jwt_token,
+      refresh_token,
     };
   }
 

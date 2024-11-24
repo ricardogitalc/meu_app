@@ -72,7 +72,7 @@ CALLBACK GOOGLE OAUTH
       imageUrl?: string
     }
   - Headers: Authorization: Bearer {jwt_token}
-  - Retorno: { message: string, user: user }
+  - Retorno: { message: string, user: user, jwt_token: string, refresh_token: string }
 
 
 ### Deletar Usuário
