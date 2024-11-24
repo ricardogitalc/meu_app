@@ -92,8 +92,14 @@ export async function updateUser(
     firstName?: string;
     lastName?: string;
     whatsappNumber?: string;
+    imageUrl?: string;
   }
-): Promise<{ success: boolean; message?: string }> {
+): Promise<{
+  success: boolean;
+  message?: string;
+  jwt_token?: string;
+  user?: User;
+}> {
   try {
     const { cookies } = await import("next/headers");
     const cookieStore = await cookies();
@@ -108,6 +114,8 @@ export async function updateUser(
       headers: {
         "Content-Type": "application/json",
         Authorization: `Bearer ${accessToken}`,
+        // Adiciona cabeçalho para evitar cache
+        "Cache-Control": "no-cache, no-store, must-revalidate",
       },
       body: JSON.stringify(userData),
     });
@@ -123,7 +131,21 @@ export async function updateUser(
       };
     }
 
-    return { success: true };
+    // Atualiza o token imediatamente
+    if (data.jwt_token) {
+      await cookieStore.set("accessToken", data.jwt_token, {
+        httpOnly: true,
+        secure: process.env.NODE_ENV === "production",
+        sameSite: "lax",
+        path: "/",
+      });
+    }
+
+    return {
+      success: true,
+      jwt_token: data.jwt_token,
+      user: data.user,
+    };
   } catch (error) {
     return { success: false, message: "Erro ao conectar com o servidor" };
   }

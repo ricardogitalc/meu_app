@@ -88,7 +88,6 @@ export class UsersController {
     message: string;
     user: User;
     jwt_token: string;
-    refresh_token: string;
   }> {
     const user = await this.usersService.UserFindUnique({ id });
 
@@ -102,13 +101,11 @@ export class UsersController {
     });
 
     const { jwt_token } = this.authService.generateTokens(updatedUser);
-    const refresh_token = this.authService.generateRefreshToken(updatedUser);
 
     return {
       message: CONFIG_MESSAGES.UpdateUserSucess,
       user: updatedUser,
       jwt_token,
-      refresh_token,
     };
   }
 

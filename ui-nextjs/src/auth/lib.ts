@@ -46,30 +46,30 @@ export async function login(response: LoginResponse) {
 
   const cookieStore = await cookies();
 
-  await Promise.all([
-    cookieStore.set("accessToken", response.jwt_token, {
-      httpOnly: true,
-      secure: process.env.NODE_ENV === "production",
-      sameSite: "lax",
-      path: "/",
-    }),
-    cookieStore.set("refreshToken", response.refresh_token, {
-      httpOnly: true,
-      secure: process.env.NODE_ENV === "production",
-      sameSite: "lax",
-      path: "/",
-    }),
-  ]);
+  await cookieStore.set("accessToken", response.jwt_token, {
+    httpOnly: true,
+    secure: process.env.NODE_ENV === "production",
+    sameSite: "lax",
+    path: "/",
+  });
+
+  await cookieStore.set("refreshToken", response.refresh_token, {
+    httpOnly: true,
+    secure: process.env.NODE_ENV === "production",
+    sameSite: "lax",
+    path: "/",
+  });
 
   return response.user;
 }
 
 export async function logout() {
   const cookieStore = await cookies();
-  await Promise.all([
-    cookieStore.set("accessToken", "", { expires: new Date(0), path: "/" }),
-    cookieStore.set("refreshToken", "", { expires: new Date(0), path: "/" }),
-  ]);
+  await cookieStore.set("accessToken", "", { expires: new Date(0), path: "/" });
+  await cookieStore.set("refreshToken", "", {
+    expires: new Date(0),
+    path: "/",
+  });
   redirect("/login");
 }
 
@@ -198,4 +198,15 @@ export async function handleGoogleLogin(code: string) {
     }
     throw new Error("Erro desconhecido na autenticação Google");
   }
+}
+
+export async function updateUserSession(jwt_token: string, user: User) {
+  const cookieStore = await cookies();
+  await cookieStore.set("accessToken", jwt_token, {
+    httpOnly: true,
+    secure: process.env.NODE_ENV === "production",
+    sameSite: "lax",
+    path: "/",
+  });
+  return user;
 }

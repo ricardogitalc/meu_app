@@ -20,6 +20,7 @@ import { updateUser } from "@/auth/api/api";
 import { useToast } from "@/hooks/use-toast";
 import { useState } from "react";
 import { Loader2 } from "lucide-react";
+import { useRouter } from "next/navigation";
 
 type ProfileFormData = z.infer<typeof profileSchema>;
 
@@ -30,6 +31,7 @@ type ProfileFormProps = {
 export default function ProfileForm({ user }: ProfileFormProps) {
   const { toast } = useToast();
   const [isLoading, setIsLoading] = useState(false);
+  const router = useRouter();
 
   const {
     register,
@@ -62,14 +64,27 @@ export default function ProfileForm({ user }: ProfileFormProps) {
         return;
       }
 
-      toast({
-        title: "Sucesso!",
-        description: "Perfil atualizado com sucesso!",
-        variant: "success",
-      });
+      // Usar os dados atualizados do usuário retornados pela API
+      if (result.user) {
+        reset({
+          firstName: result.user.firstName,
+          lastName: result.user.lastName,
+          whatsappNumber: result.user.whatsappNumber,
+        });
+      } else {
+        reset(data);
+      }
 
-      // Reseta o formulário com os novos valores
-      reset(data);
+      if (result.success) {
+        // Força a revalidação dos dados e atualiza a página
+        router.refresh();
+
+        toast({
+          title: "Sucesso!",
+          description: "Perfil atualizado com sucesso!",
+          variant: "success",
+        });
+      }
     } catch (error: any) {
       toast({
         title: "Erro",
