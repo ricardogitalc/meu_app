@@ -34,7 +34,7 @@ export default async function Navbar() {
           <div className="flex items-center gap-4">
             <Link href="/" className="flex items-center gap-2">
               <KeySquare className="w-6 h-6 text-secondary" />
-              <p className="text-lg font-medium">Logotipo</p>
+              <p className="text-lg font-bold">Logo</p>
             </Link>
           </div>
           <div className="flex items-center space-x-2 sm:space-x-4">

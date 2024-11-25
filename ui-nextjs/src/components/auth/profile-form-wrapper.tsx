@@ -1,7 +1,7 @@
 "use client";
 
 import { useFormStatus } from "react-dom";
-import { useActionState } from "react";
+import React, { useActionState } from "react";
 import { Button } from "@/components/ui/button";
 import { Loader2 } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
@@ -11,6 +11,7 @@ import { CardFooter } from "../ui/card";
 interface FormState {
   success?: boolean;
   error?: string;
+  fieldErrors?: Record<string, string>;
 }
 
 type FormStateWithNull = FormState | null;
@@ -43,11 +44,12 @@ export function FormStateHandler({
   initialValues,
 }: {
   action: FormAction;
-  children: React.ReactNode;
+  children: React.ReactElement;
   initialValues: Record<string, string | undefined>;
 }) {
   const [isDirty, setIsDirty] = useState(false);
   const formRef = useRef<HTMLFormElement>(null);
+  const [fieldErrors, setFieldErrors] = useState<Record<string, string>>({});
 
   const handleChange = () => {
     if (formRef.current) {
@@ -72,6 +74,10 @@ export function FormStateHandler({
       const result = await action(prevState, formData);
       if (result.success) {
         setIsDirty(false);
+        setFieldErrors({});
+      }
+      if (result.fieldErrors) {
+        setFieldErrors(result.fieldErrors);
       }
       return result;
     },
@@ -80,10 +86,12 @@ export function FormStateHandler({
   const { toast } = useToast();
 
   useEffect(() => {
-    if (state?.error) {
+    if (state?.error && !state.fieldErrors) {
       toast({
         title: "Erro",
-        description: state.error,
+        description: state.error
+          .split("\n")
+          .map((line, i) => <p key={i}>{line}</p>),
         variant: "destructive",
       });
     } else if (state?.success) {
@@ -97,7 +105,7 @@ export function FormStateHandler({
 
   return (
     <form ref={formRef} action={formAction} onChange={handleChange}>
-      {children}
+      {React.cloneElement(children as React.ReactElement, { fieldErrors })}
       <CardFooter>
         <SubmitButton disabled={!isDirty} />
       </CardFooter>

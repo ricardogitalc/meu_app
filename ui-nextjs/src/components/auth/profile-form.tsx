@@ -14,10 +14,13 @@ import { updateUser } from "@/auth/api/api";
 import { FormStateHandler } from "./profile-form-wrapper";
 import { redirect } from "next/navigation";
 import { User } from "@/auth/interfaces/interfaces";
+import { ZodError } from "zod";
+import { FormContent } from "./form-content";
 
 interface FormState {
   success?: boolean;
   error?: string;
+  fieldErrors?: Record<string, string>;
 }
 
 type FormStateWithNull = FormState | null;
@@ -51,17 +54,36 @@ export default async function ProfileForm() {
         whatsappNumber: formData.get("whatsappNumber") as string,
       };
 
-      const validatedData = profileSchema.parse(data);
-      const result = await updateUser(user.id, validatedData);
+      try {
+        const validatedData = profileSchema.parse(data);
 
-      if (!result.success) {
-        return {
-          error: result.message || "Não foi possível atualizar o perfil",
-        };
+        await new Promise((resolve) => setTimeout(resolve, 2000));
+
+        const result = await updateUser(user.id, validatedData);
+
+        if (!result.success) {
+          return {
+            error: result.message || "Não foi possível atualizar o perfil",
+          };
+        }
+
+        revalidatePath("/perfil");
+        return { success: true };
+      } catch (zodError) {
+        if (zodError instanceof ZodError) {
+          const fieldErrors: Record<string, string> = {};
+          zodError.errors.forEach((error) => {
+            if (error.path) {
+              fieldErrors[error.path[0]] = error.message;
+            }
+          });
+          return {
+            error: "Erro de validação",
+            fieldErrors,
+          };
+        }
+        throw zodError; // Re-throw se não for um erro do Zod
       }
-
-      revalidatePath("/perfil");
-      return { success: true };
     } catch (error) {
       return {
         error: error instanceof Error ? error.message : "Erro ao validar dados",
@@ -76,44 +98,7 @@ export default async function ProfileForm() {
         <CardDescription>Atualize suas informações pessoais</CardDescription>
       </CardHeader>
       <FormStateHandler action={updateProfile} initialValues={initialValues}>
-        <CardContent className="space-y-4">
-          <div className="space-y-2">
-            <Label htmlFor="email">Email</Label>
-            <Input
-              id="email"
-              type="email"
-              disabled
-              className="bg-muted"
-              value={user.email}
-            />
-          </div>
-          <div className="space-y-2">
-            <Label htmlFor="firstName">Nome</Label>
-            <Input
-              name="firstName"
-              defaultValue={user.firstName}
-              placeholder="Nome"
-            />
-          </div>
-          <div className="space-y-2">
-            <Label htmlFor="lastName">Sobrenome</Label>
-            <Input
-              name="lastName"
-              defaultValue={user.lastName}
-              placeholder="Sobrenome"
-            />
-          </div>
-          <div className="space-y-2">
-            <Label htmlFor="whatsapp">WhatsApp</Label>
-            <Input
-              name="whatsappNumber"
-              defaultValue={user.whatsappNumber}
-              placeholder="Ex: 11999999999"
-              type="tel"
-              maxLength={11}
-            />
-          </div>
-        </CardContent>
+        <FormContent user={user} fieldErrors={{}} />
       </FormStateHandler>
     </Card>
   );

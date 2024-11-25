@@ -1,8 +1,8 @@
 export const AUHT_MENSSAGES = {
   invalidEmail: "Por favor, insira um email válido",
   confirmEmail: "Os emails não coincidem",
-  firstNameError: "Mínimo 2 caracteres",
-  lastNameError: "Mínimo 2 caracteres",
+  firstNameError: "O nome deve conter no mínimo 2 caracteres",
+  lastNameError: "O sobrenome deve conter no mínimo 2 caracteres",
   minWhatsappError: "WhatsApp é obrigatório",
   regexWhatsappError: "WhatsApp deve estar no formato: 11999999999",
 } as const;

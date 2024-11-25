@@ -39,7 +39,6 @@ export function LoginForm() {
       setIsLoading(true);
       const response = await sendMagicLink(data.destination);
 
-      // Adiciona delay de 2 segundos
       await new Promise((resolve) => setTimeout(resolve, 2000));
 
       if (response.status === 401) {

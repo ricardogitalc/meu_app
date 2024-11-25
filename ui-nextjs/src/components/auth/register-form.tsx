@@ -49,10 +49,8 @@ export function RegisterForm() {
 
       const response = await registerUser(outputData);
 
-      // Adiciona delay de 2 segundos
       await new Promise((resolve) => setTimeout(resolve, 2000));
 
-      // Verifica se a resposta contém status de erro
       if (response.status === 401) {
         toast({
           title: "Erro",
