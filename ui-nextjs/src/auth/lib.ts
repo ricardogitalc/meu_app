@@ -34,16 +34,7 @@ export async function login(response: LoginResponse) {
     throw new Error("Dados de login inválidos");
   }
 
-  let verified: JWTVerifyResult;
-  try {
-    verified = await verifyJWT(response.jwt_token, key);
-  } catch (error) {
-    if (error instanceof Error) {
-      throw new Error(`Erro na verificação do token: ${error.message}`);
-    }
-    throw error;
-  }
-
+  await verifyJWT(response.jwt_token, key);
   const cookieStore = await cookies();
 
   await cookieStore.set("accessToken", response.jwt_token, {
@@ -186,18 +177,11 @@ async function handleAuthFailure(request: NextRequest) {
 }
 
 export async function handleGoogleLogin(code: string) {
-  try {
-    const response = await handleGoogleCallback(code);
-    if (!response.jwt_token || !response.refresh_token || !response.user) {
-      throw new Error("Resposta inválida do Google OAuth");
-    }
-    return await login(response);
-  } catch (error) {
-    if (error instanceof Error) {
-      throw new Error(`Erro na autenticação Google: ${error.message}`);
-    }
-    throw new Error("Erro desconhecido na autenticação Google");
+  const response = await handleGoogleCallback(code);
+  if (!response.jwt_token || !response.refresh_token || !response.user) {
+    throw new Error("Resposta inválida do Google OAuth");
   }
+  return await login(response);
 }
 
 export async function updateUserSession(jwt_token: string, user: User) {

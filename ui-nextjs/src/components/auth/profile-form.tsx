@@ -1,100 +1,73 @@
-"use client";
-
-import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import {
   Card,
   CardContent,
   CardDescription,
-  CardFooter,
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
-import { useForm } from "react-hook-form";
-import { zodResolver } from "@hookform/resolvers/zod";
+import { getSession } from "@/auth/lib";
 import { profileSchema } from "@/auth/schema/schema";
-import type { z } from "zod";
-import type { User } from "@/types/user";
+import { revalidatePath } from "next/cache";
 import { updateUser } from "@/auth/api/api";
-import { useToast } from "@/hooks/use-toast";
-import { useState } from "react";
-import { Loader2 } from "lucide-react";
-import { useRouter } from "next/navigation";
+import { FormStateHandler } from "./profile-form-wrapper";
+import { redirect } from "next/navigation";
+import type { User } from "@/types/user";
 
-type ProfileFormData = z.infer<typeof profileSchema>;
+interface FormState {
+  success?: boolean;
+  error?: string;
+}
 
-type ProfileFormProps = {
-  user: User;
-};
+type FormStateWithNull = FormState | null;
 
-export default function ProfileForm({ user }: ProfileFormProps) {
-  const { toast } = useToast();
-  const [isLoading, setIsLoading] = useState(false);
-  const router = useRouter();
+function assertUser(user: User | null): asserts user is User {
+  if (!user) redirect("/login");
+}
 
-  const {
-    register,
-    handleSubmit,
-    reset,
-    formState: { errors, isDirty },
-  } = useForm<ProfileFormData>({
-    resolver: zodResolver(profileSchema),
-    defaultValues: {
-      firstName: user.firstName,
-      lastName: user.lastName,
-      whatsappNumber: user.whatsappNumber,
-    },
-  });
+export default async function ProfileForm() {
+  const userResponse = await getSession();
+  assertUser(userResponse);
 
-  const onSubmit = async (data: ProfileFormData) => {
+  const user: User = userResponse;
+
+  const initialValues: Record<string, string | undefined> = {
+    firstName: user.firstName || "",
+    lastName: user.lastName || "",
+    whatsappNumber: user.whatsappNumber,
+  };
+
+  async function updateProfile(
+    prevState: FormStateWithNull,
+    formData: FormData
+  ): Promise<FormState> {
+    "use server";
+
     try {
-      setIsLoading(true);
-      const result = await updateUser(user.id, data);
+      const data = {
+        firstName: formData.get("firstName") as string,
+        lastName: formData.get("lastName") as string,
+        whatsappNumber: formData.get("whatsappNumber") as string,
+      };
 
-      // Adiciona delay de 2 segundos
-      await new Promise((resolve) => setTimeout(resolve, 2000));
+      const validatedData = profileSchema.parse(data);
+      const result = await updateUser(user.id, validatedData);
 
       if (!result.success) {
-        toast({
-          title: "Erro",
-          description: result.message || "Não foi possível atualizar o perfil",
-          variant: "destructive",
-        });
-        return;
+        return {
+          error: result.message || "Não foi possível atualizar o perfil",
+        };
       }
 
-      // Usar os dados atualizados do usuário retornados pela API
-      if (result.user) {
-        reset({
-          firstName: result.user.firstName,
-          lastName: result.user.lastName,
-          whatsappNumber: result.user.whatsappNumber,
-        });
-      } else {
-        reset(data);
-      }
-
-      if (result.success) {
-        // Força a revalidação dos dados e atualiza a página
-        router.refresh();
-
-        toast({
-          title: "Sucesso!",
-          description: "Perfil atualizado com sucesso!",
-          variant: "success",
-        });
-      }
-    } catch (error: any) {
-      toast({
-        title: "Erro",
-        description: error.message || "Erro ao conectar com o servidor",
-        variant: "destructive",
-      });
-    } finally {
-      setIsLoading(false);
+      revalidatePath("/perfil");
+      return { success: true };
+    } catch (error) {
+      return {
+        error: error instanceof Error ? error.message : "Erro ao validar dados",
+      };
     }
-  };
+  }
 
   return (
     <Card className="w-full max-w-md">
@@ -102,7 +75,7 @@ export default function ProfileForm({ user }: ProfileFormProps) {
         <CardTitle>Perfil</CardTitle>
         <CardDescription>Atualize suas informações pessoais</CardDescription>
       </CardHeader>
-      <form onSubmit={handleSubmit(onSubmit)}>
+      <FormStateHandler action={updateProfile} initialValues={initialValues}>
         <CardContent className="space-y-4">
           <div className="space-y-2">
             <Label htmlFor="email">Email</Label>
@@ -116,54 +89,32 @@ export default function ProfileForm({ user }: ProfileFormProps) {
           </div>
           <div className="space-y-2">
             <Label htmlFor="firstName">Nome</Label>
-            <Input {...register("firstName")} placeholder="Nome" />
-            {errors.firstName && (
-              <span className="text-sm text-red-500">
-                {errors.firstName.message}
-              </span>
-            )}
+            <Input
+              name="firstName"
+              defaultValue={user.firstName}
+              placeholder="Nome"
+            />
           </div>
           <div className="space-y-2">
             <Label htmlFor="lastName">Sobrenome</Label>
-            <Input {...register("lastName")} placeholder="Sobrenome" />
-            {errors.lastName && (
-              <span className="text-sm text-red-500">
-                {errors.lastName.message}
-              </span>
-            )}
+            <Input
+              name="lastName"
+              defaultValue={user.lastName}
+              placeholder="Sobrenome"
+            />
           </div>
           <div className="space-y-2">
             <Label htmlFor="whatsapp">WhatsApp</Label>
             <Input
-              {...register("whatsappNumber")}
+              name="whatsappNumber"
+              defaultValue={user.whatsappNumber}
               placeholder="Ex: 11999999999"
               type="tel"
               maxLength={11}
             />
-            {errors.whatsappNumber && (
-              <span className="text-sm text-red-500">
-                {errors.whatsappNumber.message}
-              </span>
-            )}
           </div>
         </CardContent>
-        <CardFooter>
-          <Button
-            className="w-full"
-            type="submit"
-            disabled={isLoading || !isDirty}
-          >
-            {isLoading ? (
-              <>
-                <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                Atualizando...
-              </>
-            ) : (
-              "Atualizar perfil"
-            )}
-          </Button>
-        </CardFooter>
-      </form>
+      </FormStateHandler>
     </Card>
   );
 }
