@@ -22,6 +22,7 @@ import { ModeToggle } from "./theme/ModeToggle";
 import LogoIcon from "./icons/logoIcon";
 import { getSession, logout } from "@/auth/lib";
 import { redirect } from "next/navigation";
+import { KeySquare } from "@/svgs/key-square";
 
 export default async function Navbar() {
   const session = await getSession();
@@ -31,8 +32,9 @@ export default async function Navbar() {
       <div className="mx-auto max-w-[1440px] px-4 sm:px-6 lg:px-8">
         <div className="flex h-16 items-center justify-between">
           <div className="flex items-center gap-4">
-            <Link href="/">
-              <LogoIcon />
+            <Link href="/" className="flex items-center gap-2">
+              <KeySquare className="w-6 h-6 text-secondary" />
+              <p className="text-lg font-medium">Logotipo</p>
             </Link>
           </div>
           <div className="flex items-center space-x-2 sm:space-x-4">

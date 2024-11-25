@@ -42,7 +42,7 @@ export default function VerifyLoginPage() {
                 message: response.message || "Login verificado com sucesso!",
               });
               setTimeout(() => {
-                router.push("/dashboard");
+                router.push("/");
               }, 2000);
             } else {
               setAlert({

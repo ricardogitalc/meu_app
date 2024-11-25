@@ -41,7 +41,7 @@ export default function VerifyRegisterPage() {
                 message: response.message || "Conta verificada com sucesso!",
               });
               setTimeout(() => {
-                router.push("/dashboard");
+                router.push("/");
               }, 2000);
             } else {
               setAlert({
