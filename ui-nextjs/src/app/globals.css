@@ -25,14 +25,14 @@ body {
     --primary-foreground: 0 0% 100%; /* Texto branco */
     --secondary: 160 80% 40%; /* Verde mais escuro */
     --secondary-foreground: 230 15% 10%; /* Texto escuro */
-    --muted: 230 10% 90%; /* Fundo suavizado */
+    --muted: 230 10% 93%; /* Fundo suavizado */
     --muted-foreground: 230 15% 35%; /* Texto suavizado */
     --accent: 265 13% 94%; /* Roxo */
     --accent-foreground: 230 15% 10%; /* Texto branco */
     --destructive: 0 80% 50%; /* Vermelho de alerta */
     --destructive-foreground: 0 0% 100%; /* Texto branco */
     --border: 265 5% 90%; /* Bordas suaves */
-    --input: 265 5% 90%; /* Campo de input branco */
+    --input: 265 5% 89%; /* Campo de input branco */
     --ring: 160 80% 40%; /* Verde escuro para foco */
     --radius: 0.5rem; /* Arredondamento padrão */
     --chart-1: 251 70% 55%; /* Roxo */

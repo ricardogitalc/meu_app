@@ -38,11 +38,10 @@ export default async function Navbar() {
             </Link>
           </div>
           <div className="flex items-center space-x-2 sm:space-x-4">
-            <ModeToggle />
             <Link href="/planos">
               <Button>
                 <Rocket className="h-4 w-4" />
-                <p>Assinar</p>
+                <p>Pro</p>
               </Button>
             </Link>
 
@@ -75,6 +74,11 @@ export default async function Navbar() {
                       </p>
                     </div>
                   </DropdownMenuLabel>
+                  <DropdownMenuSeparator />
+                  <div className="flex justify-between items-center p-2">
+                    <h1 className="text-sm">Tema</h1>
+                    <ModeToggle />
+                  </div>
                   <DropdownMenuSeparator />
                   <Link href="/perfil">
                     <DropdownMenuItem>

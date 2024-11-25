@@ -12,10 +12,28 @@ import {
 
 export function ModeToggle() {
   const { theme, setTheme } = useTheme();
+  const [mounted, setMounted] = React.useState(false);
+
+  React.useEffect(() => {
+    setMounted(true);
+  }, []);
+
+  if (!mounted) {
+    return (
+      <div className="flex items-center space-x-2 p-1.5 bg-muted/50 rounded-full">
+        {[1, 2, 3].map((i) => (
+          <div
+            key={i}
+            className="w-7 h-7 rounded-full bg-muted animate-pulse"
+          />
+        ))}
+      </div>
+    );
+  }
 
   return (
     <TooltipProvider>
-      <div className="flex items-center space-x-2 p-1.5 bg-muted/50 rounded-full">
+      <div className="flex items-center gap-1 p-1 bg-muted/60 rounded-full">
         <Tooltip>
           <TooltipTrigger asChild>
             <button
