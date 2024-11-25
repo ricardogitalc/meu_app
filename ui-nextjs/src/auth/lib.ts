@@ -1,4 +1,4 @@
-import { jwtVerify, JWTVerifyResult } from "jose";
+import { jwtVerify } from "jose";
 import { cookies } from "next/headers";
 import { NextRequest, NextResponse } from "next/server";
 import { redirect } from "next/navigation";
@@ -6,7 +6,7 @@ import {
   handleGoogleCallback,
   refreshToken as refreshTokenRequest,
 } from "./api/api";
-import type { User } from "@/types/user";
+import { User } from "./interfaces/interfaces";
 
 const secretKey =
   "986c0859540006e4aa01aea281858ec3a8e673aa311b112bc87f5d6de0e2389b";
@@ -22,14 +22,14 @@ export async function verifyJWT(
   return payload;
 }
 
-interface LoginResponse {
+interface BaseAuthResponse {
   jwt_token: string;
   refresh_token: string;
   user: User;
   message: string;
 }
 
-export async function login(response: LoginResponse) {
+export async function login(response: BaseAuthResponse) {
   if (!response.jwt_token || !response.refresh_token || !response.user) {
     throw new Error("Dados de login inválidos");
   }

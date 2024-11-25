@@ -7,7 +7,6 @@ export const protectedRoutes = [
   "/favoritos",
   "/perfil",
   "/seguindo",
-  "/test-info",
 ];
 
 export const authRoutes = [
@@ -15,6 +14,7 @@ export const authRoutes = [
   "/register",
   "/verify-login",
   "/verify-register",
+  "/google-callback",
 ];
 
 export const isPublicRoute = (path: string) =>

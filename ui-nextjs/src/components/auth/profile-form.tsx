@@ -13,7 +13,7 @@ import { revalidatePath } from "next/cache";
 import { updateUser } from "@/auth/api/api";
 import { FormStateHandler } from "./profile-form-wrapper";
 import { redirect } from "next/navigation";
-import type { User } from "@/types/user";
+import type { User } from "@/auth/types/user";
 
 interface FormState {
   success?: boolean;

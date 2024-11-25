@@ -19,6 +19,7 @@ import { Response } from 'express';
 import { JwtGuard } from './guards/jwt.guard';
 import { CONFIG_MESSAGES } from 'src/config/config';
 import { UsersService } from '../users/users.service';
+import { ResendService } from '../mail/resend';
 
 @Controller('auth')
 @UseFilters(HttpExceptionsFilter)
@@ -27,6 +28,7 @@ export class AuthController {
     private readonly authService: AuthService,
     private readonly strategy: MagicLoginStrategy,
     private readonly usersService: UsersService,
+    private readonly resendService: ResendService,
   ) {}
 
   @Post('login')
@@ -44,6 +46,11 @@ export class AuthController {
     const tokens = await this.authService.generateMagicLinkToken(
       body.destination,
     );
+    await this.resendService.sendLoginEmail(
+      body.destination,
+      tokens.verify_url,
+    );
+
     return { message: 'Link de acesso enviado.', tokens: tokens };
   }
 

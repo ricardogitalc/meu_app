@@ -16,13 +16,12 @@ export interface BaseAuthResponse {
   status: number;
 }
 
-export interface LoginResponse extends BaseAuthResponse {}
-
 export interface RegisterResponse {
   message: string;
   register_token: string;
   verify_url: string;
 }
 
-// Removemos a exportação duplicada e usamos BaseAuthResponse como base
+export interface LoginResponse extends BaseAuthResponse {}
 export type AuthResponse = BaseAuthResponse;
+export * from "./interfaces";

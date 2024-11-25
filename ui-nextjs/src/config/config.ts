@@ -1,9 +1,3 @@
-export const AUTH_TIMES = {
-  JWT_TOKEN: "3m",
-  LOGIN_TOKEN: "3m",
-  REFRESH_TOKEN: "10m",
-} as const;
-
 export const AUHT_MENSSAGES = {
   invalidEmail: "Por favor, insira um email válido",
   confirmEmail: "Os emails não coincidem",
@@ -14,7 +8,7 @@ export const AUHT_MENSSAGES = {
 } as const;
 
 export const AUTH_GOOGLE = {
-  backendUrl: process.env.NEXT_PUBLIC_BACKEND_URL || "http://localhost:3003",
+  backendUrl: process.env.BACKEND_URL || "http://localhost:3003",
   defaultRedirect: "/",
   loginPath: "/login",
   errors: {

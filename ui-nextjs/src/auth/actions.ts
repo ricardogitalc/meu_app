@@ -1,7 +1,7 @@
 "use server";
 
 import { cookies } from "next/headers";
-import type { User } from "@/types/user";
+import { User } from "./interfaces/interfaces";
 
 export async function serverLogin(
   jwt_token: string,

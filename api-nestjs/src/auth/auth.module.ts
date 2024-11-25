@@ -9,6 +9,7 @@ import { JwtStrategy } from './strategy/jwt.strategy';
 import { GoogleStrategy } from './strategy/google.strategy';
 import { MagicLoginStrategy } from './strategy/magic-login.strategy';
 import { AUTH_TIMES } from 'src/config/config';
+import { ResendService } from '../mail/resend';
 
 @Module({
   imports: [
@@ -29,6 +30,12 @@ import { AUTH_TIMES } from 'src/config/config';
   ],
   controllers: [AuthController],
   exports: [AuthService],
-  providers: [AuthService, MagicLoginStrategy, JwtStrategy, GoogleStrategy],
+  providers: [
+    AuthService,
+    MagicLoginStrategy,
+    JwtStrategy,
+    GoogleStrategy,
+    ResendService,
+  ],
 })
 export class AuthModule {}

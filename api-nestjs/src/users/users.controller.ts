@@ -23,6 +23,7 @@ import { AdminGuard } from './guards/admin.guard';
 import { AuthService } from 'src/auth/auth.service';
 import { ConfigService } from '@nestjs/config';
 import { JwtGuard } from 'src/auth/guards/jwt.guard';
+import { ResendService } from '../mail/resend';
 
 @Controller('users')
 @UseFilters(HttpExceptionsFilter)
@@ -32,6 +33,7 @@ export class UsersController {
     @Inject(forwardRef(() => AuthService))
     private readonly authService: AuthService,
     private readonly configService: ConfigService,
+    private readonly resendService: ResendService,
   ) {}
 
   @Post('register')
@@ -47,6 +49,11 @@ export class UsersController {
     const verify_url = `${this.configService.get<string>(
       'FRONTEND_URL',
     )}/verify-register?register_token=${register_token}`;
+
+    await this.resendService.sendVerificationEmail(
+      createUserDto.email,
+      verify_url,
+    );
 
     return {
       message: CONFIG_MESSAGES.SendVerificationLink,

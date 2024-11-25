@@ -114,7 +114,6 @@ export async function updateUser(
       headers: {
         "Content-Type": "application/json",
         Authorization: `Bearer ${accessToken}`,
-        // Adiciona cabeçalho para evitar cache
         "Cache-Control": "no-cache, no-store, must-revalidate",
       },
       body: JSON.stringify(userData),
@@ -131,7 +130,6 @@ export async function updateUser(
       };
     }
 
-    // Atualiza o token imediatamente
     if (data.jwt_token) {
       await cookieStore.set("accessToken", data.jwt_token, {
         httpOnly: true,
