@@ -1,13 +1,22 @@
-import { Injectable, UnauthorizedException } from '@nestjs/common';
+import {
+  HttpException,
+  HttpStatus,
+  Injectable,
+  Logger,
+  UnauthorizedException,
+} from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import { ConfigService } from '@nestjs/config';
 import { UsersService } from 'src/users/users.service';
 import { AUTH_TIMES, CONFIG_MESSAGES } from 'src/config/config';
 import { CreateUserDto } from 'src/users/dto/users.dto';
 import { UserEntity } from 'src/users/entity/users.entity';
+import * as jose from 'jose';
 
 @Injectable()
 export class AuthService {
+  private readonly logger = new Logger(AuthService.name);
+
   constructor(
     private usersService: UsersService,
     private jwtService: JwtService,
@@ -114,5 +123,42 @@ export class AuthService {
       secret: this.configService.get<string>('REFRESH_TOKEN_SECRET'),
       expiresIn: AUTH_TIMES.REFRESH_TOKEN,
     });
+  }
+
+  async generateTestJWE() {
+    const payload = {
+      sub: '3424234',
+      name: 'Payloading...',
+      role: 'adminnn',
+      exp: Math.floor(Date.now() / 1000) + 60 * 15,
+    };
+
+    const secretKey = this.configService.get<string>('JWT_SECRET_KEY');
+    const key = new TextEncoder().encode(secretKey.slice(0, 32));
+    const jwe = await new jose.CompactEncrypt(
+      new TextEncoder().encode(JSON.stringify(payload)),
+    )
+      .setProtectedHeader({ alg: 'dir', enc: 'A256GCM' })
+      .encrypt(key);
+
+    return {
+      jwe,
+      message: 'Token JWE gerado com sucesso',
+    };
+  }
+
+  async decryptTestJWE(jwe: string) {
+    const secretKey = this.configService.get<string>('JWT_SECRET_KEY');
+
+    const key = new TextEncoder().encode(secretKey.slice(0, 32));
+
+    const { plaintext } = await jose.compactDecrypt(jwe, key);
+    const decodedPayload = new TextDecoder().decode(plaintext);
+    const payload = JSON.parse(decodedPayload);
+
+    return {
+      payload: payload,
+      message: 'Token JWE descriptografado com sucesso',
+    };
   }
 }

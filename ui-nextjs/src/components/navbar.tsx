@@ -75,7 +75,7 @@ export default async function Navbar() {
                     </div>
                   </DropdownMenuLabel>
                   <DropdownMenuSeparator />
-                  <div className="flex justify-between items-center p-2">
+                  <div className="flex justify-center items-center p-2 gap-4">
                     <h1 className="text-sm">Tema</h1>
                     <ModeToggle />
                   </div>

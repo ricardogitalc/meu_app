@@ -50,6 +50,9 @@ importers:
       i:
         specifier: ^0.3.7
         version: 0.3.7
+      jose:
+        specifier: ^5.9.6
+        version: 5.9.6
       migrate:
         specifier: ^2.1.0
         version: 2.1.0
@@ -2006,6 +2009,9 @@ packages:
     peerDependenciesMeta:
       node-notifier:
         optional: true
+
+  jose@5.9.6:
+    resolution: {integrity: sha512-AMlnetc9+CV9asI19zHmrgS/WYsWUwCn2R7RzlbJWD7F9eWYUTGyBmU9o6PxngtLGOiDGPRu+Uc4fhKzbpteZQ==}
 
   js-beautify@1.15.1:
     resolution: {integrity: sha512-ESjNzSlt/sWE8sciZH8kBF8BPlwXPwhR6pWKAw8bw4Bwj+iZcnKW6ONWUutJ7eObuBZQpiIb8S7OYspWrKt7rA==}
@@ -5539,6 +5545,8 @@ snapshots:
       - babel-plugin-macros
       - supports-color
       - ts-node
+
+  jose@5.9.6: {}
 
   js-beautify@1.15.1:
     dependencies:

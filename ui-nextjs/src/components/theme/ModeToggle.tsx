@@ -2,7 +2,7 @@
 
 import * as React from "react";
 import { useTheme } from "next-themes";
-import { CircleSlash2, Moon, Sun } from "lucide-react";
+import { Monitor, Moon, Sun } from "lucide-react";
 import {
   Tooltip,
   TooltipContent,
@@ -78,7 +78,7 @@ export function ModeToggle() {
                   : "hover:bg-input"
               }`}
             >
-              <CircleSlash2 className="h-4 w-4" />
+              <Monitor className="h-4 w-4" />
             </button>
           </TooltipTrigger>
           <TooltipContent className="bg-background text-foreground border">

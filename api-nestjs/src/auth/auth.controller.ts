@@ -132,4 +132,14 @@ export class AuthController {
       throw new UnauthorizedException(CONFIG_MESSAGES.JwtTokenExpired);
     }
   }
+
+  @Post('test-jwe')
+  async generateTestJWE() {
+    return this.authService.generateTestJWE();
+  }
+
+  @Post('decrypt-jwe')
+  async decryptTestJWE(@Body() body: { jwe: string }) {
+    return this.authService.decryptTestJWE(body.jwe);
+  }
 }
