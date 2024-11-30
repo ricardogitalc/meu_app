@@ -11,15 +11,15 @@ export interface User {
 export interface BaseAuthResponse {
   message: string;
   user: User;
-  jwt_token: string;
-  refresh_token: string;
+  accessToken: string;
+  refreshToken: string;
   status: number;
 }
 
 export interface RegisterResponse {
   message: string;
-  register_token: string;
-  verify_url: string;
+  registerToken: string;
+  verifyUrl: string;
 }
 
 export interface LoginResponse extends BaseAuthResponse {}

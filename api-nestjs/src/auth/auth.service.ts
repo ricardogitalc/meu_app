@@ -2,7 +2,7 @@ import { Injectable, UnauthorizedException } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import { ConfigService } from '@nestjs/config';
 import { UsersService } from 'src/users/users.service';
-import { AUTH_TIMES, CONFIG_MESSAGES } from 'src/config/config';
+import { JWT_TIMES, CONFIG_MESSAGES } from 'src/config/config';
 import { CreateUserDto } from 'src/users/dto/users.dto';
 import { UserEntity } from 'src/users/entity/users.entity';
 
@@ -16,6 +16,10 @@ export class AuthService {
 
   validateUser(email: string) {
     return this.usersService.UserFindUnique({ email });
+  }
+
+  validateUserById(id: number) {
+    return this.usersService.UserFindById(id);
   }
 
   async createGoogleUser(userData: {
@@ -35,32 +39,26 @@ export class AuthService {
   generateTokens(user: UserEntity) {
     const payload = {
       sub: user.id,
-      email: user.email,
-      firstName: user.firstName,
-      lastName: user.lastName,
-      whatsappNumber: user.whatsappNumber,
-      imageUrl: user.imageUrl,
-      verified: user.verified,
     };
-    return { jwt_token: this.jwtService.sign(payload) };
+    return { accessToken: this.jwtService.sign(payload) };
   }
 
-  generateMagicLinkToken(destination: string) {
-    const payload = { destination };
-    const login_token = this.jwtService.sign(payload, {
-      expiresIn: AUTH_TIMES.LOGIN_TOKEN,
+  generateMagicLinkToken(email: string) {
+    const payload = { email };
+    const loginToken = this.jwtService.sign(payload, {
+      expiresIn: JWT_TIMES.LOGIN_TOKEN,
     });
-    const verify_url = `${this.configService.get<string>(
+    const verifyUrl = `${this.configService.get<string>(
       'FRONTEND_URL',
-    )}/verify-login?login_token=${login_token}`;
+    )}/verify-login?loginToken=${loginToken}`;
 
-    return { login_token, verify_url };
+    return { loginToken, verifyUrl };
   }
 
   async verifyMagicLinkToken(token: string) {
     try {
       const payload = this.jwtService.verify(token);
-      const user = await this.validateUser(payload.destination);
+      const user = await this.validateUser(payload.email);
       return user;
     } catch (error) {
       throw new UnauthorizedException(CONFIG_MESSAGES.JwtTokenExpired);
@@ -70,17 +68,20 @@ export class AuthService {
   async verifyRegisterToken(token: string) {
     try {
       const payload = this.jwtService.verify(token);
-      return payload.userData;
+      return payload;
     } catch (error) {
       throw new UnauthorizedException(CONFIG_MESSAGES.JwtTokenExpired);
     }
   }
 
   generateRegisterToken(userData: CreateUserDto) {
-    const payload = { userData };
-    return this.jwtService.sign(payload, {
-      expiresIn: AUTH_TIMES.LOGIN_TOKEN,
-    });
+    const payload = {
+      email: userData.email,
+      firstName: userData.firstName,
+      lastName: userData.lastName,
+      whatsappNumber: userData.whatsappNumber,
+    };
+    return this.jwtService.sign(payload);
   }
 
   async refreshToken(refreshToken: string) {
@@ -89,14 +90,14 @@ export class AuthService {
         secret: this.configService.get<string>('REFRESH_TOKEN_SECRET'),
       });
 
-      const user = await this.validateUser(payload.email);
+      const user = await this.validateUserById(payload.sub);
       if (!user) {
         throw new UnauthorizedException(CONFIG_MESSAGES.UserNotFound);
       }
 
-      const jwt_token = this.generateTokens(user);
+      const accessToken = this.generateTokens(user);
 
-      return { user, ...jwt_token };
+      return accessToken;
     } catch (error) {
       throw new UnauthorizedException(CONFIG_MESSAGES.JwtTokenExpired);
     }
@@ -104,12 +105,12 @@ export class AuthService {
 
   generateRefreshToken(user: UserEntity) {
     const payload = {
-      email: user.email,
+      sub: user.id,
     };
 
     return this.jwtService.sign(payload, {
       secret: this.configService.get<string>('REFRESH_TOKEN_SECRET'),
-      expiresIn: AUTH_TIMES.REFRESH_TOKEN,
+      expiresIn: JWT_TIMES.REFRESH_TOKEN,
     });
   }
 }

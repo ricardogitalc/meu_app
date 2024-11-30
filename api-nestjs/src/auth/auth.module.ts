@@ -7,7 +7,7 @@ import { PassportModule } from '@nestjs/passport';
 import { JwtModule } from '@nestjs/jwt';
 import { JwtStrategy } from './strategy/jwt.strategy';
 import { GoogleStrategy } from './strategy/google.strategy';
-import { AUTH_TIMES } from 'src/config/config';
+import { JWT_TIMES, JWT_CONFIG } from 'src/config/config';
 import { ResendService } from '../mail/resend';
 
 @Module({
@@ -19,9 +19,8 @@ import { ResendService } from '../mail/resend';
       useFactory: async (configService: ConfigService) => ({
         secret: configService.get<string>('JWT_SECRET_KEY'),
         signOptions: {
-          expiresIn: AUTH_TIMES.JWT_TOKEN,
-          algorithm: 'HS512',
-          encoding: 'UTF8',
+          expiresIn: JWT_TIMES.ACCESS_TOKEN,
+          ...JWT_CONFIG,
         },
       }),
       inject: [ConfigService],

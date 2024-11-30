@@ -13,7 +13,7 @@ export default function CallbackPage() {
     async function handleCallback() {
       try {
         const token = searchParams.get("token");
-        const refreshToken = searchParams.get("refresh_token");
+        const refreshToken = searchParams.get("refreshToken");
         const userStr = searchParams.get("user");
 
         if (!token || !refreshToken) {

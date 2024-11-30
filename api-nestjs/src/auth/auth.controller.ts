@@ -18,6 +18,7 @@ import { Response } from 'express';
 import { CONFIG_MESSAGES } from 'src/config/config';
 import { UsersService } from '../users/users.service';
 import { ResendService } from '../mail/resend';
+import { Throttle } from '@nestjs/throttler';
 
 @Controller('auth')
 @UseFilters(HttpExceptionsFilter)
@@ -28,9 +29,10 @@ export class AuthController {
     private readonly resendService: ResendService,
   ) {}
 
+  @Throttle({ default: { limit: 3, ttl: 60000 } })
   @Post('login')
   async login(@Body() body: LoginDto) {
-    const user = await this.authService.validateUser(body.destination);
+    const user = await this.authService.validateUser(body.email);
 
     if (!user) {
       throw new UnauthorizedException(CONFIG_MESSAGES.UserNotFound);
@@ -40,36 +42,33 @@ export class AuthController {
       throw new UnauthorizedException(CONFIG_MESSAGES.EmailNotVerified);
     }
 
-    const tokens = await this.authService.generateMagicLinkToken(
-      body.destination,
-    );
-    await this.resendService.sendLoginEmail(
-      body.destination,
-      tokens.verify_url,
-    );
+    const tokens = await this.authService.generateMagicLinkToken(body.email);
+    await this.resendService.sendLoginEmail(body.email, tokens.verifyUrl);
 
     return { message: 'Link de acesso enviado.', ...tokens };
   }
 
+  @Throttle({ default: { limit: 1, ttl: 60000 } })
   @Get('verify-login')
   async verifyL(
-    @Headers('login-token') loginToken: string,
+    @Headers('loginToken') loginToken: string,
     @Res({ passthrough: true }) response: Response,
   ) {
     const user = await this.authService.verifyMagicLinkToken(loginToken);
 
-    const { jwt_token } = this.authService.generateTokens(user);
-    const refresh_token = this.authService.generateRefreshToken(user);
+    const { accessToken } = this.authService.generateTokens(user);
+    const refreshToken = this.authService.generateRefreshToken(user);
 
     return {
       message: CONFIG_MESSAGES.UserLogged,
-      jwt_token: jwt_token,
-      refresh_token: refresh_token,
+      accessToken: accessToken,
+      refreshToken: refreshToken,
     };
   }
 
+  @Throttle({ default: { limit: 1, ttl: 60000 } })
   @Get('verify-register')
-  async verifyRegister(@Headers('register-token') registerToken: string) {
+  async verifyRegister(@Headers('registerToken') registerToken: string) {
     const userData = await this.authService.verifyRegisterToken(registerToken);
 
     const user = await this.usersService.updateUser({
@@ -77,13 +76,13 @@ export class AuthController {
       data: { verified: true },
     });
 
-    const { jwt_token } = this.authService.generateTokens(user);
-    const refresh_token = this.authService.generateRefreshToken(user);
+    const { accessToken } = this.authService.generateTokens(user);
+    const refreshToken = this.authService.generateRefreshToken(user);
 
     return {
       message: CONFIG_MESSAGES.UserCreatedVerified,
-      jwt_token: jwt_token,
-      refresh_token: refresh_token,
+      accessToken: accessToken,
+      refreshToken: refreshToken,
     };
   }
 
@@ -94,29 +93,26 @@ export class AuthController {
   @Get('google/callback')
   @UseGuards(AuthGuard('google'))
   async googleAuthCallback(@Req() req, @Res() res) {
-    const { jwt_token } = this.authService.generateTokens(req.user);
-    const refresh_token = this.authService.generateRefreshToken(req.user);
+    const { accessToken } = this.authService.generateTokens(req.user);
+    const refreshToken = this.authService.generateRefreshToken(req.user);
 
     const frontendUrl = process.env.FRONTEND_URL || 'http://localhost:3000';
     const userStr = encodeURIComponent(JSON.stringify(req.user));
-    const callbackUrl = `${frontendUrl}/google-callback?token=${jwt_token}&refresh_token=${refresh_token}&user=${userStr}`;
+    const callbackUrl = `${frontendUrl}/google-callback?token=${accessToken}&refreshToken=${refreshToken}&user=${userStr}`;
 
     return res.redirect(callbackUrl);
   }
 
   @Get('refresh-token')
   async refreshToken(
-    @Headers('refresh-token') refreshToken: string,
+    @Headers('refreshToken') refreshToken: string,
     @Res({ passthrough: true }) response: Response,
   ) {
     try {
-      const { user, jwt_token } = await this.authService.refreshToken(
-        refreshToken,
-      );
+      const { accessToken } = await this.authService.refreshToken(refreshToken);
       return {
         message: 'Token atualizado com sucesso',
-        user,
-        jwt_token,
+        accessToken: accessToken,
       };
     } catch (error) {
       throw new UnauthorizedException(CONFIG_MESSAGES.JwtTokenExpired);

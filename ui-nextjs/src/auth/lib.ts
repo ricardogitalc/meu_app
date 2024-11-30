@@ -23,28 +23,28 @@ export async function verifyJWT(
 }
 
 interface BaseAuthResponse {
-  jwt_token: string;
-  refresh_token: string;
+  accessToken: string;
+  refreshToken: string;
   user: User;
   message: string;
 }
 
 export async function login(response: BaseAuthResponse) {
-  if (!response.jwt_token || !response.refresh_token || !response.user) {
+  if (!response.accessToken || !response.refreshToken || !response.user) {
     throw new Error("Dados de login inválidos");
   }
 
-  await verifyJWT(response.jwt_token, key);
+  await verifyJWT(response.accessToken, key);
   const cookieStore = await cookies();
 
-  await cookieStore.set("accessToken", response.jwt_token, {
+  await cookieStore.set("accessToken", response.accessToken, {
     httpOnly: true,
     secure: process.env.NODE_ENV === "production",
     sameSite: "lax",
     path: "/",
   });
 
-  await cookieStore.set("refreshToken", response.refresh_token, {
+  await cookieStore.set("refreshToken", response.refreshToken, {
     httpOnly: true,
     secure: process.env.NODE_ENV === "production",
     sameSite: "lax",
@@ -98,9 +98,9 @@ export async function getSession(): Promise<User | null> {
   if (refreshToken) {
     try {
       const refreshResponse = await refreshTokenRequest(refreshToken);
-      if (refreshResponse.jwt_token && refreshResponse.user) {
+      if (refreshResponse.accessToken && refreshResponse.user) {
         const cookieStore = await cookies();
-        await cookieStore.set("accessToken", refreshResponse.jwt_token, {
+        await cookieStore.set("accessToken", refreshResponse.accessToken, {
           httpOnly: true,
           secure: process.env.NODE_ENV === "production",
           sameSite: "lax",
@@ -147,11 +147,11 @@ export async function updateSession(request: NextRequest) {
   if (refreshToken) {
     try {
       const refreshResponse = await refreshTokenRequest(refreshToken);
-      if (refreshResponse.jwt_token && refreshResponse.user) {
+      if (refreshResponse.accessToken && refreshResponse.user) {
         const response = NextResponse.next();
         response.cookies.set({
           name: "accessToken",
-          value: refreshResponse.jwt_token,
+          value: refreshResponse.accessToken,
           httpOnly: true,
           secure: process.env.NODE_ENV === "production",
           sameSite: "lax",
@@ -178,15 +178,15 @@ async function handleAuthFailure(request: NextRequest) {
 
 export async function handleGoogleLogin(code: string) {
   const response = await handleGoogleCallback(code);
-  if (!response.jwt_token || !response.refresh_token || !response.user) {
+  if (!response.accessToken || !response.refreshToken || !response.user) {
     throw new Error("Resposta inválida do Google OAuth");
   }
   return await login(response);
 }
 
-export async function updateUserSession(jwt_token: string, user: User) {
+export async function updateUserSession(accessToken: string, user: User) {
   const cookieStore = await cookies();
-  await cookieStore.set("accessToken", jwt_token, {
+  await cookieStore.set("accessToken", accessToken, {
     httpOnly: true,
     secure: process.env.NODE_ENV === "production",
     sameSite: "lax",

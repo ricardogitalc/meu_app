@@ -3,12 +3,9 @@ import {
   Controller,
   Delete,
   Get,
-  Param,
-  ParseIntPipe,
   Patch,
   Post,
   Query,
-  UnauthorizedException,
   UseFilters,
   UseGuards,
   Inject,
@@ -25,6 +22,7 @@ import { AuthService } from 'src/auth/auth.service';
 import { ConfigService } from '@nestjs/config';
 import { JwtGuard } from 'src/auth/guards/jwt.guard';
 import { ResendService } from '../mail/resend';
+import { SkipThrottle, Throttle } from '@nestjs/throttler';
 
 @Controller('user')
 @UseFilters(HttpExceptionsFilter)
@@ -37,32 +35,34 @@ export class UsersController {
     private readonly resendService: ResendService,
   ) {}
 
+  @Throttle({ default: { limit: 3, ttl: 60000 } })
   @Post('register')
   async create(@Body() createUserDto: CreateUserDto): Promise<any> {
     await this.usersService.createUser({
       ...createUserDto,
     });
 
-    const register_token = await this.authService.generateRegisterToken(
+    const registerToken = await this.authService.generateRegisterToken(
       createUserDto,
     );
 
-    const verify_url = `${this.configService.get<string>(
+    const verifyUrl = `${this.configService.get<string>(
       'FRONTEND_URL',
-    )}/verify-register?register_token=${register_token}`;
+    )}/verify-register?registerToken=${registerToken}`;
 
     await this.resendService.sendVerificationEmail(
       createUserDto.email,
-      verify_url,
+      verifyUrl,
     );
 
     return {
       message: CONFIG_MESSAGES.SendVerificationLink,
-      register_token,
-      verify_url,
+      registerToken,
+      verifyUrl,
     };
   }
 
+  @SkipThrottle()
   @Get('all')
   @UseGuards(AdminGuard)
   async findAll(
@@ -75,67 +75,44 @@ export class UsersController {
     });
   }
 
-  @Get('get/:id')
+  @Throttle({ default: { limit: 10, ttl: 60000 } })
+  @Get('details')
   @UseGuards(JwtGuard)
-  async findOne(
-    @Param('id', ParseIntPipe) id: number,
-    @Request() req,
-  ): Promise<User> {
-    if (req.user.id !== id) {
-      throw new UnauthorizedException(CONFIG_MESSAGES.UserNotPermission);
-    }
-
-    const user = await this.usersService.UserFindUnique({ id });
-
-    if (!user) {
-      throw new UnauthorizedException(CONFIG_MESSAGES.UserNotFound);
-    }
-
-    return user;
+  async findOne(@Request() req): Promise<User> {
+    return await this.usersService.UserFindUnique({ id: req.user.id });
   }
 
-  @Patch('update/:id')
+  @Throttle({ default: { limit: 3, ttl: 60000 } })
+  @Patch('update')
   @UseGuards(JwtGuard)
   async update(
-    @Param('id', ParseIntPipe) id: number,
+    @Request() req,
     @Body() updateUserDto: UpdateUserDto,
   ): Promise<{
     message: string;
-    user: User;
-    jwt_token: string;
+    updatedFields: Partial<User>;
   }> {
-    const user = await this.usersService.UserFindUnique({ id });
-
-    if (!user) {
-      throw new UnauthorizedException(CONFIG_MESSAGES.UserNotFound);
-    }
-
     const updatedUser = await this.usersService.updateUser({
-      where: { id },
+      where: { id: req.user.id },
       data: updateUserDto,
     });
 
-    const { jwt_token } = this.authService.generateTokens(updatedUser);
+    const updatedFields: Partial<User> = {};
+    Object.keys(updateUserDto).forEach((key) => {
+      updatedFields[key] = updatedUser[key];
+    });
 
     return {
       message: CONFIG_MESSAGES.UpdateUserSucess,
-      user: updatedUser,
-      jwt_token,
+      updatedFields,
     };
   }
 
-  @Delete('delete/:id')
+  @Throttle({ default: { limit: 1, ttl: 60000 } })
+  @Delete('delete')
   @UseGuards(JwtGuard)
-  async remove(
-    @Param('id', ParseIntPipe) id: number,
-  ): Promise<{ message: string; user: User }> {
-    const user = await this.usersService.UserFindUnique({ id });
-
-    if (!user) {
-      throw new UnauthorizedException(CONFIG_MESSAGES.UserNotFound);
-    }
-
-    const deletedUser = await this.usersService.deleteUser({ id });
+  async remove(@Request() req): Promise<{ message: string; user: User }> {
+    const deletedUser = await this.usersService.deleteUser({ id: req.user.id });
 
     return {
       message: CONFIG_MESSAGES.UserDeletedSucess,

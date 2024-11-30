@@ -14,12 +14,11 @@ export class JwtStrategy extends PassportStrategy(Strategy) {
       jwtFromRequest: ExtractJwt.fromAuthHeaderAsBearerToken(),
       ignoreExpiration: false,
       secretOrKey: configService.get<string>('JWT_SECRET_KEY'),
-      algorithms: ['HS512'],
     });
   }
 
   async validate(payload: any) {
-    const user = this.authService.validateUser(payload.email);
-    return user;
+    const result = await this.authService.validateUserById(payload.sub);
+    return result;
   }
 }

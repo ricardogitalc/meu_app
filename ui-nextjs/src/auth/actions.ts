@@ -4,20 +4,20 @@ import { cookies } from "next/headers";
 import { User } from "./interfaces/interfaces";
 
 export async function serverLogin(
-  jwt_token: string,
-  refresh_token: string,
+  accessToken: string,
+  refreshToken: string,
   user: User
 ) {
   const cookieStore = await cookies();
 
-  cookieStore.set("accessToken", jwt_token, {
+  cookieStore.set("accessToken", accessToken, {
     httpOnly: true,
     secure: process.env.NODE_ENV === "production",
     sameSite: "lax",
     path: "/",
   });
 
-  cookieStore.set("refreshToken", refresh_token, {
+  cookieStore.set("refreshToken", refreshToken, {
     httpOnly: true,
     secure: process.env.NODE_ENV === "production",
     sameSite: "lax",

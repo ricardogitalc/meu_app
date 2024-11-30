@@ -28,6 +28,7 @@
     "@nestjs/mapped-types": "*",
     "@nestjs/passport": "^9.0.3",
     "@nestjs/platform-express": "^9.0.0",
+    "@nestjs/throttler": "^6.2.1",
     "@prisma/client": "^5.22.0",
     "@types/passport-google-oauth20": "^2.0.16",
     "class-transformer": "^0.5.1",

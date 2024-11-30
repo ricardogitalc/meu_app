@@ -38,12 +38,12 @@ CALLBACK GOOGLE OAUTH
 
 # VERIFICAR CADASTRO
 - GET /auth/verify-register
-  - Headers: { register-token: "register_token" }
+  - Headers: { registerToken: "register_token" }
   - Retorno: { message: string, jwt_token: string, verify_url: string }
 
 # REFRESH TOKEN
 - GET /auth/refresh-token
-  - Headers: { refresh-token: "refresh_token" }
+  - Headers: { refreshToken: "refresh_token" }
   - Retorno: { message: string, user: user, jwt_token: string }
 
 ## CRUD USUÁRIOS

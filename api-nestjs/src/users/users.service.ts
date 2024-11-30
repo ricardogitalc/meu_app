@@ -17,6 +17,14 @@ export class UsersService {
     return user;
   }
 
+  async UserFindById(id: number): Promise<User | null> {
+    const user = await this.prisma.user.findUnique({
+      where: { id },
+    });
+
+    return user;
+  }
+
   async createUser(data: Prisma.UserCreateInput): Promise<User> {
     const existingUser = await this.prisma.user.findUnique({
       where: { email: data.email },

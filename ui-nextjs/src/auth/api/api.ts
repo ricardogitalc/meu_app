@@ -24,7 +24,7 @@ export async function sendMagicLink(
 
 export async function verifyLogin(loginToken: string): Promise<AuthResponse> {
   const response = await fetch(`${API_BASE_URL}/auth/verify-login`, {
-    headers: { "login-token": loginToken },
+    headers: { loginToken: loginToken },
   });
   const data = await response.json();
   return { ...data, status: response.status };
@@ -34,7 +34,7 @@ export async function verifyRegister(
   registerToken: string
 ): Promise<AuthResponse> {
   const response = await fetch(`${API_BASE_URL}/auth/verify-register`, {
-    headers: { "register-token": registerToken },
+    headers: { registerToken: registerToken },
   });
   return response.json();
 }
@@ -43,7 +43,7 @@ export async function refreshToken(
   refreshToken: string
 ): Promise<AuthResponse> {
   const response = await fetch(`${API_BASE_URL}/auth/refresh-token`, {
-    headers: { "refresh-token": refreshToken },
+    headers: { refreshToken: refreshToken },
   });
   return response.json();
 }
@@ -67,21 +67,21 @@ export async function registerUser(userData: {
 export async function allUsers(params: {
   skip?: number;
   take?: number;
-  jwt_token: string;
+  accessToken: string;
 }): Promise<User[]> {
   const queryParams = new URLSearchParams();
   if (params.skip) queryParams.append("skip", params.skip.toString());
   if (params.take) queryParams.append("take", params.take.toString());
 
   const response = await fetch(`${API_BASE_URL}/user/all?${queryParams}`, {
-    headers: { Authorization: `Bearer ${params.jwt_token}` },
+    headers: { Authorization: `Bearer ${params.accessToken}` },
   });
   return response.json();
 }
 
-export async function getUser(id: number, jwt_token: string): Promise<User> {
+export async function getUser(id: number, accessToken: string): Promise<User> {
   const response = await fetch(`${API_BASE_URL}/user/details/${id}`, {
-    headers: { Authorization: `Bearer ${jwt_token}` },
+    headers: { Authorization: `Bearer ${accessToken}` },
   });
   return response.json();
 }
@@ -97,7 +97,7 @@ export async function updateUser(
 ): Promise<{
   success: boolean;
   message?: string;
-  jwt_token?: string;
+  accessToken?: string;
   user?: User;
 }> {
   try {
@@ -130,8 +130,8 @@ export async function updateUser(
       };
     }
 
-    if (data.jwt_token) {
-      await cookieStore.set("accessToken", data.jwt_token, {
+    if (data.accessToken) {
+      await cookieStore.set("accessToken", data.accessToken, {
         httpOnly: true,
         secure: process.env.NODE_ENV === "production",
         sameSite: "lax",
@@ -141,7 +141,7 @@ export async function updateUser(
 
     return {
       success: true,
-      jwt_token: data.jwt_token,
+      accessToken: data.accessToken,
       user: data.user,
     };
   } catch (error) {
@@ -151,11 +151,11 @@ export async function updateUser(
 
 export async function deleteUser(
   id: number,
-  jwt_token: string
+  accessToken: string
 ): Promise<AuthResponse> {
   const response = await fetch(`${API_BASE_URL}/user/delete/${id}`, {
     method: "DELETE",
-    headers: { Authorization: `Bearer ${jwt_token}` },
+    headers: { Authorization: `Bearer ${accessToken}` },
   });
   return response.json();
 }
@@ -171,7 +171,7 @@ export async function handleGoogleCallback(
   );
   const data = await response.json();
 
-  if (!data.jwt_token || !data.refresh_token || !data.user) {
+  if (!data.accessToken || !data.refreshToken || !data.user) {
     throw new Error("Resposta inválida do servidor");
   }
 

@@ -15,17 +15,17 @@ type AlertType = {
 export default function VerifyRegisterPage() {
   const router = useRouter();
   const searchParams = useSearchParams();
-  const register_token = searchParams.get("register_token");
+  const registerToken = searchParams.get("registerToken");
   const [alert, setAlert] = useState<AlertType | null>(null);
   const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
     async function verificarRegistro() {
-      if (register_token) {
+      if (registerToken) {
         try {
           await new Promise((resolve) => setTimeout(resolve, 1500));
 
-          const response = await verifyRegister(register_token);
+          const response = await verifyRegister(registerToken);
 
           if (response.status === 401) {
             setAlert({
@@ -62,7 +62,7 @@ export default function VerifyRegisterPage() {
     }
 
     verificarRegistro();
-  }, [register_token, router]);
+  }, [registerToken, router]);
 
   return (
     <div className="flex min-h-screen items-start justify-center p-4">

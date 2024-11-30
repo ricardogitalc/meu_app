@@ -15,17 +15,17 @@ type AlertType = {
 export default function VerifyLoginPage() {
   const router = useRouter();
   const searchParams = useSearchParams();
-  const login_token = searchParams.get("login_token");
+  const loginToken = searchParams.get("loginToken");
   const [alert, setAlert] = useState<AlertType | null>(null);
   const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
     async function verificarLogin() {
-      if (login_token) {
+      if (loginToken) {
         try {
           await new Promise((resolve) => setTimeout(resolve, 1500));
 
-          const response = await verifyLogin(login_token);
+          const response = await verifyLogin(loginToken);
           console.log("Resposta da API:", response);
 
           if (response.status === 401) {
@@ -63,7 +63,7 @@ export default function VerifyLoginPage() {
     }
 
     verificarLogin();
-  }, [login_token, router]);
+  }, [loginToken, router]);
 
   return (
     <div className="flex min-h-screen items-start justify-center p-4">
