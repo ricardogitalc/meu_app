@@ -101,4 +101,32 @@ export class UsersService {
       where,
     });
   }
+
+  async updateUserById(
+    id: number,
+    data: Prisma.UserUpdateInput,
+  ): Promise<User> {
+    const existingUser = await this.UserFindById(id);
+
+    if (!existingUser) {
+      throw new UnauthorizedException(CONFIG_MESSAGES.UserNotFound);
+    }
+
+    return this.prisma.user.update({
+      where: { id },
+      data,
+    });
+  }
+
+  async deleteUserById(id: number): Promise<User> {
+    const existingUser = await this.UserFindById(id);
+
+    if (!existingUser) {
+      throw new UnauthorizedException(CONFIG_MESSAGES.UserNotFound);
+    }
+
+    return this.prisma.user.delete({
+      where: { id },
+    });
+  }
 }

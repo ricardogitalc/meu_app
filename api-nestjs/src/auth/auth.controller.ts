@@ -19,7 +19,9 @@ import { CONFIG_MESSAGES } from 'src/config/config';
 import { UsersService } from '../users/users.service';
 import { ResendService } from '../mail/resend';
 import { Throttle } from '@nestjs/throttler';
+import { ApiTags, ApiOperation, ApiResponse, ApiHeader } from '@nestjs/swagger';
 
+@ApiTags('Autenticação')
 @Controller('auth')
 @UseFilters(HttpExceptionsFilter)
 export class AuthController {
@@ -29,7 +31,15 @@ export class AuthController {
     private readonly resendService: ResendService,
   ) {}
 
-  @Throttle({ default: { limit: 3, ttl: 60000 } })
+  @ApiOperation({ summary: 'Enviar magic link para login' })
+  @ApiResponse({ status: 201, description: 'Link de acesso enviado.' })
+  @ApiResponse({ status: 401, description: 'Usuário não encontrado.' })
+  @ApiResponse({ status: 429, description: 'Muitas tentativas.' })
+  @ApiResponse({
+    status: 401,
+    description: 'Usuário não encontrado ou não verificado.',
+  })
+  // @Throttle({ default: { limit: 3, ttl: 60000 } })
   @Post('login')
   async login(@Body() body: LoginDto) {
     const user = await this.authService.validateUser(body.email);
@@ -43,12 +53,17 @@ export class AuthController {
     }
 
     const tokens = await this.authService.generateMagicLinkToken(body.email);
-    await this.resendService.sendLoginEmail(body.email, tokens.verifyUrl);
+    await this.resendService.sendLoginEmail(body.email, tokens.verifyLoginUrl);
 
     return { message: 'Link de acesso enviado.', ...tokens };
   }
 
-  @Throttle({ default: { limit: 1, ttl: 60000 } })
+  @ApiOperation({ summary: 'Verificar magic link' })
+  @ApiHeader({ name: 'loginToken', required: true })
+  @ApiResponse({ status: 200, description: 'Login realizado com sucesso.' })
+  @ApiResponse({ status: 401, description: 'Token inválido ou expirado.' })
+  @ApiResponse({ status: 429, description: 'Muitas tentativas.' })
+  // @Throttle({ default: { limit: 1, ttl: 60000 } })
   @Get('verify-login')
   async verifyL(
     @Headers('loginToken') loginToken: string,
@@ -66,7 +81,12 @@ export class AuthController {
     };
   }
 
-  @Throttle({ default: { limit: 1, ttl: 60000 } })
+  @ApiOperation({ summary: 'Verificar registro de usuário' })
+  @ApiHeader({ name: 'registerToken', required: true })
+  @ApiResponse({ status: 200, description: 'Registro verificado com sucesso.' })
+  @ApiResponse({ status: 401, description: 'Token inválido ou expirado.' })
+  @ApiResponse({ status: 429, description: 'Muitas tentativas.' })
+  // @Throttle({ default: { limit: 1, ttl: 60000 } })
   @Get('verify-register')
   async verifyRegister(@Headers('registerToken') registerToken: string) {
     const userData = await this.authService.verifyRegisterToken(registerToken);
@@ -86,10 +106,17 @@ export class AuthController {
     };
   }
 
+  @ApiOperation({ summary: 'Iniciar autenticação com Google' })
+  @ApiResponse({ status: 302, description: 'Redirecionamento para Google.' })
   @Get('google')
   @UseGuards(AuthGuard('google'))
   async googleAuth() {}
 
+  @ApiOperation({ summary: 'Callback da autenticação Google' })
+  @ApiResponse({
+    status: 302,
+    description: 'Redirecionamento após autenticação.',
+  })
   @Get('google/callback')
   @UseGuards(AuthGuard('google'))
   async googleAuthCallback(@Req() req, @Res() res) {
@@ -103,6 +130,10 @@ export class AuthController {
     return res.redirect(callbackUrl);
   }
 
+  @ApiOperation({ summary: 'Renovar token de acesso' })
+  @ApiHeader({ name: 'refreshToken', required: true })
+  @ApiResponse({ status: 200, description: 'Token atualizado com sucesso.' })
+  @ApiResponse({ status: 401, description: 'O token é inválido ou expirou.' })
   @Get('refresh-token')
   async refreshToken(
     @Headers('refreshToken') refreshToken: string,

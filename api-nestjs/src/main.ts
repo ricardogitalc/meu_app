@@ -5,11 +5,22 @@ import { ConfigService } from '@nestjs/config';
 import { Logger } from '@nestjs/common';
 import helmet from 'helmet';
 import * as compression from 'compression';
+import { SwaggerModule, DocumentBuilder } from '@nestjs/swagger';
 
 async function bootstrap() {
   const logger = new Logger('Bootstrap');
   const app = await NestFactory.create(AppModule);
   const configService = app.get(ConfigService);
+
+  const config = new DocumentBuilder()
+    .setTitle('API')
+    .setDescription('API documentation')
+    .setVersion('1.0')
+    .addTag('API')
+    .build();
+
+  const document = SwaggerModule.createDocument(app, config);
+  SwaggerModule.setup('api', app, document);
 
   morgan.token('time', () => {
     const date = new Date();

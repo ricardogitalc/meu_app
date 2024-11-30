@@ -22,20 +22,6 @@ export class AuthService {
     return this.usersService.UserFindById(id);
   }
 
-  async createGoogleUser(userData: {
-    email: string;
-    firstName: string;
-    lastName: string;
-    imageUrl?: string;
-    verified: boolean;
-  }) {
-    try {
-      return await this.usersService.createUser(userData);
-    } catch (error) {
-      throw new UnauthorizedException('Falha na autenticação com Google');
-    }
-  }
-
   generateTokens(user: UserEntity) {
     const payload = {
       sub: user.id,
@@ -48,11 +34,11 @@ export class AuthService {
     const loginToken = this.jwtService.sign(payload, {
       expiresIn: JWT_TIMES.LOGIN_TOKEN,
     });
-    const verifyUrl = `${this.configService.get<string>(
+    const verifyLoginUrl = `${this.configService.get<string>(
       'FRONTEND_URL',
     )}/verify-login?loginToken=${loginToken}`;
 
-    return { loginToken, verifyUrl };
+    return { loginToken, verifyLoginUrl };
   }
 
   async verifyMagicLinkToken(token: string) {
