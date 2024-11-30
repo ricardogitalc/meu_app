@@ -12,11 +12,9 @@ import {
 } from '@nestjs/common';
 import { AuthService } from './auth.service';
 import { AuthGuard } from '@nestjs/passport';
-import { MagicLoginStrategy } from './strategy/magic-login.strategy';
 import { LoginDto } from './dto/login.dto';
 import { HttpExceptionsFilter } from 'src/common/filter/http-exception.filter';
 import { Response } from 'express';
-import { JwtGuard } from './guards/jwt.guard';
 import { CONFIG_MESSAGES } from 'src/config/config';
 import { UsersService } from '../users/users.service';
 import { ResendService } from '../mail/resend';
@@ -26,7 +24,6 @@ import { ResendService } from '../mail/resend';
 export class AuthController {
   constructor(
     private readonly authService: AuthService,
-    private readonly strategy: MagicLoginStrategy,
     private readonly usersService: UsersService,
     private readonly resendService: ResendService,
   ) {}
@@ -108,12 +105,6 @@ export class AuthController {
     return res.redirect(callbackUrl);
   }
 
-  @Get('me')
-  @UseGuards(JwtGuard)
-  async verifyToken(@Req() req) {
-    return req.user;
-  }
-
   @Get('refresh-token')
   async refreshToken(
     @Headers('refresh-token') refreshToken: string,
@@ -131,15 +122,5 @@ export class AuthController {
     } catch (error) {
       throw new UnauthorizedException(CONFIG_MESSAGES.JwtTokenExpired);
     }
-  }
-
-  @Post('test-jwe')
-  async generateTestJWE() {
-    return this.authService.generateTestJWE();
-  }
-
-  @Post('decrypt-jwe')
-  async decryptTestJWE(@Body() body: { jwe: string }) {
-    return this.authService.decryptTestJWE(body.jwe);
   }
 }

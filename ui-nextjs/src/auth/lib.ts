@@ -17,7 +17,7 @@ export async function verifyJWT(
   secretKey: Uint8Array
 ): Promise<any> {
   const { payload } = await jwtVerify(token, secretKey, {
-    algorithms: ["HS256"],
+    algorithms: ["HS512"],
   });
   return payload;
 }

@@ -13,6 +13,7 @@ import {
   UseGuards,
   Inject,
   forwardRef,
+  Request,
 } from '@nestjs/common';
 import { UsersService } from './users.service';
 import { CreateUserDto, UpdateUserDto } from './dto/users.dto';
@@ -25,7 +26,7 @@ import { ConfigService } from '@nestjs/config';
 import { JwtGuard } from 'src/auth/guards/jwt.guard';
 import { ResendService } from '../mail/resend';
 
-@Controller('users')
+@Controller('user')
 @UseFilters(HttpExceptionsFilter)
 export class UsersController {
   constructor(
@@ -74,9 +75,16 @@ export class UsersController {
     });
   }
 
-  @Get(':id')
+  @Get('get/:id')
   @UseGuards(JwtGuard)
-  async findOne(@Param('id', ParseIntPipe) id: number): Promise<User> {
+  async findOne(
+    @Param('id', ParseIntPipe) id: number,
+    @Request() req,
+  ): Promise<User> {
+    if (req.user.id !== id) {
+      throw new UnauthorizedException(CONFIG_MESSAGES.UserNotPermission);
+    }
+
     const user = await this.usersService.UserFindUnique({ id });
 
     if (!user) {
@@ -86,7 +94,7 @@ export class UsersController {
     return user;
   }
 
-  @Patch(':id')
+  @Patch('update/:id')
   @UseGuards(JwtGuard)
   async update(
     @Param('id', ParseIntPipe) id: number,
@@ -116,7 +124,7 @@ export class UsersController {
     };
   }
 
-  @Delete(':id')
+  @Delete('delete/:id')
   @UseGuards(JwtGuard)
   async remove(
     @Param('id', ParseIntPipe) id: number,

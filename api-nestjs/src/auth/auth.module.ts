@@ -7,13 +7,12 @@ import { PassportModule } from '@nestjs/passport';
 import { JwtModule } from '@nestjs/jwt';
 import { JwtStrategy } from './strategy/jwt.strategy';
 import { GoogleStrategy } from './strategy/google.strategy';
-import { MagicLoginStrategy } from './strategy/magic-login.strategy';
 import { AUTH_TIMES } from 'src/config/config';
 import { ResendService } from '../mail/resend';
 
 @Module({
   imports: [
-    forwardRef(() => UsersModule), // Usando forwardRef aqui também
+    forwardRef(() => UsersModule),
     PassportModule,
     JwtModule.registerAsync({
       imports: [ConfigModule],
@@ -21,7 +20,7 @@ import { ResendService } from '../mail/resend';
         secret: configService.get<string>('JWT_SECRET_KEY'),
         signOptions: {
           expiresIn: AUTH_TIMES.JWT_TOKEN,
-          algorithm: 'HS256',
+          algorithm: 'HS512',
           encoding: 'UTF8',
         },
       }),
@@ -30,12 +29,6 @@ import { ResendService } from '../mail/resend';
   ],
   controllers: [AuthController],
   exports: [AuthService],
-  providers: [
-    AuthService,
-    MagicLoginStrategy,
-    JwtStrategy,
-    GoogleStrategy,
-    ResendService,
-  ],
+  providers: [AuthService, JwtStrategy, GoogleStrategy, ResendService],
 })
 export class AuthModule {}

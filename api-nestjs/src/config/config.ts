@@ -21,4 +21,5 @@ export const CONFIG_MESSAGES = {
   TooManyRequests:
     'Muitas tentativas realizadas. Aguarde um momento e tente novamente.',
   RefreshTokenExpired: 'O refresh token expirou. Faça login novamente.',
+  UserNotPermission: 'Acesso negado, você só pode acessar suas informações.',
 } as const;

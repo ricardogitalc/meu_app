@@ -54,7 +54,7 @@ export async function registerUser(userData: {
   lastName: string;
   whatsappNumber?: string;
 }): Promise<RegisterResponse & { status: number }> {
-  const response = await fetch(`${API_BASE_URL}/users/register`, {
+  const response = await fetch(`${API_BASE_URL}/user/register`, {
     method: "POST",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify(userData),
@@ -64,7 +64,7 @@ export async function registerUser(userData: {
   return { ...data, status: response.status };
 }
 
-export async function listUsers(params: {
+export async function allUsers(params: {
   skip?: number;
   take?: number;
   jwt_token: string;
@@ -73,14 +73,14 @@ export async function listUsers(params: {
   if (params.skip) queryParams.append("skip", params.skip.toString());
   if (params.take) queryParams.append("take", params.take.toString());
 
-  const response = await fetch(`${API_BASE_URL}/users/all?${queryParams}`, {
+  const response = await fetch(`${API_BASE_URL}/user/all?${queryParams}`, {
     headers: { Authorization: `Bearer ${params.jwt_token}` },
   });
   return response.json();
 }
 
 export async function getUser(id: number, jwt_token: string): Promise<User> {
-  const response = await fetch(`${API_BASE_URL}/users/${id}`, {
+  const response = await fetch(`${API_BASE_URL}/user/details/${id}`, {
     headers: { Authorization: `Bearer ${jwt_token}` },
   });
   return response.json();
@@ -109,7 +109,7 @@ export async function updateUser(
       return { success: false, message: "Token não encontrado" };
     }
 
-    const response = await fetch(`${API_BASE_URL}/users/${userId}`, {
+    const response = await fetch(`${API_BASE_URL}/user/update/${userId}`, {
       method: "PATCH",
       headers: {
         "Content-Type": "application/json",
@@ -153,7 +153,7 @@ export async function deleteUser(
   id: number,
   jwt_token: string
 ): Promise<AuthResponse> {
-  const response = await fetch(`${API_BASE_URL}/users/${id}`, {
+  const response = await fetch(`${API_BASE_URL}/user/delete/${id}`, {
     method: "DELETE",
     headers: { Authorization: `Bearer ${jwt_token}` },
   });
