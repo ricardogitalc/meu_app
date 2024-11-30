@@ -52,8 +52,11 @@ export class UsersController {
 
   // ROTAS USER
 
-  @ApiOperation(UserSwaggerDocs.findOne.operation)
-  @ApiResponse(UserSwaggerDocs.findOne.response)
+  @ApiOperation({
+    summary: UserSwaggerDocs.userDetails.operation.summary,
+    operationId: UserSwaggerDocs.userDetails.operationId,
+  })
+  @ApiResponse(UserSwaggerDocs.userDetails.response)
   @ApiResponse(SwaggerErros.Unauthorized)
   @Get('details')
   @UseGuards(JwtGuard)
@@ -61,8 +64,11 @@ export class UsersController {
     return await this.usersService.UserFindUnique({ id: req.user.id });
   }
 
-  @ApiOperation(UserSwaggerDocs.update.operation)
-  @ApiResponse(UserSwaggerDocs.update.response)
+  @ApiOperation({
+    summary: UserSwaggerDocs.updateUser.operation.summary,
+    operationId: UserSwaggerDocs.updateUser.operationId,
+  })
+  @ApiResponse(UserSwaggerDocs.updateUser.response)
   @ApiResponse(SwaggerErros.Unauthorized)
   @ApiResponse(SwaggerErros.InvalidDetails)
   @Patch('update')
@@ -87,8 +93,11 @@ export class UsersController {
     };
   }
 
-  @ApiOperation(UserSwaggerDocs.remove.operation)
-  @ApiResponse(UserSwaggerDocs.remove.responses.success)
+  @ApiOperation({
+    summary: UserSwaggerDocs.deleteUser.operation.summary,
+    operationId: UserSwaggerDocs.deleteUser.operationId,
+  })
+  @ApiResponse(UserSwaggerDocs.deleteUser.responses.success)
   @ApiResponse(SwaggerErros.Unauthorized)
   @Delete('delete')
   @UseGuards(JwtGuard)
@@ -103,8 +112,11 @@ export class UsersController {
 
   // ROTAS ADMIN
 
-  @ApiOperation(UserSwaggerDocs.findAll.operation)
-  @ApiResponse(UserSwaggerDocs.findAll.responses.success)
+  @ApiOperation({
+    summary: UserSwaggerDocs.getUsers.operation.summary,
+    operationId: UserSwaggerDocs.getUsers.operationId,
+  })
+  @ApiResponse(UserSwaggerDocs.getUsers.responses.success)
   @ApiResponse(SwaggerErros.Unauthorized)
   @SkipThrottle()
   @Get('users')
@@ -113,8 +125,11 @@ export class UsersController {
     return await this.usersService.users({});
   }
 
-  @ApiOperation(UserSwaggerDocs.findById.operation)
-  @ApiResponse(UserSwaggerDocs.findById.responses.success)
+  @ApiOperation({
+    summary: UserSwaggerDocs.findUserById.operation.summary,
+    operationId: UserSwaggerDocs.findUserById.operationId,
+  })
+  @ApiResponse(UserSwaggerDocs.findUserById.responses.success)
   @ApiResponse(SwaggerErros.Unauthorized)
   @SkipThrottle()
   @Get(':id')
@@ -123,8 +138,11 @@ export class UsersController {
     return await this.usersService.UserFindById(Number(id));
   }
 
-  @ApiOperation(UserSwaggerDocs.updateById.operation)
-  @ApiResponse(UserSwaggerDocs.updateById.responses.success)
+  @ApiOperation({
+    summary: UserSwaggerDocs.updateUserById.operation.summary,
+    operationId: UserSwaggerDocs.updateUserById.operationId,
+  })
+  @ApiResponse(UserSwaggerDocs.updateUserById.responses.success)
   @ApiResponse(SwaggerErros.Unauthorized)
   @ApiResponse(SwaggerErros.InvalidDetails)
   @SkipThrottle()
@@ -150,8 +168,11 @@ export class UsersController {
     };
   }
 
-  @ApiOperation(UserSwaggerDocs.removeById.operation)
-  @ApiResponse(UserSwaggerDocs.removeById.responses.success)
+  @ApiOperation({
+    summary: UserSwaggerDocs.deleteUserById.operation.summary,
+    operationId: UserSwaggerDocs.deleteUserById.operationId,
+  })
+  @ApiResponse(UserSwaggerDocs.deleteUserById.responses.success)
   @ApiResponse(SwaggerErros.Unauthorized)
   @SkipThrottle()
   @Delete(':id')

@@ -3,13 +3,22 @@
   "paths": {
     "/": {
       "get": {
-        "operationId": "AppController_serverIsRuning",
+        "operationId": "serverStatus",
         "parameters": [],
         "responses": {
           "200": {
-            "description": ""
+            "description": "Servidor está rodando normalmente",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "string",
+                  "example": "🚀 O servidor está rodando..."
+                }
+              }
+            }
           }
         },
+        "summary": "Verifica status do servidor",
         "tags": [
           "App"
         ]
@@ -17,7 +26,7 @@
     },
     "/user/details": {
       "get": {
-        "operationId": "UsersController_findOne",
+        "operationId": "userDetails",
         "parameters": [],
         "responses": {
           "200": {
@@ -85,7 +94,7 @@
     },
     "/user/update": {
       "patch": {
-        "operationId": "UsersController_update",
+        "operationId": "updateUser",
         "parameters": [],
         "requestBody": {
           "required": true,
@@ -142,7 +151,7 @@
     },
     "/user/delete": {
       "delete": {
-        "operationId": "UsersController_remove",
+        "operationId": "deleteUser",
         "parameters": [],
         "responses": {
           "200": {
@@ -223,7 +232,7 @@
     },
     "/user/users": {
       "get": {
-        "operationId": "UsersController_findAll",
+        "operationId": "getUsers",
         "parameters": [],
         "responses": {
           "200": {
@@ -326,7 +335,7 @@
     },
     "/user/{id}": {
       "get": {
-        "operationId": "UsersController_findById",
+        "operationId": "findUserById",
         "parameters": [
           {
             "name": "id",
@@ -406,7 +415,7 @@
         ]
       },
       "patch": {
-        "operationId": "UsersController_updateById",
+        "operationId": "updateUserById",
         "parameters": [
           {
             "name": "id",
@@ -470,7 +479,7 @@
         ]
       },
       "delete": {
-        "operationId": "UsersController_removeById",
+        "operationId": "deleteUserById",
         "parameters": [
           {
             "name": "id",
@@ -560,7 +569,7 @@
     },
     "/auth/login": {
       "post": {
-        "operationId": "AuthController_login",
+        "operationId": "login",
         "parameters": [],
         "requestBody": {
           "required": true,
@@ -615,7 +624,7 @@
     },
     "/auth/register": {
       "post": {
-        "operationId": "AuthController_register",
+        "operationId": "registerUser",
         "parameters": [],
         "requestBody": {
           "required": true,
@@ -670,7 +679,7 @@
     },
     "/auth/verify-login": {
       "get": {
-        "operationId": "AuthController_verifyLogin",
+        "operationId": "verifyLogin",
         "parameters": [
           {
             "name": "loginToken",
@@ -721,7 +730,7 @@
     },
     "/auth/verify-register": {
       "get": {
-        "operationId": "AuthController_verifyRegister",
+        "operationId": "verifyRegister",
         "parameters": [
           {
             "name": "registerToken",
@@ -772,7 +781,7 @@
     },
     "/auth/google": {
       "get": {
-        "operationId": "AuthController_googleAuth",
+        "operationId": "googleLogin",
         "parameters": [],
         "responses": {
           "302": {
@@ -795,7 +804,7 @@
     },
     "/auth/google/callback": {
       "get": {
-        "operationId": "AuthController_googleAuthCallback",
+        "operationId": "googleCallback",
         "parameters": [],
         "responses": {
           "302": {
@@ -818,7 +827,7 @@
     },
     "/auth/refresh-token": {
       "get": {
-        "operationId": "AuthController_refreshToken",
+        "operationId": "refreshToken",
         "parameters": [
           {
             "name": "refreshToken",

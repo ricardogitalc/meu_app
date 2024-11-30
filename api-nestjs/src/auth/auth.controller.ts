@@ -42,7 +42,10 @@ export class AuthController {
     private readonly configService: ConfigService,
   ) {}
 
-  @ApiOperation(AuthSwaggerDocs.login.operation)
+  @ApiOperation({
+    summary: AuthSwaggerDocs.login.operation.summary,
+    operationId: AuthSwaggerDocs.login.operationId,
+  })
   @ApiResponse(AuthSwaggerDocs.login.response)
   @ApiResponse(SwaggerErros.Unauthorized)
   @ApiResponse(SwaggerErros.TooManyRequests)
@@ -66,8 +69,11 @@ export class AuthController {
     return { message: CONFIG_MESSAGES.loginLinkSent, ...tokens };
   }
 
-  @ApiOperation(AuthSwaggerDocs.register.operation)
-  @ApiResponse(AuthSwaggerDocs.register.response)
+  @ApiOperation({
+    summary: AuthSwaggerDocs.registerUser.operation.summary,
+    operationId: AuthSwaggerDocs.registerUser.operationId,
+  })
+  @ApiResponse(AuthSwaggerDocs.registerUser.response)
   @ApiResponse(SwaggerErros.Unauthorized)
   @ApiResponse(SwaggerErros.TooManyRequests)
   @ApiResponse(SwaggerErros.InvalidDetails)
@@ -99,7 +105,10 @@ export class AuthController {
     };
   }
 
-  @ApiOperation(AuthSwaggerDocs.verifyLogin.operation)
+  @ApiOperation({
+    summary: AuthSwaggerDocs.verifyLogin.operation.summary,
+    operationId: AuthSwaggerDocs.verifyLogin.operationId,
+  })
   @ApiHeader(AuthSwaggerDocs.verifyLogin.header)
   @ApiResponse(AuthSwaggerDocs.verifyLogin.responses.success)
   @ApiResponse(SwaggerErros.Unauthorized)
@@ -121,7 +130,10 @@ export class AuthController {
     };
   }
 
-  @ApiOperation(AuthSwaggerDocs.verifyRegister.operation)
+  @ApiOperation({
+    summary: AuthSwaggerDocs.verifyRegister.operation.summary,
+    operationId: AuthSwaggerDocs.verifyRegister.operationId,
+  })
   @ApiHeader(AuthSwaggerDocs.verifyRegister.header)
   @ApiResponse(AuthSwaggerDocs.verifyRegister.responses.success)
   @ApiResponse(SwaggerErros.Unauthorized)
@@ -147,13 +159,19 @@ export class AuthController {
     };
   }
 
-  @ApiOperation(AuthSwaggerDocs.googleAuth.operation)
-  @ApiResponse(AuthSwaggerDocs.googleAuth.response)
+  @ApiOperation({
+    summary: AuthSwaggerDocs.googleLogin.operation.summary,
+    operationId: AuthSwaggerDocs.googleLogin.operationId,
+  })
+  @ApiResponse(AuthSwaggerDocs.googleLogin.response)
   @Get('google')
   @UseGuards(AuthGuard('google'))
   async googleAuth() {}
 
-  @ApiOperation(AuthSwaggerDocs.googleCallback.operation)
+  @ApiOperation({
+    summary: AuthSwaggerDocs.googleCallback.operation.summary,
+    operationId: AuthSwaggerDocs.googleCallback.operationId,
+  })
   @ApiResponse(AuthSwaggerDocs.googleCallback.response)
   @Get('google/callback')
   @UseGuards(AuthGuard('google'))
@@ -168,7 +186,10 @@ export class AuthController {
     return res.redirect(callbackUrl);
   }
 
-  @ApiOperation(AuthSwaggerDocs.refreshToken.operation)
+  @ApiOperation({
+    summary: AuthSwaggerDocs.refreshToken.operation.summary,
+    operationId: AuthSwaggerDocs.refreshToken.operationId,
+  })
   @ApiHeader(AuthSwaggerDocs.refreshToken.header)
   @ApiResponse(AuthSwaggerDocs.refreshToken.responses.success)
   @ApiResponse(SwaggerErros.Unauthorized)

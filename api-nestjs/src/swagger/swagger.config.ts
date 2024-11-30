@@ -66,6 +66,7 @@ export const SwaggerErros = {
 export const AuthSwaggerDocs = {
   login: {
     operation: { summary: 'Enviar magic link para login' },
+    operationId: 'login',
     response: {
       status: 201,
       description: CONFIG_MESSAGES.loginLinkSent,
@@ -86,8 +87,9 @@ export const AuthSwaggerDocs = {
     },
   },
 
-  register: {
+  registerUser: {
     operation: { summary: 'Criar novo usuário' },
+    operationId: 'registerUser',
     response: {
       status: 201,
       description: CONFIG_MESSAGES.verificationLinkSent,
@@ -113,6 +115,7 @@ export const AuthSwaggerDocs = {
 
   verifyLogin: {
     operation: { summary: 'Verificar magic link' },
+    operationId: 'verifyLogin',
     header: { name: 'loginToken', required: true },
     responses: {
       success: {
@@ -141,6 +144,7 @@ export const AuthSwaggerDocs = {
 
   verifyRegister: {
     operation: { summary: 'Verificar registro de usuário' },
+    operationId: 'verifyRegister',
     header: { name: 'registerToken', required: true },
     responses: {
       success: {
@@ -167,8 +171,9 @@ export const AuthSwaggerDocs = {
     },
   },
 
-  googleAuth: {
+  googleLogin: {
     operation: { summary: 'Iniciar autenticação com Google' },
+    operationId: 'googleLogin',
     response: {
       status: 302,
       description: 'Redirecionamento para Google',
@@ -181,6 +186,7 @@ export const AuthSwaggerDocs = {
 
   googleCallback: {
     operation: { summary: 'Callback da autenticação Google' },
+    operationId: 'googleCallback',
     response: {
       status: 302,
       description: 'Redirecionamento após autenticação',
@@ -193,6 +199,7 @@ export const AuthSwaggerDocs = {
 
   refreshToken: {
     operation: { summary: 'Renovar token de acesso' },
+    operationId: 'refreshToken',
     header: { name: 'refreshToken', required: true },
     responses: {
       success: {
@@ -218,8 +225,9 @@ export const AuthSwaggerDocs = {
 
 // User Swagger Docs
 export const UserSwaggerDocs = {
-  findOne: {
+  userDetails: {
     operation: { summary: 'Obter detalhes do usuário atual' },
+    operationId: 'userDetails',
     response: {
       status: 200,
       description: 'Detalhes do usuário',
@@ -240,8 +248,9 @@ export const UserSwaggerDocs = {
     },
   },
 
-  update: {
+  updateUser: {
     operation: { summary: 'Atualizar usuário atual' },
+    operationId: 'updateUser',
     response: {
       status: 200,
       description: CONFIG_MESSAGES.userUpdated,
@@ -265,8 +274,9 @@ export const UserSwaggerDocs = {
     },
   },
 
-  remove: {
+  deleteUser: {
     operation: { summary: 'Deletar usuário atual' },
+    operationId: 'deleteUser',
     responses: {
       success: {
         status: 200,
@@ -304,8 +314,9 @@ export const UserSwaggerDocs = {
       },
     },
   },
-  findAll: {
+  getUsers: {
     operation: { summary: 'Listar todos usuários (Admin)' },
+    operationId: 'getUsers',
     responses: {
       success: {
         status: 200,
@@ -370,8 +381,9 @@ export const UserSwaggerDocs = {
     },
   },
 
-  findById: {
+  findUserById: {
     operation: { summary: 'Buscar usuário por ID (Admin)' },
+    operationId: 'findUserById',
     responses: {
       success: {
         status: 200,
@@ -399,8 +411,9 @@ export const UserSwaggerDocs = {
     },
   },
 
-  updateById: {
+  updateUserById: {
     operation: { summary: 'Atualizar usuário por ID (Admin)' },
+    operationId: 'updateUserById',
     responses: {
       success: {
         status: 200,
@@ -426,8 +439,9 @@ export const UserSwaggerDocs = {
     },
   },
 
-  removeById: {
+  deleteUserById: {
     operation: { summary: 'Deletar usuário por ID (Admin)' },
+    operationId: 'deleteUserById',
     responses: {
       success: {
         status: 200,
@@ -462,6 +476,26 @@ export const UserSwaggerDocs = {
             },
           },
         },
+      },
+    },
+  },
+};
+
+// Server Swagger Docs
+export const ServerSwaggerDocs = {
+  serverStatus: {
+    operation: {
+      summary: 'Verifica status do servidor',
+      description:
+        'Retorna uma mensagem indicando que o servidor está em execução',
+    },
+    operationId: 'serverStatus',
+    response: {
+      status: 200,
+      description: 'Servidor está rodando normalmente',
+      schema: {
+        type: 'string',
+        example: '🚀 O servidor está rodando...',
       },
     },
   },
