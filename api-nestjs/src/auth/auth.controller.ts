@@ -18,8 +18,18 @@ import { Response } from 'express';
 import { CONFIG_MESSAGES } from 'src/config/config';
 import { UsersService } from '../users/users.service';
 import { ResendService } from '../mail/resend';
-import { Throttle } from '@nestjs/throttler';
 import { ApiTags, ApiOperation, ApiResponse, ApiHeader } from '@nestjs/swagger';
+import { CreateUserDto } from '../users/dto/users.dto';
+import { ConfigService } from '@nestjs/config';
+import {
+  AuthSwaggerDocs,
+  SwaggerErros,
+  LoginResponse,
+  RegisterResponse,
+  VerifyLoginResponse,
+  VerifyRegisterResponse,
+  RefreshTokenResponse,
+} from '../swagger/swagger.config';
 
 @ApiTags('Autenticação')
 @Controller('auth')
@@ -29,66 +39,97 @@ export class AuthController {
     private readonly authService: AuthService,
     private readonly usersService: UsersService,
     private readonly resendService: ResendService,
+    private readonly configService: ConfigService,
   ) {}
 
-  @ApiOperation({ summary: 'Enviar magic link para login' })
-  @ApiResponse({ status: 201, description: 'Link de acesso enviado.' })
-  @ApiResponse({ status: 401, description: 'Usuário não encontrado.' })
-  @ApiResponse({ status: 429, description: 'Muitas tentativas.' })
-  @ApiResponse({
-    status: 401,
-    description: 'Usuário não encontrado ou não verificado.',
-  })
-  // @Throttle({ default: { limit: 3, ttl: 60000 } })
+  @ApiOperation(AuthSwaggerDocs.login.operation)
+  @ApiResponse(AuthSwaggerDocs.login.response)
+  @ApiResponse(SwaggerErros.Unauthorized)
+  @ApiResponse(SwaggerErros.TooManyRequests)
+  @ApiResponse(SwaggerErros.InvalidDetails)
   @Post('login')
-  async login(@Body() body: LoginDto) {
+  async login(@Body() body: LoginDto): Promise<LoginResponse> {
     const user = await this.authService.validateUser(body.email);
 
     if (!user) {
-      throw new UnauthorizedException(CONFIG_MESSAGES.UserNotFound);
+      throw new UnauthorizedException(CONFIG_MESSAGES.userNotFound);
     }
 
     if (!user.verified) {
-      throw new UnauthorizedException(CONFIG_MESSAGES.EmailNotVerified);
+      throw new UnauthorizedException(CONFIG_MESSAGES.userNotVerified);
     }
 
     const tokens = await this.authService.generateMagicLinkToken(body.email);
-    await this.resendService.sendLoginEmail(body.email, tokens.verifyLoginUrl);
 
-    return { message: 'Link de acesso enviado.', ...tokens };
+    // await this.resendService.sendLoginEmail(body.email, tokens.verifyLoginUrl);
+
+    return { message: CONFIG_MESSAGES.loginLinkSent, ...tokens };
   }
 
-  @ApiOperation({ summary: 'Verificar magic link' })
-  @ApiHeader({ name: 'loginToken', required: true })
-  @ApiResponse({ status: 200, description: 'Login realizado com sucesso.' })
-  @ApiResponse({ status: 401, description: 'Token inválido ou expirado.' })
-  @ApiResponse({ status: 429, description: 'Muitas tentativas.' })
-  // @Throttle({ default: { limit: 1, ttl: 60000 } })
+  @ApiOperation(AuthSwaggerDocs.register.operation)
+  @ApiResponse(AuthSwaggerDocs.register.response)
+  @ApiResponse(SwaggerErros.Unauthorized)
+  @ApiResponse(SwaggerErros.TooManyRequests)
+  @ApiResponse(SwaggerErros.InvalidDetails)
+  @Post('register')
+  async register(
+    @Body() createUserDto: CreateUserDto,
+  ): Promise<RegisterResponse> {
+    await this.usersService.createUser({
+      ...createUserDto,
+    });
+
+    const registerToken = await this.authService.generateRegisterToken(
+      createUserDto,
+    );
+
+    const verifyRegisterUrl = `${this.configService.get<string>(
+      'FRONTEND_URL',
+    )}/verify-register?registerToken=${registerToken}`;
+
+    // await this.resendService.sendVerificationEmail(
+    //   createUserDto.email,
+    //   verifyRegisterUrl,
+    // );
+
+    return {
+      message: CONFIG_MESSAGES.verificationLinkSent,
+      registerToken,
+      verifyRegisterUrl,
+    };
+  }
+
+  @ApiOperation(AuthSwaggerDocs.verifyLogin.operation)
+  @ApiHeader(AuthSwaggerDocs.verifyLogin.header)
+  @ApiResponse(AuthSwaggerDocs.verifyLogin.responses.success)
+  @ApiResponse(SwaggerErros.Unauthorized)
+  @ApiResponse(SwaggerErros.TooManyRequests)
   @Get('verify-login')
-  async verifyL(
+  async verifyLogin(
     @Headers('loginToken') loginToken: string,
     @Res({ passthrough: true }) response: Response,
-  ) {
+  ): Promise<VerifyLoginResponse> {
     const user = await this.authService.verifyMagicLinkToken(loginToken);
 
     const { accessToken } = this.authService.generateTokens(user);
     const refreshToken = this.authService.generateRefreshToken(user);
 
     return {
-      message: CONFIG_MESSAGES.UserLogged,
+      message: CONFIG_MESSAGES.userLogged,
       accessToken: accessToken,
       refreshToken: refreshToken,
     };
   }
 
-  @ApiOperation({ summary: 'Verificar registro de usuário' })
-  @ApiHeader({ name: 'registerToken', required: true })
-  @ApiResponse({ status: 200, description: 'Registro verificado com sucesso.' })
-  @ApiResponse({ status: 401, description: 'Token inválido ou expirado.' })
-  @ApiResponse({ status: 429, description: 'Muitas tentativas.' })
-  // @Throttle({ default: { limit: 1, ttl: 60000 } })
+  @ApiOperation(AuthSwaggerDocs.verifyRegister.operation)
+  @ApiHeader(AuthSwaggerDocs.verifyRegister.header)
+  @ApiResponse(AuthSwaggerDocs.verifyRegister.responses.success)
+  @ApiResponse(SwaggerErros.Unauthorized)
+  @ApiResponse(SwaggerErros.TooManyRequests)
   @Get('verify-register')
-  async verifyRegister(@Headers('registerToken') registerToken: string) {
+  async verifyRegister(
+    @Headers('registerToken') registerToken: string,
+  ): Promise<VerifyRegisterResponse> {
     const userData = await this.authService.verifyRegisterToken(registerToken);
 
     const user = await this.usersService.updateUser({
@@ -100,23 +141,20 @@ export class AuthController {
     const refreshToken = this.authService.generateRefreshToken(user);
 
     return {
-      message: CONFIG_MESSAGES.UserCreatedVerified,
+      message: CONFIG_MESSAGES.userVerified,
       accessToken: accessToken,
       refreshToken: refreshToken,
     };
   }
 
-  @ApiOperation({ summary: 'Iniciar autenticação com Google' })
-  @ApiResponse({ status: 302, description: 'Redirecionamento para Google.' })
+  @ApiOperation(AuthSwaggerDocs.googleAuth.operation)
+  @ApiResponse(AuthSwaggerDocs.googleAuth.response)
   @Get('google')
   @UseGuards(AuthGuard('google'))
   async googleAuth() {}
 
-  @ApiOperation({ summary: 'Callback da autenticação Google' })
-  @ApiResponse({
-    status: 302,
-    description: 'Redirecionamento após autenticação.',
-  })
+  @ApiOperation(AuthSwaggerDocs.googleCallback.operation)
+  @ApiResponse(AuthSwaggerDocs.googleCallback.response)
   @Get('google/callback')
   @UseGuards(AuthGuard('google'))
   async googleAuthCallback(@Req() req, @Res() res) {
@@ -130,23 +168,24 @@ export class AuthController {
     return res.redirect(callbackUrl);
   }
 
-  @ApiOperation({ summary: 'Renovar token de acesso' })
-  @ApiHeader({ name: 'refreshToken', required: true })
-  @ApiResponse({ status: 200, description: 'Token atualizado com sucesso.' })
-  @ApiResponse({ status: 401, description: 'O token é inválido ou expirou.' })
+  @ApiOperation(AuthSwaggerDocs.refreshToken.operation)
+  @ApiHeader(AuthSwaggerDocs.refreshToken.header)
+  @ApiResponse(AuthSwaggerDocs.refreshToken.responses.success)
+  @ApiResponse(SwaggerErros.Unauthorized)
+  @ApiResponse(SwaggerErros.TooManyRequests)
   @Get('refresh-token')
   async refreshToken(
     @Headers('refreshToken') refreshToken: string,
     @Res({ passthrough: true }) response: Response,
-  ) {
+  ): Promise<RefreshTokenResponse> {
     try {
       const { accessToken } = await this.authService.refreshToken(refreshToken);
       return {
-        message: 'Token atualizado com sucesso',
+        message: CONFIG_MESSAGES.tokenUpdated,
         accessToken: accessToken,
       };
     } catch (error) {
-      throw new UnauthorizedException(CONFIG_MESSAGES.JwtTokenExpired);
+      throw new UnauthorizedException(CONFIG_MESSAGES.invalidToken);
     }
   }
 }

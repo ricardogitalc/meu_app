@@ -22,7 +22,7 @@ export class CreateUserDto {
 
   @ApiProperty({
     description: 'Primeiro nome do usuário',
-    example: 'João',
+    example: 'Nome',
   })
   @IsString({ message: 'O nome deve ser uma string' })
   @IsNotEmpty({ message: 'O nome é obrigatório' })
@@ -32,7 +32,7 @@ export class CreateUserDto {
 
   @ApiProperty({
     description: 'Sobrenome do usuário',
-    example: 'Silva',
+    example: 'Sobrenome',
   })
   @IsString({ message: 'O sobrenome deve ser uma string' })
   @IsNotEmpty({ message: 'O sobrenome é obrigatório' })
@@ -65,7 +65,7 @@ export class UpdateUserDto {
 
   @ApiProperty({
     description: 'Primeiro nome do usuário',
-    example: 'João',
+    example: 'Nome',
   })
   @IsString({ message: 'O nome deve ser uma string' })
   @IsNotEmpty({ message: 'O nome é obrigatório' })
@@ -75,7 +75,7 @@ export class UpdateUserDto {
 
   @ApiProperty({
     description: 'Sobrenome do usuário',
-    example: 'Silva',
+    example: 'Sobrenome',
   })
   @IsString({ message: 'O sobrenome deve ser uma string' })
   @IsNotEmpty({ message: 'O sobrenome é obrigatório' })

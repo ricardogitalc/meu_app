@@ -10,6 +10,6 @@ export class CustomThrottlerGuard extends ThrottlerGuard {
     context: ExecutionContext,
     throttlerLimitDetail: ThrottlerLimitDetail,
   ): Promise<void> {
-    throw new ThrottlerException(CONFIG_MESSAGES.TooManyRequests);
+    throw new ThrottlerException(CONFIG_MESSAGES.tooManyRequests);
   }
 }

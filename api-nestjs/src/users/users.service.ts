@@ -22,6 +22,10 @@ export class UsersService {
       where: { id },
     });
 
+    if (!user) {
+      throw new UnauthorizedException(CONFIG_MESSAGES.userNotFound);
+    }
+
     return user;
   }
 
@@ -31,7 +35,7 @@ export class UsersService {
     });
 
     if (existingUser && existingUser.verified) {
-      throw new UnauthorizedException(CONFIG_MESSAGES.UserAlReady);
+      throw new UnauthorizedException(CONFIG_MESSAGES.userAllReady);
     }
 
     if (existingUser && !existingUser.verified) {
@@ -63,7 +67,7 @@ export class UsersService {
     });
 
     if (!users.length) {
-      throw new UnauthorizedException(CONFIG_MESSAGES.UserNotFound);
+      throw new UnauthorizedException(CONFIG_MESSAGES.userNotFound);
     }
 
     return users;
@@ -79,7 +83,7 @@ export class UsersService {
     });
 
     if (!existingUser) {
-      throw new UnauthorizedException(CONFIG_MESSAGES.UserNotFound);
+      throw new UnauthorizedException(CONFIG_MESSAGES.userNotFound);
     }
 
     return this.prisma.user.update({
@@ -94,7 +98,7 @@ export class UsersService {
     });
 
     if (!existingUser) {
-      throw new UnauthorizedException(CONFIG_MESSAGES.UserNotFound);
+      throw new UnauthorizedException(CONFIG_MESSAGES.userNotFound);
     }
 
     return this.prisma.user.delete({
@@ -109,7 +113,7 @@ export class UsersService {
     const existingUser = await this.UserFindById(id);
 
     if (!existingUser) {
-      throw new UnauthorizedException(CONFIG_MESSAGES.UserNotFound);
+      throw new UnauthorizedException(CONFIG_MESSAGES.userNotFound);
     }
 
     return this.prisma.user.update({
@@ -122,7 +126,7 @@ export class UsersService {
     const existingUser = await this.UserFindById(id);
 
     if (!existingUser) {
-      throw new UnauthorizedException(CONFIG_MESSAGES.UserNotFound);
+      throw new UnauthorizedException(CONFIG_MESSAGES.userNotFound);
     }
 
     return this.prisma.user.delete({

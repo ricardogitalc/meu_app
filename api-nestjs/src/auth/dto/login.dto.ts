@@ -8,7 +8,7 @@ export class LoginDto {
     description: 'Email do usuário',
     example: 'usuario@email.com',
   })
-  @IsEmail({}, { message: CONFIG_MESSAGES.InvalidEmail })
+  @IsEmail({}, { message: CONFIG_MESSAGES.invalidEmail })
   @Transform(({ value }) => value.toLowerCase().trim())
   email: string;
 }

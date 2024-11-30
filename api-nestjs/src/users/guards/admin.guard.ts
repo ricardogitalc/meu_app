@@ -16,7 +16,7 @@ export class AdminGuard extends JwtGuard implements CanActivate {
     const user = request.user;
 
     if (user?.role !== 'ADMIN') {
-      throw new UnauthorizedException(CONFIG_MESSAGES.AdminOnly);
+      throw new UnauthorizedException(CONFIG_MESSAGES.adminOnly);
     }
 
     return true;

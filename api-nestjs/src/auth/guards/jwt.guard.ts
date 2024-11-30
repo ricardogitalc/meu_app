@@ -13,7 +13,7 @@ export class JwtGuard extends AuthGuard('jwt') {
       const result = await super.canActivate(context);
       return result as boolean;
     } catch {
-      throw new UnauthorizedException(CONFIG_MESSAGES.JwtTokenExpired);
+      throw new UnauthorizedException(CONFIG_MESSAGES.expiredToken);
     }
   }
 }

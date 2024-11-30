@@ -1,21 +1,37 @@
 export const CONFIG_MESSAGES = {
-  UserLogged: 'Login verificado com sucesso',
-  JwtTokenExpired: 'O token é inválido ou expirou.',
-  LoginTokenExpired: 'O link de acesso expirou.',
-  UserNotFound: 'Usuário não encontrado.',
-  UserAlReady: 'O usuário já existe.',
-  AdminOnly: 'Você não é um administrador.',
-  InvalidEmail: 'Insira um email válido.',
-  EmailNotVerified: 'Usuário não verificado.',
-  UserCreatedVerified: 'Usuário verificado.',
-  UpdateUserSucess: 'Usuário atualizado.',
-  UserDeletedSucess: 'Usuário deletado com sucesso.',
-  GoogleLoginError: 'Ocorreu um erro ao tentar entrar com Google.',
-  SendVerificationLink:
-    'Usuário criado. Verifique seu email para ativar a conta.',
-  TooManyRequests: 'Muitas tentativas. Aguarde um momento e tente novamente.',
-  RefreshTokenExpired: 'O refresh token expirou. Faça login novamente.',
-  UserNotPermission: 'Acesso negado, você só pode acessar suas informações.',
+  // USER SUCCESS
+  userCreated: 'Usuário criado.',
+  userUpdated: 'Usuário atualizado.',
+  userDeleted: 'Usuário deletado.',
+  userVerified: 'Usuário verificado.',
+  userLogged: 'Login realizado.',
+
+  // USER ERROR
+  userExists: 'Usuário já cadastrado.',
+  userAllReady: 'Usuário já existe.',
+  userNotFound: 'Usuário não encontrado.',
+  userNotVerified: 'Email não verificado.',
+  userNoPermission: 'Acesso negado.',
+
+  // AUTH SUCCESS
+  loginLinkSent: 'Link de acesso enviado.',
+  verificationLinkSent: 'Link de verificação enviado.',
+  tokenUpdated: 'Token atualizado.',
+
+  // AUTH ERROR
+  expiredToken: 'Token inválido ou expirado.',
+  invalidToken: 'Token inválido.',
+  accessLinkExpired: 'Link expirado.',
+  unauthorized: 'Não autorizado.',
+  adminOnly: 'Acesso apenas para admin.',
+
+  // VALIDATION ERROR
+  invalidData: 'Dados inválidos.',
+  invalidEmail: 'Email inválido.',
+  tooManyRequests: 'Muitas tentativas, aguarde um momento.',
+
+  // INTEGRATION ERROR
+  googleLoginError: 'Erro no login Google.',
 } as const;
 
 export const JWT_TIMES = {

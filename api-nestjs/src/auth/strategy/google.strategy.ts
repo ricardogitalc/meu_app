@@ -44,7 +44,7 @@ export class GoogleStrategy extends PassportStrategy(Strategy) {
       return done(null, user);
     } catch (error) {
       return done(
-        new UnauthorizedException(CONFIG_MESSAGES.GoogleLoginError),
+        new UnauthorizedException(CONFIG_MESSAGES.googleLoginError),
         false,
       );
     }

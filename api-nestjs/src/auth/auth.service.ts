@@ -47,7 +47,7 @@ export class AuthService {
       const user = await this.validateUser(payload.email);
       return user;
     } catch (error) {
-      throw new UnauthorizedException(CONFIG_MESSAGES.JwtTokenExpired);
+      throw new UnauthorizedException(CONFIG_MESSAGES.expiredToken);
     }
   }
 
@@ -56,7 +56,7 @@ export class AuthService {
       const payload = this.jwtService.verify(token);
       return payload;
     } catch (error) {
-      throw new UnauthorizedException(CONFIG_MESSAGES.JwtTokenExpired);
+      throw new UnauthorizedException(CONFIG_MESSAGES.expiredToken);
     }
   }
 
@@ -78,14 +78,14 @@ export class AuthService {
 
       const user = await this.validateUserById(payload.sub);
       if (!user) {
-        throw new UnauthorizedException(CONFIG_MESSAGES.UserNotFound);
+        throw new UnauthorizedException(CONFIG_MESSAGES.userNotFound);
       }
 
       const accessToken = this.generateTokens(user);
 
       return accessToken;
     } catch (error) {
-      throw new UnauthorizedException(CONFIG_MESSAGES.JwtTokenExpired);
+      throw new UnauthorizedException(CONFIG_MESSAGES.expiredToken);
     }
   }
 
