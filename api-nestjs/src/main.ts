@@ -21,6 +21,11 @@ async function bootstrap() {
     .build();
 
   const document = SwaggerModule.createDocument(app, config);
+
+  // Salvar JSON do Swagger
+  const fs = require('fs');
+  fs.writeFileSync('./swagger.json', JSON.stringify(document, null, 2), 'utf8');
+
   SwaggerModule.setup('api', app, document);
 
   morgan.token('time', () => {

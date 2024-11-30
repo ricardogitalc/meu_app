@@ -1,0 +1,964 @@
+{
+  "openapi": "3.0.0",
+  "paths": {
+    "/": {
+      "get": {
+        "operationId": "AppController_serverIsRuning",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "tags": [
+          "App"
+        ]
+      }
+    },
+    "/user/details": {
+      "get": {
+        "operationId": "UsersController_findOne",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "Detalhes do usuário",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "role": {
+                      "type": "string",
+                      "example": "USER"
+                    },
+                    "id": {
+                      "type": "number",
+                      "example": 1
+                    },
+                    "email": {
+                      "type": "string",
+                      "example": "usuario@email.com"
+                    },
+                    "firstName": {
+                      "type": "string",
+                      "example": "Nome"
+                    },
+                    "lastName": {
+                      "type": "string",
+                      "example": "Sobrenome"
+                    },
+                    "whatsappNumber": {
+                      "type": "string",
+                      "example": "11999999999"
+                    },
+                    "verified": {
+                      "type": "boolean",
+                      "example": true
+                    },
+                    "createdAt": {
+                      "type": "string",
+                      "example": "2023-01-01T00:00:00.000Z"
+                    },
+                    "updatedAt": {
+                      "type": "string",
+                      "example": "2023-01-01T00:00:00.000Z"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Não autorizado."
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Obter detalhes do usuário atual",
+        "tags": [
+          "Usuários"
+        ]
+      }
+    },
+    "/user/update": {
+      "patch": {
+        "operationId": "UsersController_update",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UpdateUserDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Usuário atualizado.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "message": {
+                      "type": "string",
+                      "example": "Usuário atualizado."
+                    },
+                    "updatedFields": {
+                      "type": "object",
+                      "example": {
+                        "fisrtName": "Novo",
+                        "lastName": "Nome",
+                        "whatsappNumber": "11999999999"
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Dados inválidos."
+          },
+          "401": {
+            "description": "Não autorizado."
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Atualizar usuário atual",
+        "tags": [
+          "Usuários"
+        ]
+      }
+    },
+    "/user/delete": {
+      "delete": {
+        "operationId": "UsersController_remove",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "Usuário deletado.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "message": {
+                      "type": "string",
+                      "example": "Usuário deletado."
+                    },
+                    "user": {
+                      "type": "object",
+                      "properties": {
+                        "role": {
+                          "type": "string",
+                          "example": "USER"
+                        },
+                        "id": {
+                          "type": "number",
+                          "example": 1
+                        },
+                        "email": {
+                          "type": "string",
+                          "example": "usuario@email.com"
+                        },
+                        "fisrtName": {
+                          "type": "string",
+                          "example": "Nome"
+                        },
+                        "lastName": {
+                          "type": "string",
+                          "example": "Sobrenome"
+                        },
+                        "whatsappNumber": {
+                          "type": "string",
+                          "example": "11999999999"
+                        },
+                        "imageUrl": {
+                          "type": "string",
+                          "example": "imageUrl"
+                        },
+                        "verified": {
+                          "type": "boolean",
+                          "example": true
+                        },
+                        "createdAt": {
+                          "type": "string",
+                          "example": "2023-01-01T00:00:00.000Z"
+                        },
+                        "updatedAt": {
+                          "type": "string",
+                          "example": "2023-01-01T00:00:00.000"
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Não autorizado."
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Deletar usuário atual",
+        "tags": [
+          "Usuários"
+        ]
+      }
+    },
+    "/user/users": {
+      "get": {
+        "operationId": "UsersController_findAll",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "Lista de usuários retornada com sucesso",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "example": [
+                    {
+                      "role": "USER",
+                      "id": 1,
+                      "email": "joao@email.com",
+                      "firstName": "João",
+                      "lastName": "Silva",
+                      "whatsappNumber": "11999999999",
+                      "imageUrl": "https://exemplo.com/joao.jpg",
+                      "verified": true,
+                      "createdAt": "2023-01-01T00:00:00.000Z",
+                      "updatedAt": "2023-01-01T00:00:00.000Z"
+                    },
+                    {
+                      "role": "ADMIN",
+                      "id": 2,
+                      "email": "maria@email.com",
+                      "firstName": "Maria",
+                      "lastName": "Santos",
+                      "whatsappNumber": "11988888888",
+                      "imageUrl": "https://exemplo.com/maria.jpg",
+                      "verified": true,
+                      "createdAt": "2023-01-02T00:00:00.000Z",
+                      "updatedAt": "2023-01-02T00:00:00.000Z"
+                    },
+                    {
+                      "role": "USER",
+                      "id": 3,
+                      "email": "pedro@email.com",
+                      "firstName": "Pedro",
+                      "lastName": "Oliveira",
+                      "whatsappNumber": "11977777777",
+                      "imageUrl": "https://exemplo.com/pedro.jpg",
+                      "verified": false,
+                      "createdAt": "2023-01-03T00:00:00.000Z",
+                      "updatedAt": "2023-01-03T00:00:00.000Z"
+                    }
+                  ],
+                  "items": {
+                    "type": "object",
+                    "properties": {
+                      "role": {
+                        "type": "string"
+                      },
+                      "id": {
+                        "type": "number"
+                      },
+                      "email": {
+                        "type": "string"
+                      },
+                      "firstName": {
+                        "type": "string"
+                      },
+                      "lastName": {
+                        "type": "string"
+                      },
+                      "whatsappNumber": {
+                        "type": "string"
+                      },
+                      "imageUrl": {
+                        "type": "string"
+                      },
+                      "verified": {
+                        "type": "boolean"
+                      },
+                      "createdAt": {
+                        "type": "string"
+                      },
+                      "updatedAt": {
+                        "type": "string"
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Não autorizado."
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Listar todos usuários (Admin)",
+        "tags": [
+          "Usuários"
+        ]
+      }
+    },
+    "/user/{id}": {
+      "get": {
+        "operationId": "UsersController_findById",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Usuário encontrado",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "role": {
+                      "type": "string",
+                      "example": "USER"
+                    },
+                    "id": {
+                      "type": "number",
+                      "example": 1
+                    },
+                    "email": {
+                      "type": "string",
+                      "example": "usuario@email.com"
+                    },
+                    "firstName": {
+                      "type": "string",
+                      "example": "Nome"
+                    },
+                    "lastName": {
+                      "type": "string",
+                      "example": "Sobrenome"
+                    },
+                    "whatsappNumber": {
+                      "type": "string",
+                      "example": "11999999999",
+                      "nullable": true
+                    },
+                    "imageUrl": {
+                      "type": "string",
+                      "example": "imageUrl"
+                    },
+                    "verified": {
+                      "type": "boolean",
+                      "example": true
+                    },
+                    "createdAt": {
+                      "type": "string",
+                      "example": "2024-11-30T16:14:20.100Z"
+                    },
+                    "updatedAt": {
+                      "type": "string",
+                      "example": "2024-11-30T17:02:17.452Z"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Não autorizado."
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Buscar usuário por ID (Admin)",
+        "tags": [
+          "Usuários"
+        ]
+      },
+      "patch": {
+        "operationId": "UsersController_updateById",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UpdateUserDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Usuário atualizado.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "message": {
+                      "type": "string",
+                      "example": "Usuário atualizado."
+                    },
+                    "updatedFields": {
+                      "type": "object",
+                      "example": {
+                        "firstName": "novo",
+                        "lastName": "nome",
+                        "whatsappNumber": "11999999999"
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Dados inválidos."
+          },
+          "401": {
+            "description": "Não autorizado."
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Atualizar usuário por ID (Admin)",
+        "tags": [
+          "Usuários"
+        ]
+      },
+      "delete": {
+        "operationId": "UsersController_removeById",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Usuário deletado.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "message": {
+                      "type": "string",
+                      "example": "Usuário deletado."
+                    },
+                    "user": {
+                      "type": "object",
+                      "properties": {
+                        "role": {
+                          "type": "string",
+                          "example": "USER"
+                        },
+                        "id": {
+                          "type": "number",
+                          "example": 1
+                        },
+                        "email": {
+                          "type": "string",
+                          "example": "usuario@email.com"
+                        },
+                        "fisrtName": {
+                          "type": "string",
+                          "example": "Nome"
+                        },
+                        "lastName": {
+                          "type": "string",
+                          "example": "Sobrenome"
+                        },
+                        "whatsappNumber": {
+                          "type": "string",
+                          "example": "11999999999"
+                        },
+                        "imageUrl": {
+                          "type": "string",
+                          "example": "imageUrl"
+                        },
+                        "verified": {
+                          "type": "boolean",
+                          "example": true
+                        },
+                        "createdAt": {
+                          "type": "string",
+                          "example": "2023-01-01T00:00:00.000Z"
+                        },
+                        "updatedAt": {
+                          "type": "string",
+                          "example": "2023-01-01T00:00:00.000"
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Não autorizado."
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Deletar usuário por ID (Admin)",
+        "tags": [
+          "Usuários"
+        ]
+      }
+    },
+    "/auth/login": {
+      "post": {
+        "operationId": "AuthController_login",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/LoginDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Link de acesso enviado.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "message": {
+                      "type": "string",
+                      "example": "Link de acesso enviado."
+                    },
+                    "verifyLoginUrl": {
+                      "type": "string",
+                      "example": "http://seusite.com/verify-login?token=xyz"
+                    },
+                    "loginToken": {
+                      "type": "string",
+                      "example": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9..."
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Dados inválidos."
+          },
+          "401": {
+            "description": "Não autorizado."
+          },
+          "429": {
+            "description": "Muitas tentativas, aguarde um momento."
+          }
+        },
+        "summary": "Enviar magic link para login",
+        "tags": [
+          "Autenticação"
+        ]
+      }
+    },
+    "/auth/register": {
+      "post": {
+        "operationId": "AuthController_register",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreateUserDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Link de verificação enviado.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "message": {
+                      "type": "string",
+                      "example": "Link de verificação enviado."
+                    },
+                    "registerToken": {
+                      "type": "string",
+                      "example": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9..."
+                    },
+                    "verifyRegisterUrl": {
+                      "type": "string",
+                      "example": "http://seusite.com/verify-register?token=xyz"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Dados inválidos."
+          },
+          "401": {
+            "description": "Não autorizado."
+          },
+          "429": {
+            "description": "Muitas tentativas, aguarde um momento."
+          }
+        },
+        "summary": "Criar novo usuário",
+        "tags": [
+          "Autenticação"
+        ]
+      }
+    },
+    "/auth/verify-login": {
+      "get": {
+        "operationId": "AuthController_verifyLogin",
+        "parameters": [
+          {
+            "name": "loginToken",
+            "required": true,
+            "in": "header",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Login realizado.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "message": {
+                      "type": "string",
+                      "example": "Login realizado."
+                    },
+                    "accessToken": {
+                      "type": "string",
+                      "example": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9..."
+                    },
+                    "refreshToken": {
+                      "type": "string",
+                      "example": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9..."
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Não autorizado."
+          },
+          "429": {
+            "description": "Muitas tentativas, aguarde um momento."
+          }
+        },
+        "summary": "Verificar magic link",
+        "tags": [
+          "Autenticação"
+        ]
+      }
+    },
+    "/auth/verify-register": {
+      "get": {
+        "operationId": "AuthController_verifyRegister",
+        "parameters": [
+          {
+            "name": "registerToken",
+            "required": true,
+            "in": "header",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Usuário verificado.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "message": {
+                      "type": "string",
+                      "example": "Usuário verificado."
+                    },
+                    "accessToken": {
+                      "type": "string",
+                      "example": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9..."
+                    },
+                    "refreshToken": {
+                      "type": "string",
+                      "example": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9..."
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Não autorizado."
+          },
+          "429": {
+            "description": "Muitas tentativas, aguarde um momento."
+          }
+        },
+        "summary": "Verificar registro de usuário",
+        "tags": [
+          "Autenticação"
+        ]
+      }
+    },
+    "/auth/google": {
+      "get": {
+        "operationId": "AuthController_googleAuth",
+        "parameters": [],
+        "responses": {
+          "302": {
+            "description": "Redirecionamento para Google",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "string",
+                  "example": "Redirecionando para autenticação Google"
+                }
+              }
+            }
+          }
+        },
+        "summary": "Iniciar autenticação com Google",
+        "tags": [
+          "Autenticação"
+        ]
+      }
+    },
+    "/auth/google/callback": {
+      "get": {
+        "operationId": "AuthController_googleAuthCallback",
+        "parameters": [],
+        "responses": {
+          "302": {
+            "description": "Redirecionamento após autenticação",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "string",
+                  "example": "{FRONTEND_URL}/google/callback?token=token"
+                }
+              }
+            }
+          }
+        },
+        "summary": "Callback da autenticação Google",
+        "tags": [
+          "Autenticação"
+        ]
+      }
+    },
+    "/auth/refresh-token": {
+      "get": {
+        "operationId": "AuthController_refreshToken",
+        "parameters": [
+          {
+            "name": "refreshToken",
+            "required": true,
+            "in": "header",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Token atualizado.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "message": {
+                      "type": "string",
+                      "example": "Token atualizado."
+                    },
+                    "accessToken": {
+                      "type": "string",
+                      "example": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9..."
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Não autorizado."
+          },
+          "429": {
+            "description": "Muitas tentativas, aguarde um momento."
+          }
+        },
+        "summary": "Renovar token de acesso",
+        "tags": [
+          "Autenticação"
+        ]
+      }
+    }
+  },
+  "info": {
+    "title": "API",
+    "description": "API documentation",
+    "version": "1.0",
+    "contact": {}
+  },
+  "tags": [
+    {
+      "name": "API",
+      "description": ""
+    }
+  ],
+  "servers": [],
+  "components": {
+    "securitySchemes": {
+      "bearer": {
+        "scheme": "bearer",
+        "bearerFormat": "JWT",
+        "type": "http"
+      }
+    },
+    "schemas": {
+      "UpdateUserDto": {
+        "type": "object",
+        "properties": {
+          "email": {
+            "type": "string",
+            "description": "Email do usuário",
+            "example": "usuario@email.com"
+          },
+          "firstName": {
+            "type": "string",
+            "description": "Primeiro nome do usuário",
+            "example": "Nome"
+          },
+          "lastName": {
+            "type": "string",
+            "description": "Sobrenome do usuário",
+            "example": "Sobrenome"
+          },
+          "whatsappNumber": {
+            "type": "string",
+            "description": "Número do WhatsApp",
+            "example": "11999999999"
+          }
+        },
+        "required": [
+          "email",
+          "firstName",
+          "lastName"
+        ]
+      },
+      "LoginDto": {
+        "type": "object",
+        "properties": {
+          "email": {
+            "type": "string",
+            "description": "Email do usuário",
+            "example": "usuario@email.com"
+          }
+        },
+        "required": [
+          "email"
+        ]
+      },
+      "CreateUserDto": {
+        "type": "object",
+        "properties": {
+          "email": {
+            "type": "string",
+            "description": "Email do usuário",
+            "example": "usuario@email.com"
+          },
+          "firstName": {
+            "type": "string",
+            "description": "Primeiro nome do usuário",
+            "example": "Nome"
+          },
+          "lastName": {
+            "type": "string",
+            "description": "Sobrenome do usuário",
+            "example": "Sobrenome"
+          },
+          "whatsappNumber": {
+            "type": "string",
+            "description": "Número do WhatsApp",
+            "example": "11999999999"
+          }
+        },
+        "required": [
+          "email",
+          "firstName",
+          "lastName"
+        ]
+      }
+    }
+  }
+}
