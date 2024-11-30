@@ -17,5 +17,3 @@ export class JwtGuard extends AuthGuard('jwt') {
     }
   }
 }
-
-// usar jwt.guard.ts para rotas que precisam verificar se o token jwt está válido

@@ -5,6 +5,7 @@ export const AUTH_TIMES = {
 } as const;
 
 export const CONFIG_MESSAGES = {
+  UserLogged: 'Login verificado com sucesso',
   JwtTokenExpired: 'O token é inválido ou expirou.',
   LoginTokenExpired: 'O link de acesso expirou.',
   UserNotFound: 'Usuário não encontrado.',

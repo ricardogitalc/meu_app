@@ -48,23 +48,23 @@ export class AuthController {
       tokens.verify_url,
     );
 
-    return { message: 'Link de acesso enviado.', tokens: tokens };
+    return { message: 'Link de acesso enviado.', ...tokens };
   }
 
   @Get('verify-login')
-  async verifyMagicLink(
+  async verifyL(
     @Headers('login-token') loginToken: string,
     @Res({ passthrough: true }) response: Response,
   ) {
     const user = await this.authService.verifyMagicLinkToken(loginToken);
+
     const { jwt_token } = this.authService.generateTokens(user);
     const refresh_token = this.authService.generateRefreshToken(user);
 
     return {
-      message: 'Login verificado com sucesso',
-      user,
-      jwt_token,
-      refresh_token,
+      message: CONFIG_MESSAGES.UserLogged,
+      jwt_token: jwt_token,
+      refresh_token: refresh_token,
     };
   }
 
@@ -82,7 +82,6 @@ export class AuthController {
 
     return {
       message: CONFIG_MESSAGES.UserCreatedVerified,
-      user: user,
       jwt_token: jwt_token,
       refresh_token: refresh_token,
     };
