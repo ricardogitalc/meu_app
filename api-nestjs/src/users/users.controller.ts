@@ -6,8 +6,6 @@ import {
   Patch,
   UseFilters,
   UseGuards,
-  Inject,
-  forwardRef,
   Request,
   Param,
 } from '@nestjs/common';
@@ -17,8 +15,6 @@ import { User } from '@prisma/client';
 import { HttpExceptionsFilter } from 'src/common/filter/http-exception.filter';
 import { CONFIG_MESSAGES } from 'src/config/config';
 import { AdminGuard } from './guards/admin.guard';
-import { AuthService } from 'src/auth/auth.service';
-import { ConfigService } from '@nestjs/config';
 import { JwtGuard } from 'src/auth/guards/jwt.guard';
 import { ResendService } from '../mail/resend';
 import { SkipThrottle } from '@nestjs/throttler';
@@ -44,9 +40,6 @@ import {
 export class UsersController {
   constructor(
     private readonly usersService: UsersService,
-    @Inject(forwardRef(() => AuthService))
-    private readonly authService: AuthService,
-    private readonly configService: ConfigService,
     private readonly resendService: ResendService,
   ) {}
 

@@ -81,13 +81,11 @@ export class AuthController {
   async register(
     @Body() createUserDto: CreateUserDto,
   ): Promise<RegisterResponse> {
-    await this.usersService.createUser({
+    const user = await this.usersService.createUser({
       ...createUserDto,
     });
 
-    const registerToken = await this.authService.generateRegisterToken(
-      createUserDto,
-    );
+    const registerToken = await this.authService.generateRegisterToken(user.id);
 
     const verifyRegisterUrl = `${this.configService.get<string>(
       'FRONTEND_URL',
@@ -142,15 +140,15 @@ export class AuthController {
   async verifyRegister(
     @Headers('registerToken') registerToken: string,
   ): Promise<VerifyRegisterResponse> {
-    const userData = await this.authService.verifyRegisterToken(registerToken);
+    const user = await this.authService.verifyRegisterToken(registerToken);
 
-    const user = await this.usersService.updateUser({
-      where: { email: userData.email },
+    const verifiedUser = await this.usersService.updateUser({
+      where: { id: user.id },
       data: { verified: true },
     });
 
-    const { accessToken } = this.authService.generateTokens(user);
-    const refreshToken = this.authService.generateRefreshToken(user);
+    const { accessToken } = this.authService.generateTokens(verifiedUser);
+    const refreshToken = this.authService.generateRefreshToken(verifiedUser);
 
     return {
       message: CONFIG_MESSAGES.userVerified,

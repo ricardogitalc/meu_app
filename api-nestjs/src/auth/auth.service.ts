@@ -3,7 +3,6 @@ import { JwtService } from '@nestjs/jwt';
 import { ConfigService } from '@nestjs/config';
 import { UsersService } from 'src/users/users.service';
 import { JWT_TIMES, CONFIG_MESSAGES } from 'src/config/config';
-import { CreateUserDto } from 'src/users/dto/users.dto';
 import { UserEntity } from 'src/users/entity/users.entity';
 
 @Injectable()
@@ -54,18 +53,16 @@ export class AuthService {
   async verifyRegisterToken(token: string) {
     try {
       const payload = this.jwtService.verify(token);
-      return payload;
+      const user = await this.validateUserById(payload.sub);
+      return user;
     } catch (error) {
       throw new UnauthorizedException(CONFIG_MESSAGES.expiredToken);
     }
   }
 
-  generateRegisterToken(userData: CreateUserDto) {
+  generateRegisterToken(userId: number) {
     const payload = {
-      email: userData.email,
-      firstName: userData.firstName,
-      lastName: userData.lastName,
-      whatsappNumber: userData.whatsappNumber,
+      sub: userId,
     };
     return this.jwtService.sign(payload);
   }

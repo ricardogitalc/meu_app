@@ -6,9 +6,7 @@ import { AuthModule } from 'src/auth/auth.module';
 import { ResendService } from '../mail/resend';
 
 @Module({
-  imports: [
-    forwardRef(() => AuthModule), // Usando forwardRef para resolver dependência circular
-  ],
+  imports: [forwardRef(() => AuthModule)],
   controllers: [UsersController],
   providers: [UsersService, PrismaService, ResendService],
   exports: [UsersService, PrismaService],
