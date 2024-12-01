@@ -1,7 +1,4 @@
-import { getSession, login, logout } from "@/auth/session";
-import { redirect } from "next/navigation";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
+import { getSession } from "@/auth/session";
 import {
   Card,
   CardHeader,
@@ -10,6 +7,8 @@ import {
   CardFooter,
 } from "@/components/ui/card";
 import { Separator } from "@/components/ui/separator";
+import LogoutButton from "./logout-button";
+import LoginButton from "./login-button";
 
 export default async function LoginTesteComponent() {
   const session = await getSession();
@@ -23,38 +22,9 @@ export default async function LoginTesteComponent() {
           </CardTitle>
         </CardHeader>
         <CardContent className="space-y-4">
-          <form
-            className="space-y-4"
-            action={async (formData) => {
-              "use server";
-              await login(formData);
-              redirect("/");
-            }}
-          >
-            <Input
-              type="email"
-              placeholder="Digite seu email"
-              className="w-full"
-              name="email"
-            />
-            <Button type="submit" className="w-full">
-              Entrar
-            </Button>
-          </form>
-
+          <LoginButton />
           <Separator className="my-4" />
-
-          <form
-            action={async () => {
-              "use server";
-              await logout();
-              redirect("/");
-            }}
-          >
-            <Button variant="outline" type="submit" className="w-full">
-              Sair
-            </Button>
-          </form>
+          <LogoutButton />
         </CardContent>
         <CardFooter className="flex flex-col">
           <div className="w-full overflow-auto rounded-lg bg-muted p-4">

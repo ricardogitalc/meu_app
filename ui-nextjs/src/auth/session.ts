@@ -21,37 +21,37 @@ export async function decrypt(input: string): Promise<any> {
   return payload;
 }
 
-export async function login(formData: FormData) {
-  const user = { email: formData.get("email"), name: "John" };
+export async function loginSession(formData: FormData) {
+  const user = { email: formData.get("email") };
 
   const expires = new Date(Date.now() + 10 * 1000);
   const session = await encrypt({ user, expires });
 
   const cookieStore = await cookies();
-  cookieStore.set("session", session, { expires, httpOnly: true });
+  cookieStore.set("accessToken", session, { expires, httpOnly: true });
 }
 
-export async function logout() {
+export async function logoutSession() {
   const cookieStore = await cookies();
-  cookieStore.set("session", "", { expires: new Date(0) });
+  cookieStore.set("accessToken", "", { expires: new Date(0) });
 }
 
 export async function getSession() {
   const cookieStore = await cookies();
-  const session = cookieStore.get("session")?.value;
+  const session = cookieStore.get("accessToken")?.value;
   if (!session) return null;
   return await decrypt(session);
 }
 
 export async function updateSession(request: NextRequest) {
-  const session = request.cookies.get("session")?.value;
+  const session = request.cookies.get("accessToken")?.value;
   if (!session) return;
 
   const parsed = await decrypt(session);
   parsed.expires = new Date(Date.now() + 10 * 1000);
   const res = NextResponse.next();
   res.cookies.set({
-    name: "session",
+    name: "accessToken",
     value: await encrypt(parsed),
     httpOnly: true,
     expires: parsed.expires,
