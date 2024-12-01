@@ -1,6 +1,6 @@
 "use server";
 
-import { login } from "@/auth/lib";
+import { login } from "@/auth/auth";
 
 export async function loginAction(response: any) {
   try {

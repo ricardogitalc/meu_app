@@ -1,105 +1,47 @@
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
+"use client";
+
 import {
   Card,
   CardContent,
   CardDescription,
+  CardFooter,
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
-import { getSession } from "@/auth/lib";
-import { profileSchema } from "@/auth/schema/schema";
-import { revalidatePath } from "next/cache";
-import { updateUser } from "@/auth/api/api";
-import { FormStateHandler } from "./profile-form-wrapper";
-import { redirect } from "next/navigation";
-import { User } from "@/auth/interfaces/interfaces";
-import { ZodError } from "zod";
-import { FormContent } from "./form-content";
+import { Input } from "../ui/input";
+import { Button } from "../ui/button";
+import { Label } from "@/components/ui/label";
 
-interface FormState {
-  success?: boolean;
-  error?: string;
-  fieldErrors?: Record<string, string>;
-}
-
-type FormStateWithNull = FormState | null;
-
-function assertUser(user: User | null): asserts user is User {
-  if (!user) redirect("/login");
-}
-
-export default async function ProfileForm() {
-  const userResponse = await getSession();
-  assertUser(userResponse);
-
-  const user: User = userResponse;
-
-  const initialValues: Record<string, string | undefined> = {
-    firstName: user.firstName || "",
-    lastName: user.lastName || "",
-    whatsappNumber: user.whatsappNumber,
-  };
-
-  async function updateProfile(
-    prevState: FormStateWithNull,
-    formData: FormData
-  ): Promise<FormState> {
-    "use server";
-
-    try {
-      const data = {
-        firstName: formData.get("firstName") as string,
-        lastName: formData.get("lastName") as string,
-        whatsappNumber: formData.get("whatsappNumber") as string,
-      };
-
-      try {
-        const validatedData = profileSchema.parse(data);
-
-        await new Promise((resolve) => setTimeout(resolve, 2000));
-
-        const result = await updateUser(user.id, validatedData);
-
-        if (!result.success) {
-          return {
-            error: result.message || "Não foi possível atualizar o perfil",
-          };
-        }
-
-        revalidatePath("/perfil");
-        return { success: true };
-      } catch (zodError) {
-        if (zodError instanceof ZodError) {
-          const fieldErrors: Record<string, string> = {};
-          zodError.errors.forEach((error) => {
-            if (error.path) {
-              fieldErrors[error.path[0]] = error.message;
-            }
-          });
-          return {
-            error: "Erro de validação",
-            fieldErrors,
-          };
-        }
-        throw zodError; // Re-throw se não for um erro do Zod
-      }
-    } catch (error) {
-      return {
-        error: error instanceof Error ? error.message : "Erro ao validar dados",
-      };
-    }
-  }
-
+export default function ProfileForm() {
   return (
     <Card className="w-full max-w-md">
       <CardHeader>
-        <CardTitle>Perfil</CardTitle>
-        <CardDescription>Atualize suas informações pessoais</CardDescription>
+        <CardTitle>Atualizar perfil</CardTitle>
+        <CardDescription>Atualize informações da sua conta</CardDescription>
       </CardHeader>
-      <FormStateHandler action={updateProfile} initialValues={initialValues}>
-        <FormContent user={user} fieldErrors={{}} />
-      </FormStateHandler>
+      <form>
+        <CardContent className="space-y-4">
+          <div className="flex space-x-4">
+            <div className="space-y-2 flex-1">
+              <Label>Nome</Label>
+              <Input placeholder="Digite seu nome" />
+            </div>
+            <div className="space-y-2 flex-1">
+              <Label>Sobrenome</Label>
+              <Input placeholder="Digite seu sobrenome" />
+            </div>
+          </div>
+          <div className="space-y-2">
+            <Label>WhatsApp</Label>
+            <Input placeholder="Ex: 11999999999" type="tel" />
+          </div>
+        </CardContent>
+        <CardFooter className="flex flex-col gap-4">
+          <Button className="w-full" type="submit">
+            Atualizar perfil
+          </Button>
+        </CardFooter>
+      </form>
     </Card>
   );
 }

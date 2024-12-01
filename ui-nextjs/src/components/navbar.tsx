@@ -20,7 +20,7 @@ import Link from "next/link";
 import { Avatar, AvatarFallback, AvatarImage } from "./ui/avatar";
 import { ModeToggle } from "./theme/ModeToggle";
 import LogoIcon from "./icons/logoIcon";
-import { getSession, logout } from "@/auth/lib";
+import { getSession, logout } from "@/auth/auth";
 import { redirect } from "next/navigation";
 import { KeySquare } from "@/svgs/key-square";
 

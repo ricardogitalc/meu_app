@@ -2,11 +2,8 @@ import { jwtVerify } from "jose";
 import { cookies } from "next/headers";
 import { NextRequest, NextResponse } from "next/server";
 import { redirect } from "next/navigation";
-import {
-  handleGoogleCallback,
-  refreshToken as refreshTokenRequest,
-} from "./api/api";
 import { User } from "./interfaces/interfaces";
+import { RefreshToken200 } from "./api/api.schemas";
 
 const secretKey =
   "986c0859540006e4aa01aea281858ec3a8e673aa311b112bc87f5d6de0e2389b";
@@ -193,4 +190,56 @@ export async function updateUserSession(accessToken: string, user: User) {
     path: "/",
   });
   return user;
+}
+
+async function refreshTokenRequest(
+  token: string
+): Promise<{ accessToken: string; user: User }> {
+  const response = await fetch("http://localhost:3003/auth/refresh-token", {
+    method: "GET",
+    headers: {
+      Cookie: `refreshToken=${token}`,
+    },
+  });
+
+  if (!response.ok) {
+    throw new Error("Falha ao atualizar token");
+  }
+
+  const data = (await response.json()) as RefreshToken200;
+
+  if (!data.accessToken) {
+    throw new Error("Token de acesso não recebido");
+  }
+
+  // Extrair dados do usuário do token
+  const payload = await verifyJWT(data.accessToken, key);
+
+  return {
+    accessToken: data.accessToken,
+    user: {
+      id: Number(payload.sub),
+      email: payload.email,
+      firstName: payload.firstName,
+      lastName: payload.lastName,
+      whatsappNumber: payload.whatsappNumber,
+      imageUrl: payload.imageUrl,
+      verified: payload.verified,
+    },
+  };
+}
+
+export async function handleGoogleCallback(code: string) {
+  const response = await fetch(
+    `http://localhost:3003/auth/google/callback?code=${code}`,
+    {
+      method: "GET",
+    }
+  );
+
+  if (!response.ok) {
+    throw new Error("Falha na autenticação Google");
+  }
+
+  return await response.json();
 }
