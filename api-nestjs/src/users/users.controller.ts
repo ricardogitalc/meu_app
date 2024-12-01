@@ -33,7 +33,7 @@ import {
   UserListResponse,
 } from '../swagger/swagger.config';
 
-@ApiTags('Usuários')
+@ApiTags('users')
 @Controller('user')
 @ApiBearerAuth()
 @UseFilters(HttpExceptionsFilter)

@@ -20,7 +20,7 @@ import Link from "next/link";
 import { Avatar, AvatarFallback, AvatarImage } from "./ui/avatar";
 import { ModeToggle } from "./theme/ModeToggle";
 import LogoIcon from "./icons/logoIcon";
-import { getSession, logout } from "@/auth/auth";
+import { getSession, logout } from "@/auth/session";
 import { redirect } from "next/navigation";
 import { KeySquare } from "@/svgs/key-square";
 
@@ -38,6 +38,11 @@ export default async function Navbar() {
             </Link>
           </div>
           <div className="flex items-center space-x-2 sm:space-x-4">
+            <Link href="/login-test">
+              <Button variant={"outline"}>
+                <p>Login Test</p>
+              </Button>
+            </Link>
             <Link href="/planos">
               <Button>
                 <Rocket className="h-4 w-4" />

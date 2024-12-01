@@ -31,7 +31,7 @@ import {
   RefreshTokenResponse,
 } from '../swagger/swagger.config';
 
-@ApiTags('Autenticação')
+@ApiTags('auth')
 @Controller('auth')
 @UseFilters(HttpExceptionsFilter)
 export class AuthController {
