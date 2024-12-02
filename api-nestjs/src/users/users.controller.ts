@@ -51,7 +51,7 @@ export class UsersController {
   })
   @ApiResponse(UserSwaggerDocs.userDetails.response)
   @ApiResponse(SwaggerErros.Unauthorized)
-  @Get('details')
+  @Get('me/details')
   @UseGuards(JwtGuard)
   async findOne(@Request() req): Promise<UserDetailsResponse> {
     return await this.usersService.UserFindUnique({ id: req.user.id });
@@ -64,7 +64,7 @@ export class UsersController {
   @ApiResponse(UserSwaggerDocs.updateUser.response)
   @ApiResponse(SwaggerErros.Unauthorized)
   @ApiResponse(SwaggerErros.InvalidDetails)
-  @Patch('update')
+  @Patch('me/update')
   @UseGuards(JwtGuard)
   async update(
     @Request() req,
@@ -92,10 +92,10 @@ export class UsersController {
   })
   @ApiResponse(UserSwaggerDocs.deleteUser.responses.success)
   @ApiResponse(SwaggerErros.Unauthorized)
-  @Delete('delete')
+  @Delete('me/delete')
   @UseGuards(JwtGuard)
   async remove(@Request() req): Promise<DeleteUserResponse> {
-    const deletedUser = await this.usersService.deleteUser({ id: req.user.id });
+    await this.usersService.deleteUser({ id: req.user.id });
 
     return {
       message: CONFIG_MESSAGES.userDeleted,
@@ -170,7 +170,7 @@ export class UsersController {
   @Delete(':id')
   @UseGuards(AdminGuard)
   async removeById(@Param('id') id: string): Promise<DeleteUserResponse> {
-    const deletedUser = await this.usersService.deleteUserById(Number(id));
+    await this.usersService.deleteUserById(Number(id));
 
     return {
       message: CONFIG_MESSAGES.userDeleted,

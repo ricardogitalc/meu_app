@@ -24,7 +24,7 @@
         ]
       }
     },
-    "/user/details": {
+    "/user/me/details": {
       "get": {
         "operationId": "userDetails",
         "parameters": [],
@@ -92,7 +92,7 @@
         ]
       }
     },
-    "/user/update": {
+    "/user/me/update": {
       "patch": {
         "operationId": "updateUser",
         "parameters": [],
@@ -149,7 +149,7 @@
         ]
       }
     },
-    "/user/delete": {
+    "/user/me/delete": {
       "delete": {
         "operationId": "deleteUser",
         "parameters": [],
