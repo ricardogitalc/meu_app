@@ -28,14 +28,14 @@ export interface RegisterResponse {
 
 export interface VerifyLoginResponse {
   message: string;
-  // accessToken: string;
-  // refreshToken: string;
+  accessToken: string;
+  refreshToken: string;
 }
 
 export interface VerifyRegisterResponse {
   message: string;
-  // accessToken: string;
-  // refreshToken: string;
+  accessToken: string;
+  refreshToken: string;
 }
 
 export interface RefreshTokenResponse {
@@ -231,13 +231,13 @@ export const AuthSwaggerDocs = {
     responses: {
       success: {
         status: 200,
-        description: 'Logout realizado com sucesso',
+        description: CONFIG_MESSAGES.userLoggedOut,
         schema: {
           type: 'object',
           properties: {
             message: {
               type: 'string',
-              example: 'Logout realizado com sucesso',
+              example: CONFIG_MESSAGES.userLoggedOut,
             },
           },
         },

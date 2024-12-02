@@ -6,11 +6,20 @@ import {
 } from '@nestjs/common';
 import { JwtGuard } from 'src/users/guards/jwt.guard';
 import { CONFIG_MESSAGES } from 'src/config/config';
+import { AuthService } from 'src/auth/auth.service';
 
 @Injectable()
-export class AdminGuard extends JwtGuard implements CanActivate {
+export class AdminGuard extends JwtGuard {
+  constructor(authService: AuthService) {
+    super(authService);
+  }
+
   async canActivate(context: ExecutionContext): Promise<boolean> {
-    await super.canActivate(context);
+    const isAuthenticated = await super.canActivate(context);
+
+    if (!isAuthenticated) {
+      throw new UnauthorizedException(CONFIG_MESSAGES.expiredToken);
+    }
 
     const request = context.switchToHttp().getRequest();
     const user = request.user;

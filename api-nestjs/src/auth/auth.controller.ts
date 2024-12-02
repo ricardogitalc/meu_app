@@ -32,15 +32,13 @@ import {
   RefreshTokenResponse,
   LogoutResponse,
 } from '../swagger/swagger.config';
-import { RefreshTokenGuard } from 'src/users/guards/refresh-token.guard';
 import { JwtGuard } from 'src/users/guards/jwt.guard';
+import { RefreshGuard } from 'src/users/guards/refresh.guard';
 
 @ApiTags('auth')
 @Controller('auth')
 @UseFilters(HttpExceptionsFilter)
 export class AuthController {
-  private readonly logger = new Logger(AuthController.name);
-
   constructor(
     private readonly authService: AuthService,
     private readonly usersService: UsersService,
@@ -127,25 +125,24 @@ export class AuthController {
     const { accessToken } = this.authService.generateTokens(user);
     const refreshToken = this.authService.generateRefreshToken(user);
 
-    // Configurando cookies
     response.cookie('accessToken', accessToken, {
       httpOnly: true,
       secure: process.env.NODE_ENV === 'production',
       sameSite: 'strict',
-      maxAge: 15 * 60 * 1000, // 15 minutos
+      maxAge: 15 * 60 * 1000,
     });
 
     response.cookie('refreshToken', refreshToken, {
       httpOnly: true,
       secure: process.env.NODE_ENV === 'production',
       sameSite: 'strict',
-      maxAge: 7 * 24 * 60 * 60 * 1000, // 7 dias
+      maxAge: 7 * 24 * 60 * 60 * 1000,
     });
 
     return {
       message: CONFIG_MESSAGES.userLogged,
-      // accessToken: accessToken,
-      // refreshToken: refreshToken,
+      accessToken: accessToken,
+      refreshToken: refreshToken,
     };
   }
 
@@ -172,25 +169,24 @@ export class AuthController {
     const { accessToken } = this.authService.generateTokens(verifiedUser);
     const refreshToken = this.authService.generateRefreshToken(verifiedUser);
 
-    // Configurando cookies
     response.cookie('accessToken', accessToken, {
       httpOnly: true,
       secure: process.env.NODE_ENV === 'production',
       sameSite: 'strict',
-      maxAge: 15 * 60 * 1000, // 15 minutos
+      maxAge: 15 * 60 * 1000,
     });
 
     response.cookie('refreshToken', refreshToken, {
       httpOnly: true,
       secure: process.env.NODE_ENV === 'production',
       sameSite: 'strict',
-      maxAge: 7 * 24 * 60 * 60 * 1000, // 7 dias
+      maxAge: 7 * 24 * 60 * 60 * 1000,
     });
 
     return {
       message: CONFIG_MESSAGES.userVerified,
-      // accessToken: accessToken,
-      // refreshToken: refreshToken,
+      accessToken: accessToken,
+      refreshToken: refreshToken,
     };
   }
 
@@ -229,21 +225,21 @@ export class AuthController {
   @ApiResponse(AuthSwaggerDocs.refreshToken.responses.success)
   @ApiResponse(SwaggerErros.Unauthorized)
   @ApiResponse(SwaggerErros.TooManyRequests)
-  @UseGuards(RefreshTokenGuard)
+  @UseGuards(RefreshGuard)
   @Get('refresh-token')
   async refreshToken(
-    @Req() req,
+    @Req() request,
     @Res({ passthrough: true }) response: Response,
   ): Promise<RefreshTokenResponse> {
     try {
-      const refreshToken = req.cookies['refreshToken'];
+      const refreshToken = request.cookies?.['refreshToken'];
       const { accessToken } = await this.authService.refreshToken(refreshToken);
 
       response.cookie('accessToken', accessToken, {
         httpOnly: true,
         secure: process.env.NODE_ENV === 'production',
         sameSite: 'strict',
-        maxAge: 15 * 60 * 1000, // 15 minutos
+        maxAge: 15 * 60 * 1000,
       });
 
       return {
@@ -260,6 +256,7 @@ export class AuthController {
     operationId: AuthSwaggerDocs.logout.operationId,
   })
   @ApiResponse(AuthSwaggerDocs.logout.responses.success)
+  @ApiResponse(SwaggerErros.Unauthorized)
   @UseGuards(JwtGuard)
   @Get('logout')
   async logout(
@@ -269,16 +266,16 @@ export class AuthController {
       httpOnly: true,
       secure: process.env.NODE_ENV === 'production',
       sameSite: 'strict',
-      path: '/', // Adiciona o path para garantir a remoção do cookie correto
+      path: '/',
     });
 
     response.clearCookie('refreshToken', {
       httpOnly: true,
       secure: process.env.NODE_ENV === 'production',
       sameSite: 'strict',
-      path: '/', // Adiciona o path para garantir a remoção do cookie correto
+      path: '/',
     });
 
-    return { message: 'Logout realizado com sucesso' };
+    return { message: CONFIG_MESSAGES.userLoggedOut };
   }
 }

@@ -878,7 +878,7 @@
         "parameters": [],
         "responses": {
           "200": {
-            "description": "Logout realizado com sucesso",
+            "description": "Logout realizado.",
             "content": {
               "application/json": {
                 "schema": {
@@ -886,12 +886,15 @@
                   "properties": {
                     "message": {
                       "type": "string",
-                      "example": "Logout realizado com sucesso"
+                      "example": "Logout realizado."
                     }
                   }
                 }
               }
             }
+          },
+          "401": {
+            "description": "Não autorizado."
           }
         },
         "summary": "Realizar logout do usuário",

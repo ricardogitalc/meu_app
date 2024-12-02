@@ -51,8 +51,8 @@ export class UsersController {
   })
   @ApiResponse(UserSwaggerDocs.userDetails.response)
   @ApiResponse(SwaggerErros.Unauthorized)
-  @Get('me/details')
   @UseGuards(JwtGuard)
+  @Get('me/details')
   async findOne(@Request() req): Promise<UserDetailsResponse> {
     return await this.usersService.UserFindUnique({ id: req.user.id });
   }
@@ -64,8 +64,8 @@ export class UsersController {
   @ApiResponse(UserSwaggerDocs.updateUser.response)
   @ApiResponse(SwaggerErros.Unauthorized)
   @ApiResponse(SwaggerErros.InvalidDetails)
-  @Patch('me/update')
   @UseGuards(JwtGuard)
+  @Patch('me/update')
   async update(
     @Request() req,
     @Body() updateUserDto: UpdateUserDto,
@@ -92,8 +92,8 @@ export class UsersController {
   })
   @ApiResponse(UserSwaggerDocs.deleteUser.responses.success)
   @ApiResponse(SwaggerErros.Unauthorized)
-  @Delete('me/delete')
   @UseGuards(JwtGuard)
+  @Delete('me/delete')
   async remove(@Request() req): Promise<DeleteUserResponse> {
     await this.usersService.deleteUser({ id: req.user.id });
 
@@ -111,8 +111,8 @@ export class UsersController {
   @ApiResponse(UserSwaggerDocs.getUsers.responses.success)
   @ApiResponse(SwaggerErros.Unauthorized)
   @SkipThrottle()
-  @Get('users')
   @UseGuards(AdminGuard)
+  @Get('users')
   async findAll(): Promise<UserListResponse> {
     return await this.usersService.users({});
   }
@@ -124,8 +124,8 @@ export class UsersController {
   @ApiResponse(UserSwaggerDocs.findUserById.responses.success)
   @ApiResponse(SwaggerErros.Unauthorized)
   @SkipThrottle()
-  @Get(':id')
   @UseGuards(AdminGuard)
+  @Get(':id')
   async findById(@Param('id') id: string): Promise<User> {
     return await this.usersService.UserFindById(Number(id));
   }
@@ -138,8 +138,8 @@ export class UsersController {
   @ApiResponse(SwaggerErros.Unauthorized)
   @ApiResponse(SwaggerErros.InvalidDetails)
   @SkipThrottle()
-  @Patch(':id')
   @UseGuards(AdminGuard)
+  @Patch(':id')
   async updateById(
     @Param('id') id: string,
     @Body() updateUserDto: UpdateUserDto,
@@ -167,8 +167,8 @@ export class UsersController {
   @ApiResponse(UserSwaggerDocs.deleteUserById.responses.success)
   @ApiResponse(SwaggerErros.Unauthorized)
   @SkipThrottle()
-  @Delete(':id')
   @UseGuards(AdminGuard)
+  @Delete(':id')
   async removeById(@Param('id') id: string): Promise<DeleteUserResponse> {
     await this.usersService.deleteUserById(Number(id));
 

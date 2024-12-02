@@ -28,30 +28,30 @@ export async function loginSession(formData: FormData) {
   const session = await encrypt({ user, expires });
 
   const cookieStore = await cookies();
-  cookieStore.set("accessToken", session, { expires, httpOnly: true });
+  cookieStore.set("accessTokenX", session, { expires, httpOnly: true });
 }
 
 export async function logoutSession() {
   const cookieStore = await cookies();
-  cookieStore.set("accessToken", "", { expires: new Date(0) });
+  cookieStore.set("accessTokenX", "", { expires: new Date(0) });
 }
 
 export async function getSession() {
   const cookieStore = await cookies();
-  const session = cookieStore.get("accessToken")?.value;
+  const session = cookieStore.get("accessTokenX")?.value;
   if (!session) return null;
   return await decrypt(session);
 }
 
 export async function updateSession(request: NextRequest) {
-  const session = request.cookies.get("accessToken")?.value;
+  const session = request.cookies.get("accessTokenX")?.value;
   if (!session) return;
 
   const parsed = await decrypt(session);
   parsed.expires = new Date(Date.now() + 10 * 1000);
   const res = NextResponse.next();
   res.cookies.set({
-    name: "accessToken",
+    name: "accessTokenX",
     value: await encrypt(parsed),
     httpOnly: true,
     expires: parsed.expires,

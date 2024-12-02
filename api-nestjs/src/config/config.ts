@@ -5,6 +5,7 @@ export const CONFIG_MESSAGES = {
   userDeleted: 'Usuário deletado.',
   userVerified: 'Usuário verificado.',
   userLogged: 'Login realizado.',
+  userLoggedOut: 'Logout realizado.',
 
   // USER ERROR
   userExists: 'Usuário já cadastrado.',
@@ -21,6 +22,7 @@ export const CONFIG_MESSAGES = {
   // AUTH ERROR
   expiredToken: 'Token inválido ou expirado.',
   invalidToken: 'Token inválido.',
+  invalidRefreshToken: 'Refresh token inválido.',
   accessLinkExpired: 'Link expirado.',
   unauthorized: 'Não autorizado.',
   adminOnly: 'Acesso apenas para admin.',

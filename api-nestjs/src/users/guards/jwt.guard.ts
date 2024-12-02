@@ -9,7 +9,7 @@ import { CONFIG_MESSAGES } from 'src/config/config';
 
 @Injectable()
 export class JwtGuard extends AuthGuard('jwt') {
-  constructor(private authService: AuthService) {
+  constructor(protected authService: AuthService) {
     super();
   }
 

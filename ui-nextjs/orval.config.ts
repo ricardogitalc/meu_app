@@ -4,12 +4,18 @@ export default defineConfig({
   api: {
     input: "../api-nestjs/swagger.json",
     output: {
-      clean: true,
+      // clean: true,
       target: "./src/auth/api/api.ts",
-      mode: "tags-split",
+      // mode: "tags-split",
       httpClient: "fetch",
       client: "fetch",
       baseUrl: "http://localhost:3003",
+      override: {
+        mutator: {
+          path: "./src/auth/api/customClient.ts",
+          name: "customClient",
+        },
+      },
     },
   },
 });

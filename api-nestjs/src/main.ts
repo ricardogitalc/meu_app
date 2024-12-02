@@ -23,7 +23,6 @@ async function bootstrap() {
 
   const document = SwaggerModule.createDocument(app, config);
 
-  // Salvar JSON do Swagger
   const fs = require('fs');
   fs.writeFileSync('./swagger.json', JSON.stringify(document, null, 2), 'utf8');
 
@@ -39,13 +38,18 @@ async function bootstrap() {
   app.use(compression());
   app.use(cookieParser());
 
-  app.useLogger(new Logger('debug')); // Adicione esta linha
+  app.useLogger(new Logger('debug'));
 
   app.enableCors({
     origin: configService.get('FRONTEND_URL'),
     credentials: true,
     methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
-    allowedHeaders: ['Content-Type', 'Authorization'],
+    allowedHeaders: [
+      'Content-Type',
+      'Authorization',
+      'loginToken',
+      'registerToken',
+    ],
     exposedHeaders: ['set-cookie'],
   });
 
