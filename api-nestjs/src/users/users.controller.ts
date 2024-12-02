@@ -99,7 +99,6 @@ export class UsersController {
 
     return {
       message: CONFIG_MESSAGES.userDeleted,
-      user: deletedUser,
     };
   }
 
@@ -175,7 +174,6 @@ export class UsersController {
 
     return {
       message: CONFIG_MESSAGES.userDeleted,
-      user: deletedUser,
     };
   }
 }

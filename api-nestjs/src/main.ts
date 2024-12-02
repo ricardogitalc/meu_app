@@ -39,6 +39,8 @@ async function bootstrap() {
   app.use(compression());
   app.use(cookieParser());
 
+  app.useLogger(new Logger('debug')); // Adicione esta linha
+
   app.enableCors({
     origin: configService.get('FRONTEND_URL'),
     credentials: true,

@@ -70,7 +70,7 @@ export class AuthService {
   async refreshToken(refreshToken: string) {
     try {
       const payload = this.jwtService.verify(refreshToken, {
-        secret: this.configService.get<string>('REFRESH_TOKEN_SECRET'),
+        secret: this.configService.get<string>('REFRESH_SECRET_KEY'),
       });
 
       const user = await this.validateUserById(payload.sub);
@@ -92,7 +92,7 @@ export class AuthService {
     };
 
     return this.jwtService.sign(payload, {
-      secret: this.configService.get<string>('REFRESH_TOKEN_SECRET'),
+      secret: this.configService.get<string>('REFRESH_SECRET_KEY'), // Corrigido aqui também
       expiresIn: JWT_TIMES.REFRESH_TOKEN,
     });
   }

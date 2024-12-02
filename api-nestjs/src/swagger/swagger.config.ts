@@ -12,7 +12,6 @@ export interface UpdateUserResponse {
 
 export interface DeleteUserResponse {
   message: string;
-  user: User;
 }
 
 export interface LoginResponse {
@@ -29,14 +28,14 @@ export interface RegisterResponse {
 
 export interface VerifyLoginResponse {
   message: string;
-  accessToken: string;
-  refreshToken: string;
+  // accessToken: string;
+  // refreshToken: string;
 }
 
 export interface VerifyRegisterResponse {
   message: string;
-  accessToken: string;
-  refreshToken: string;
+  // accessToken: string;
+  // refreshToken: string;
 }
 
 export interface RefreshTokenResponse {

@@ -831,8 +831,8 @@
         "parameters": [
           {
             "name": "refreshToken",
-            "required": true,
             "in": "header",
+            "required": true,
             "schema": {
               "type": "string"
             }
