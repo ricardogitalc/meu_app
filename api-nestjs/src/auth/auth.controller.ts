@@ -29,6 +29,7 @@ import {
   VerifyLoginResponse,
   VerifyRegisterResponse,
   RefreshTokenResponse,
+  LogoutResponse,
 } from '../swagger/swagger.config';
 
 @ApiTags('auth')
@@ -121,6 +122,21 @@ export class AuthController {
     const { accessToken } = this.authService.generateTokens(user);
     const refreshToken = this.authService.generateRefreshToken(user);
 
+    // Configurando cookies
+    response.cookie('accessToken', accessToken, {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === 'production',
+      sameSite: 'strict',
+      maxAge: 15 * 60 * 1000, // 15 minutos
+    });
+
+    response.cookie('refreshToken', refreshToken, {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === 'production',
+      sameSite: 'strict',
+      maxAge: 7 * 24 * 60 * 60 * 1000, // 7 dias
+    });
+
     return {
       message: CONFIG_MESSAGES.userLogged,
       accessToken: accessToken,
@@ -139,6 +155,7 @@ export class AuthController {
   @Get('verify-register')
   async verifyRegister(
     @Headers('registerToken') registerToken: string,
+    @Res({ passthrough: true }) response: Response,
   ): Promise<VerifyRegisterResponse> {
     const user = await this.authService.verifyRegisterToken(registerToken);
 
@@ -149,6 +166,21 @@ export class AuthController {
 
     const { accessToken } = this.authService.generateTokens(verifiedUser);
     const refreshToken = this.authService.generateRefreshToken(verifiedUser);
+
+    // Configurando cookies
+    response.cookie('accessToken', accessToken, {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === 'production',
+      sameSite: 'strict',
+      maxAge: 15 * 60 * 1000, // 15 minutos
+    });
+
+    response.cookie('refreshToken', refreshToken, {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === 'production',
+      sameSite: 'strict',
+      maxAge: 7 * 24 * 60 * 60 * 1000, // 7 dias
+    });
 
     return {
       message: CONFIG_MESSAGES.userVerified,
@@ -206,5 +238,29 @@ export class AuthController {
     } catch (error) {
       throw new UnauthorizedException(CONFIG_MESSAGES.invalidToken);
     }
+  }
+
+  @ApiOperation({
+    summary: AuthSwaggerDocs.logout.operation.summary,
+    operationId: AuthSwaggerDocs.logout.operationId,
+  })
+  @ApiResponse(AuthSwaggerDocs.logout.responses.success)
+  @Get('logout')
+  async logout(
+    @Res({ passthrough: true }) response: Response,
+  ): Promise<LogoutResponse> {
+    response.clearCookie('accessToken', {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === 'production',
+      sameSite: 'strict',
+    });
+
+    response.clearCookie('refreshToken', {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === 'production',
+      sameSite: 'strict',
+    });
+
+    return { message: 'Logout realizado com sucesso' };
   }
 }

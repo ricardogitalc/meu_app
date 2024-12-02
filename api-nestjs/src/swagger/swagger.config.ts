@@ -44,6 +44,10 @@ export interface RefreshTokenResponse {
   accessToken: string;
 }
 
+export interface LogoutResponse {
+  message: string;
+}
+
 // Erros
 export const SwaggerErros = {
   Unauthorized: {
@@ -215,6 +219,26 @@ export const AuthSwaggerDocs = {
             accessToken: {
               type: 'string',
               example: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...',
+            },
+          },
+        },
+      },
+    },
+  },
+
+  logout: {
+    operation: { summary: 'Realizar logout do usuário' },
+    operationId: 'logout',
+    responses: {
+      success: {
+        status: 200,
+        description: 'Logout realizado com sucesso',
+        schema: {
+          type: 'object',
+          properties: {
+            message: {
+              type: 'string',
+              example: 'Logout realizado com sucesso',
             },
           },
         },

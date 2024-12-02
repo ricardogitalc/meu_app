@@ -8,7 +8,7 @@ export default defineConfig({
       target: "./src/auth/api/api.ts",
       mode: "tags-split",
       httpClient: "fetch",
-      client: "react-query",
+      client: "fetch",
       baseUrl: "http://localhost:3003",
     },
   },

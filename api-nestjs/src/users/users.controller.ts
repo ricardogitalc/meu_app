@@ -15,7 +15,7 @@ import { User } from '@prisma/client';
 import { HttpExceptionsFilter } from 'src/common/filter/http-exception.filter';
 import { CONFIG_MESSAGES } from 'src/config/config';
 import { AdminGuard } from './guards/admin.guard';
-import { JwtGuard } from 'src/auth/guards/jwt.guard';
+import { JwtGuard } from 'src/users/guards/jwt.guard';
 import { ResendService } from '../mail/resend';
 import { SkipThrottle } from '@nestjs/throttler';
 import {

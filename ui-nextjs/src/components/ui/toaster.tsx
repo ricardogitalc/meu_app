@@ -1,7 +1,7 @@
 "use client";
 
 import { useToast } from "@/hooks/use-toast";
-import { FiCheck, FiAlertCircle } from "react-icons/fi"; // Adicionar import
+import { FiCheckCircle, FiXCircle } from "react-icons/fi";
 import {
   Toast,
   ToastClose,
@@ -26,12 +26,12 @@ export function Toaster() {
       }) {
         return (
           <Toast key={id} variant={variant} {...props}>
-            <div className="flex items-center gap-3">
+            <div className="flex justify-center items-center gap-3">
               {variant === "destructive" && (
-                <FiAlertCircle className="h-6 w-6 text-red-600 flex-shrink-0" />
+                <FiXCircle className="h-6 w-6 text-red-600 dark:text-red-400" />
               )}
               {variant === "success" && (
-                <FiCheck className="h-6 w-6 text-green-600 flex-shrink-0" />
+                <FiCheckCircle className="h-6 w-6 text-green-600 dark:text-green-400" />
               )}
               <div className="grid gap-1">
                 {title && <ToastTitle>{title}</ToastTitle>}

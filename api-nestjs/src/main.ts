@@ -6,6 +6,7 @@ import { Logger } from '@nestjs/common';
 import helmet from 'helmet';
 import * as compression from 'compression';
 import { SwaggerModule, DocumentBuilder } from '@nestjs/swagger';
+import * as cookieParser from 'cookie-parser';
 
 async function bootstrap() {
   const logger = new Logger('Bootstrap');
@@ -36,6 +37,7 @@ async function bootstrap() {
   app.use(morgan('[:method :url :status :time]'));
   app.use(helmet());
   app.use(compression());
+  app.use(cookieParser());
 
   app.enableCors({
     origin: configService.get('FRONTEND_URL'),

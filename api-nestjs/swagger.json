@@ -871,6 +871,34 @@
           "auth"
         ]
       }
+    },
+    "/auth/logout": {
+      "get": {
+        "operationId": "logout",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "Logout realizado com sucesso",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "message": {
+                      "type": "string",
+                      "example": "Logout realizado com sucesso"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "summary": "Realizar logout do usuário",
+        "tags": [
+          "auth"
+        ]
+      }
     }
   },
   "info": {
