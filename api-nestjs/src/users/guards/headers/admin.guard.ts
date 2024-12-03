@@ -4,7 +4,7 @@ import {
   ExecutionContext,
   UnauthorizedException,
 } from '@nestjs/common';
-import { JwtGuard } from 'src/users/guards/jwt.guard';
+import { JwtGuard } from './jwt.guard';
 import { CONFIG_MESSAGES } from 'src/config/config';
 import { AuthService } from 'src/auth/auth.service';
 

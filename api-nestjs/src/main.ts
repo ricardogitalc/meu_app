@@ -6,12 +6,27 @@ import { Logger } from '@nestjs/common';
 import helmet from 'helmet';
 import * as compression from 'compression';
 import { SwaggerModule, DocumentBuilder } from '@nestjs/swagger';
-import * as cookieParser from 'cookie-parser';
+import { Redis } from 'ioredis';
 
 async function bootstrap() {
   const logger = new Logger('Bootstrap');
   const app = await NestFactory.create(AppModule);
   const configService = app.get(ConfigService);
+
+  // Configuração do Redis global
+  const redis = new Redis({
+    host: configService.get('REDIS_HOST'),
+    port: configService.get('REDIS_PORT'),
+  });
+
+  // Testar conexão com Redis
+  redis.on('connect', () => {
+    logger.log('🚀 Conexão com Redis estabelecida');
+  });
+
+  redis.on('error', (err) => {
+    logger.error('Erro na conexão com Redis:', err);
+  });
 
   const config = new DocumentBuilder()
     .setTitle('API')
@@ -36,7 +51,6 @@ async function bootstrap() {
   app.use(morgan('[:method :url :status :time]'));
   app.use(helmet());
   app.use(compression());
-  app.use(cookieParser());
 
   app.useLogger(new Logger('debug'));
 

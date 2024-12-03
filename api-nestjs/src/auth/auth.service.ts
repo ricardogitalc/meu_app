@@ -96,4 +96,12 @@ export class AuthService {
       expiresIn: JWT_TIMES.REFRESH_TOKEN,
     });
   }
+
+  verifyToken(token: string): any {
+    try {
+      return this.jwtService.verify(token);
+    } catch (error) {
+      throw new UnauthorizedException(CONFIG_MESSAGES.expiredToken);
+    }
+  }
 }

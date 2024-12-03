@@ -9,12 +9,14 @@ import { JwtStrategy } from './strategy/jwt.strategy';
 import { GoogleStrategy } from './strategy/google.strategy';
 import { JWT_TIMES, JWT_CONFIG } from 'src/config/config';
 import { ResendService } from '../mail/resend';
+import { RedisModule } from '../redis/redis.module'; // Adicione esta importação
 
 @Module({
   imports: [
     ConfigModule,
     forwardRef(() => UsersModule),
     PassportModule,
+    RedisModule, // Adicione esta linha
     JwtModule.registerAsync({
       imports: [ConfigModule],
       useFactory: async (configService: ConfigService) => ({

@@ -14,8 +14,7 @@ import { UpdateUserDto } from './dto/users.dto';
 import { User } from '@prisma/client';
 import { HttpExceptionsFilter } from 'src/common/filter/http-exception.filter';
 import { CONFIG_MESSAGES } from 'src/config/config';
-import { AdminGuard } from './guards/admin.guard';
-import { JwtGuard } from 'src/users/guards/jwt.guard';
+// import { AdminGuard } from './guards/redis/admin.guard';
 import { ResendService } from '../mail/resend';
 import { SkipThrottle } from '@nestjs/throttler';
 import {
@@ -32,6 +31,7 @@ import {
   DeleteUserResponse,
   UserListResponse,
 } from '../swagger/swagger.config';
+import { JwtGuard } from './guards/headers/jwt.guard';
 
 @ApiTags('users')
 @Controller('user')
@@ -111,7 +111,7 @@ export class UsersController {
   @ApiResponse(UserSwaggerDocs.getUsers.responses.success)
   @ApiResponse(SwaggerErros.Unauthorized)
   @SkipThrottle()
-  @UseGuards(AdminGuard)
+  // @UseGuards(AdminGuard)
   @Get('users')
   async findAll(): Promise<UserListResponse> {
     return await this.usersService.users({});
@@ -124,7 +124,7 @@ export class UsersController {
   @ApiResponse(UserSwaggerDocs.findUserById.responses.success)
   @ApiResponse(SwaggerErros.Unauthorized)
   @SkipThrottle()
-  @UseGuards(AdminGuard)
+  // @UseGuards(AdminGuard)
   @Get(':id')
   async findById(@Param('id') id: string): Promise<User> {
     return await this.usersService.UserFindById(Number(id));
@@ -138,7 +138,7 @@ export class UsersController {
   @ApiResponse(SwaggerErros.Unauthorized)
   @ApiResponse(SwaggerErros.InvalidDetails)
   @SkipThrottle()
-  @UseGuards(AdminGuard)
+  // @UseGuards(AdminGuard)
   @Patch(':id')
   async updateById(
     @Param('id') id: string,
@@ -167,7 +167,7 @@ export class UsersController {
   @ApiResponse(UserSwaggerDocs.deleteUserById.responses.success)
   @ApiResponse(SwaggerErros.Unauthorized)
   @SkipThrottle()
-  @UseGuards(AdminGuard)
+  // @UseGuards(AdminGuard)
   @Delete(':id')
   async removeById(@Param('id') id: string): Promise<DeleteUserResponse> {
     await this.usersService.deleteUserById(Number(id));

@@ -8,6 +8,7 @@ import { APP_GUARD, APP_PIPE } from '@nestjs/core';
 import { AppController } from './app.controller';
 import { ThrottlerModule } from '@nestjs/throttler';
 import { CustomThrottlerGuard } from './common/guards/custom-throttle.guard';
+import { RedisModule } from './redis/redis.module';
 
 @Module({
   imports: [
@@ -23,6 +24,7 @@ import { CustomThrottlerGuard } from './common/guards/custom-throttle.guard';
         limit: 10,
       },
     ]),
+    RedisModule,
   ],
   controllers: [AppController],
   providers: [

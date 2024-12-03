@@ -5,17 +5,11 @@ export default defineConfig({
     input: "../api-nestjs/swagger.json",
     output: {
       // clean: true,
-      target: "./src/auth/api/api.ts",
-      // mode: "tags-split",
+      target: "./src/auth/api/orval-api.ts",
+      mode: "tags-split",
       httpClient: "fetch",
-      client: "fetch",
+      client: "react-query",
       baseUrl: "http://localhost:3003",
-      override: {
-        mutator: {
-          path: "./src/auth/api/customClient.ts",
-          name: "customClient",
-        },
-      },
     },
   },
 });

@@ -32,8 +32,8 @@ import {
   RefreshTokenResponse,
   LogoutResponse,
 } from '../swagger/swagger.config';
-import { JwtGuard } from 'src/users/guards/jwt.guard';
-import { RefreshGuard } from 'src/users/guards/refresh.guard';
+import { RefreshGuard } from 'src/users/guards/cookies/refresh.guard';
+import { RedisService } from '../redis/redis.service';
 
 @ApiTags('auth')
 @Controller('auth')
@@ -44,6 +44,7 @@ export class AuthController {
     private readonly usersService: UsersService,
     private readonly resendService: ResendService,
     private readonly configService: ConfigService,
+    private readonly redisService: RedisService,
   ) {}
 
   @ApiOperation({
@@ -125,19 +126,19 @@ export class AuthController {
     const { accessToken } = this.authService.generateTokens(user);
     const refreshToken = this.authService.generateRefreshToken(user);
 
-    response.cookie('accessToken', accessToken, {
-      httpOnly: true,
-      secure: process.env.NODE_ENV === 'production',
-      sameSite: 'strict',
-      maxAge: 15 * 60 * 1000,
-    });
-
-    response.cookie('refreshToken', refreshToken, {
-      httpOnly: true,
-      secure: process.env.NODE_ENV === 'production',
-      sameSite: 'strict',
-      maxAge: 7 * 24 * 60 * 60 * 1000,
-    });
+    // // Armazenar tokens no Redis
+    // await this.redisService.setToken(
+    //   user.id,
+    //   'accessToken',
+    //   accessToken,
+    //   15 * 60,
+    // ); // 15 minutos
+    // await this.redisService.setToken(
+    //   user.id,
+    //   'refreshToken',
+    //   refreshToken,
+    //   7 * 24 * 60 * 60,
+    // ); // 7 dias
 
     return {
       message: CONFIG_MESSAGES.userLogged,
@@ -169,19 +170,19 @@ export class AuthController {
     const { accessToken } = this.authService.generateTokens(verifiedUser);
     const refreshToken = this.authService.generateRefreshToken(verifiedUser);
 
-    response.cookie('accessToken', accessToken, {
-      httpOnly: true,
-      secure: process.env.NODE_ENV === 'production',
-      sameSite: 'strict',
-      maxAge: 15 * 60 * 1000,
-    });
-
-    response.cookie('refreshToken', refreshToken, {
-      httpOnly: true,
-      secure: process.env.NODE_ENV === 'production',
-      sameSite: 'strict',
-      maxAge: 7 * 24 * 60 * 60 * 1000,
-    });
+    // // Armazenar tokens no Redis
+    // await this.redisService.setToken(
+    //   verifiedUser.id,
+    //   'accessToken',
+    //   accessToken,
+    //   15 * 60,
+    // ); // 15 minutos
+    // await this.redisService.setToken(
+    //   verifiedUser.id,
+    //   'refreshToken',
+    //   refreshToken,
+    //   7 * 24 * 60 * 60,
+    // ); // 7 dias
 
     return {
       message: CONFIG_MESSAGES.userVerified,
@@ -257,7 +258,6 @@ export class AuthController {
   })
   @ApiResponse(AuthSwaggerDocs.logout.responses.success)
   @ApiResponse(SwaggerErros.Unauthorized)
-  @UseGuards(JwtGuard)
   @Get('logout')
   async logout(
     @Res({ passthrough: true }) response: Response,
