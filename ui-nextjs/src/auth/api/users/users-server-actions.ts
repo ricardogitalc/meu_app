@@ -1,5 +1,3 @@
-"use client";
-
 import { UpdateUserDto } from "../orval-api.schemas";
 
 async function getBaseUrl() {

@@ -1,12 +1,11 @@
 import {
   Injectable,
-  CanActivate,
   ExecutionContext,
   UnauthorizedException,
 } from '@nestjs/common';
-import { JwtGuard } from './jwt.guard';
 import { CONFIG_MESSAGES } from 'src/config/config';
 import { AuthService } from 'src/auth/auth.service';
+import { JwtGuard } from './jwt.guard';
 
 @Injectable()
 export class AdminGuard extends JwtGuard {
@@ -24,7 +23,7 @@ export class AdminGuard extends JwtGuard {
     const request = context.switchToHttp().getRequest();
     const user = request.user;
 
-    if (user?.role !== 'ADMIN') {
+    if (user.role !== 'ADMIN') {
       throw new UnauthorizedException(CONFIG_MESSAGES.adminOnly);
     }
 

@@ -14,7 +14,6 @@ import { GoogleButton } from "./google-button";
 import { AuthLinks } from "./auth-links";
 import { Label } from "@/components/ui/label";
 import { Loader2 } from "lucide-react";
-import { loginAction } from "@/auth/api/auth/auth-server-actions";
 import { useState } from "react";
 import { useToast } from "@/hooks/use-toast";
 
@@ -27,18 +26,26 @@ export function LoginForm() {
     e.preventDefault();
     setIsPending(true);
     try {
-      const response = await loginAction({ email });
+      const response = await fetch("/api/auth?path=login", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ email }),
+      });
 
-      if (response.status === 201) {
+      const data = await response.json();
+
+      if (response.ok) {
         toast({
           title: "Sucesso",
-          description: response.data.message,
+          description: data.message,
           variant: "success",
         });
       } else {
         toast({
           title: "Erro",
-          description: response.data.message,
+          description: data.message,
           variant: "destructive",
         });
       }

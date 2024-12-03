@@ -1,29 +1,6 @@
 {
   "openapi": "3.0.0",
   "paths": {
-    "/": {
-      "get": {
-        "operationId": "serverStatus",
-        "parameters": [],
-        "responses": {
-          "200": {
-            "description": "Servidor está rodando normalmente",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "type": "string",
-                  "example": "🚀 O servidor está rodando..."
-                }
-              }
-            }
-          }
-        },
-        "summary": "Verifica status do servidor",
-        "tags": [
-          "App"
-        ]
-      }
-    },
     "/user/me/details": {
       "get": {
         "operationId": "userDetails",
@@ -682,7 +659,7 @@
         "operationId": "verifyLogin",
         "parameters": [
           {
-            "name": "loginToken",
+            "name": "x-login-token",
             "required": true,
             "in": "header",
             "schema": {
@@ -733,7 +710,7 @@
         "operationId": "verifyRegister",
         "parameters": [
           {
-            "name": "registerToken",
+            "name": "x-register-token",
             "required": true,
             "in": "header",
             "schema": {
@@ -830,9 +807,9 @@
         "operationId": "refreshToken",
         "parameters": [
           {
-            "name": "refreshToken",
-            "in": "header",
+            "name": "x-refresh-token",
             "required": true,
+            "in": "header",
             "schema": {
               "type": "string"
             }
@@ -867,37 +844,6 @@
           }
         },
         "summary": "Renovar token de acesso",
-        "tags": [
-          "auth"
-        ]
-      }
-    },
-    "/auth/logout": {
-      "get": {
-        "operationId": "logout",
-        "parameters": [],
-        "responses": {
-          "200": {
-            "description": "Logout realizado.",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "type": "object",
-                  "properties": {
-                    "message": {
-                      "type": "string",
-                      "example": "Logout realizado."
-                    }
-                  }
-                }
-              }
-            }
-          },
-          "401": {
-            "description": "Não autorizado."
-          }
-        },
-        "summary": "Realizar logout do usuário",
         "tags": [
           "auth"
         ]

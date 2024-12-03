@@ -5,12 +5,10 @@ import { PrismaService } from 'src/prisma/prisma.service';
 import { UsersController } from './users.controller';
 import { AuthModule } from 'src/auth/auth.module';
 import { ResendService } from '../mail/resend';
-import { RedisModule } from '../redis/redis.module';
 
 @Module({
   imports: [
     forwardRef(() => AuthModule),
-    RedisModule,
     JwtModule.register({
       secret: process.env.JWT_SECRET,
       signOptions: { expiresIn: '15m' },

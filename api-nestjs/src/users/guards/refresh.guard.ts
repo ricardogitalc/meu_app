@@ -15,22 +15,21 @@ export class RefreshGuard extends JwtGuard {
 
   async canActivate(context: ExecutionContext): Promise<boolean> {
     const request = context.switchToHttp().getRequest();
-    const refreshToken = request.headers['refreshToken'];
+    const refreshToken = request.headers['x-refresh-token'];
 
     if (!refreshToken) {
       throw new UnauthorizedException(CONFIG_MESSAGES.invalidRefreshToken);
     }
 
     try {
-      const newTokens = await this.authService.refreshToken(refreshToken);
-      if (!newTokens) {
-        throw new UnauthorizedException(CONFIG_MESSAGES.invalidToken);
+      const verified = await this.authService.refreshToken(refreshToken);
+      if (!verified) {
+        throw new UnauthorizedException(CONFIG_MESSAGES.invalidRefreshToken);
       }
 
-      request.headers.authorization = `Bearer ${newTokens.accessToken}`;
-      return super.canActivate(context);
+      return true;
     } catch (error) {
-      throw new UnauthorizedException(CONFIG_MESSAGES.invalidToken);
+      throw new UnauthorizedException(CONFIG_MESSAGES.invalidRefreshToken);
     }
   }
 }

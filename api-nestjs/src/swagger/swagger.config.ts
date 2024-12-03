@@ -43,10 +43,6 @@ export interface RefreshTokenResponse {
   accessToken: string;
 }
 
-export interface LogoutResponse {
-  message: string;
-}
-
 // Erros
 export const SwaggerErros = {
   Unauthorized: {
@@ -119,7 +115,7 @@ export const AuthSwaggerDocs = {
   verifyLogin: {
     operation: { summary: 'Verificar magic link' },
     operationId: 'verifyLogin',
-    header: { name: 'loginToken', required: true },
+    header: { name: 'x-login-token', required: true },
     responses: {
       success: {
         status: 200,
@@ -148,7 +144,7 @@ export const AuthSwaggerDocs = {
   verifyRegister: {
     operation: { summary: 'Verificar registro de usuário' },
     operationId: 'verifyRegister',
-    header: { name: 'registerToken', required: true },
+    header: { name: 'x-register-token', required: true },
     responses: {
       success: {
         status: 200,
@@ -203,7 +199,7 @@ export const AuthSwaggerDocs = {
   refreshToken: {
     operation: { summary: 'Renovar token de acesso' },
     operationId: 'refreshToken',
-    header: { name: 'refreshToken', required: true },
+    header: { name: 'x-refresh-token', required: true },
     responses: {
       success: {
         status: 200,
@@ -218,26 +214,6 @@ export const AuthSwaggerDocs = {
             accessToken: {
               type: 'string',
               example: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...',
-            },
-          },
-        },
-      },
-    },
-  },
-
-  logout: {
-    operation: { summary: 'Realizar logout do usuário' },
-    operationId: 'logout',
-    responses: {
-      success: {
-        status: 200,
-        description: CONFIG_MESSAGES.userLoggedOut,
-        schema: {
-          type: 'object',
-          properties: {
-            message: {
-              type: 'string',
-              example: CONFIG_MESSAGES.userLoggedOut,
             },
           },
         },

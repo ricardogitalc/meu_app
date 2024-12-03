@@ -9,7 +9,6 @@ import {
   UseFilters,
   UnauthorizedException,
   Headers,
-  Logger,
 } from '@nestjs/common';
 import { AuthService } from './auth.service';
 import { AuthGuard } from '@nestjs/passport';
@@ -30,10 +29,8 @@ import {
   VerifyLoginResponse,
   VerifyRegisterResponse,
   RefreshTokenResponse,
-  LogoutResponse,
 } from '../swagger/swagger.config';
-import { RefreshGuard } from 'src/users/guards/cookies/refresh.guard';
-import { RedisService } from '../redis/redis.service';
+import { RefreshGuard } from 'src/users/guards/refresh.guard';
 
 @ApiTags('auth')
 @Controller('auth')
@@ -44,7 +41,6 @@ export class AuthController {
     private readonly usersService: UsersService,
     private readonly resendService: ResendService,
     private readonly configService: ConfigService,
-    private readonly redisService: RedisService,
   ) {}
 
   @ApiOperation({
@@ -118,27 +114,13 @@ export class AuthController {
   @ApiResponse(SwaggerErros.TooManyRequests)
   @Get('verify-login')
   async verifyLogin(
-    @Headers('loginToken') loginToken: string,
+    @Headers('x-login-token') loginToken: string,
     @Res({ passthrough: true }) response: Response,
   ): Promise<VerifyLoginResponse> {
     const user = await this.authService.verifyMagicLinkToken(loginToken);
 
     const { accessToken } = this.authService.generateTokens(user);
     const refreshToken = this.authService.generateRefreshToken(user);
-
-    // // Armazenar tokens no Redis
-    // await this.redisService.setToken(
-    //   user.id,
-    //   'accessToken',
-    //   accessToken,
-    //   15 * 60,
-    // ); // 15 minutos
-    // await this.redisService.setToken(
-    //   user.id,
-    //   'refreshToken',
-    //   refreshToken,
-    //   7 * 24 * 60 * 60,
-    // ); // 7 dias
 
     return {
       message: CONFIG_MESSAGES.userLogged,
@@ -157,7 +139,7 @@ export class AuthController {
   @ApiResponse(SwaggerErros.TooManyRequests)
   @Get('verify-register')
   async verifyRegister(
-    @Headers('registerToken') registerToken: string,
+    @Headers('x-register-token') registerToken: string,
     @Res({ passthrough: true }) response: Response,
   ): Promise<VerifyRegisterResponse> {
     const user = await this.authService.verifyRegisterToken(registerToken);
@@ -169,20 +151,6 @@ export class AuthController {
 
     const { accessToken } = this.authService.generateTokens(verifiedUser);
     const refreshToken = this.authService.generateRefreshToken(verifiedUser);
-
-    // // Armazenar tokens no Redis
-    // await this.redisService.setToken(
-    //   verifiedUser.id,
-    //   'accessToken',
-    //   accessToken,
-    //   15 * 60,
-    // ); // 15 minutos
-    // await this.redisService.setToken(
-    //   verifiedUser.id,
-    //   'refreshToken',
-    //   refreshToken,
-    //   7 * 24 * 60 * 60,
-    // ); // 7 dias
 
     return {
       message: CONFIG_MESSAGES.userVerified,
@@ -229,19 +197,11 @@ export class AuthController {
   @UseGuards(RefreshGuard)
   @Get('refresh-token')
   async refreshToken(
-    @Req() request,
+    @Headers('x-refresh-token') refreshToken: string,
     @Res({ passthrough: true }) response: Response,
   ): Promise<RefreshTokenResponse> {
     try {
-      const refreshToken = request.cookies?.['refreshToken'];
       const { accessToken } = await this.authService.refreshToken(refreshToken);
-
-      response.cookie('accessToken', accessToken, {
-        httpOnly: true,
-        secure: process.env.NODE_ENV === 'production',
-        sameSite: 'strict',
-        maxAge: 15 * 60 * 1000,
-      });
 
       return {
         message: CONFIG_MESSAGES.tokenUpdated,
@@ -250,32 +210,5 @@ export class AuthController {
     } catch (error) {
       throw new UnauthorizedException(CONFIG_MESSAGES.invalidToken);
     }
-  }
-
-  @ApiOperation({
-    summary: AuthSwaggerDocs.logout.operation.summary,
-    operationId: AuthSwaggerDocs.logout.operationId,
-  })
-  @ApiResponse(AuthSwaggerDocs.logout.responses.success)
-  @ApiResponse(SwaggerErros.Unauthorized)
-  @Get('logout')
-  async logout(
-    @Res({ passthrough: true }) response: Response,
-  ): Promise<LogoutResponse> {
-    response.clearCookie('accessToken', {
-      httpOnly: true,
-      secure: process.env.NODE_ENV === 'production',
-      sameSite: 'strict',
-      path: '/',
-    });
-
-    response.clearCookie('refreshToken', {
-      httpOnly: true,
-      secure: process.env.NODE_ENV === 'production',
-      sameSite: 'strict',
-      path: '/',
-    });
-
-    return { message: CONFIG_MESSAGES.userLoggedOut };
   }
 }
