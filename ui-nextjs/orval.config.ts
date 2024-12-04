@@ -4,11 +4,11 @@ export default defineConfig({
   api: {
     input: "../api-nestjs/swagger.json",
     output: {
-      // clean: true,
+      clean: true,
       target: "./src/auth/api/orval-api.ts",
       mode: "tags-split",
       httpClient: "fetch",
-      client: "react-query",
+      client: "fetch",
       baseUrl: "http://localhost:3003",
     },
   },

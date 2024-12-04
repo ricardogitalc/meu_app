@@ -19,9 +19,7 @@ import {
 import Link from "next/link";
 import { Avatar, AvatarFallback, AvatarImage } from "./ui/avatar";
 import { ModeToggle } from "./theme/ModeToggle";
-import LogoIcon from "./icons/logoIcon";
-import { getSession, logout } from "@/auth/session";
-import { redirect } from "next/navigation";
+import { getSession } from "@/auth/session";
 import { KeySquare } from "@/svgs/key-square";
 
 export default async function Navbar() {
@@ -115,21 +113,13 @@ export default async function Navbar() {
                       <span>Seguindo</span>
                     </DropdownMenuItem>
                   </Link>
-                  <DropdownMenuSeparator />
-                  <form
-                    action={async () => {
-                      "use server";
-                      await logout();
-                      redirect("/");
-                    }}
-                  >
-                    <DropdownMenuItem asChild>
-                      <button className="w-full flex cursor-pointer items-center">
-                        <LogOutIcon className="mr-2 h-4 w-4" />
-                        <span>Sair</span>
-                      </button>
-                    </DropdownMenuItem>
-                  </form>
+                  <DropdownMenuSeparator />=
+                  <DropdownMenuItem asChild>
+                    <button className="w-full flex cursor-pointer items-center">
+                      <LogOutIcon className="mr-2 h-4 w-4" />
+                      <span>Sair</span>
+                    </button>
+                  </DropdownMenuItem>
                 </DropdownMenuContent>
               </DropdownMenu>
             )}

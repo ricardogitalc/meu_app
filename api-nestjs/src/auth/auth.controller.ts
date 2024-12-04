@@ -15,7 +15,7 @@ import { AuthGuard } from '@nestjs/passport';
 import { LoginDto } from './dto/login.dto';
 import { HttpExceptionsFilter } from 'src/common/filter/http-exception.filter';
 import { Response } from 'express';
-import { CONFIG_MESSAGES } from 'src/config/config';
+import { CONFIG_MESSAGES, COOKIE_CONFIG } from 'src/config/config';
 import { UsersService } from '../users/users.service';
 import { ResendService } from '../mail/resend';
 import { ApiTags, ApiOperation, ApiResponse, ApiHeader } from '@nestjs/swagger';
@@ -31,6 +31,7 @@ import {
   RefreshTokenResponse,
 } from '../swagger/swagger.config';
 import { RefreshGuard } from 'src/users/guards/refresh.guard';
+import { JwtGuard } from 'src/users/guards/jwt.guard';
 
 @ApiTags('auth')
 @Controller('auth')
@@ -122,10 +123,13 @@ export class AuthController {
     const { accessToken } = this.authService.generateTokens(user);
     const refreshToken = this.authService.generateRefreshToken(user);
 
+    response.cookie('accessToken', accessToken, COOKIE_CONFIG.accessToken);
+    response.cookie('refreshToken', refreshToken, COOKIE_CONFIG.refreshToken);
+
     return {
       message: CONFIG_MESSAGES.userLogged,
-      accessToken: accessToken,
-      refreshToken: refreshToken,
+      accessToken,
+      refreshToken,
     };
   }
 
@@ -152,10 +156,11 @@ export class AuthController {
     const { accessToken } = this.authService.generateTokens(verifiedUser);
     const refreshToken = this.authService.generateRefreshToken(verifiedUser);
 
+    response.cookie('accessToken', accessToken, COOKIE_CONFIG.accessToken);
+    response.cookie('refreshToken', refreshToken, COOKIE_CONFIG.refreshToken);
+
     return {
       message: CONFIG_MESSAGES.userVerified,
-      accessToken: accessToken,
-      refreshToken: refreshToken,
     };
   }
 
@@ -203,6 +208,8 @@ export class AuthController {
     try {
       const { accessToken } = await this.authService.refreshToken(refreshToken);
 
+      response.cookie('accessToken', accessToken, COOKIE_CONFIG.accessToken);
+
       return {
         message: CONFIG_MESSAGES.tokenUpdated,
         accessToken: accessToken,
@@ -210,5 +217,22 @@ export class AuthController {
     } catch (error) {
       throw new UnauthorizedException(CONFIG_MESSAGES.invalidToken);
     }
+  }
+
+  @ApiOperation({
+    summary: AuthSwaggerDocs.logout.operation.summary,
+    operationId: AuthSwaggerDocs.logout.operationId,
+  })
+  @ApiResponse(AuthSwaggerDocs.logout.response)
+  @ApiResponse(SwaggerErros.Unauthorized)
+  @UseGuards(JwtGuard)
+  @Get('logout')
+  async logout(@Res({ passthrough: true }) response: Response) {
+    response.clearCookie('accessToken');
+    response.clearCookie('refreshToken');
+
+    return {
+      message: CONFIG_MESSAGES.userLoggedOut,
+    };
   }
 }

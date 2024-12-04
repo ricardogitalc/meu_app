@@ -1,0 +1,69 @@
+AUTENTICAÇÃO (/auth)
+------------------
+POST   /login           - Enviar magic link para login
+POST   /register        - Criar novo usuário
+GET    /verify-login    - Verificar magic link de login
+GET    /verify-register - Verificar registro de usuário
+GET    /google          - Iniciar autenticação com Google
+GET    /google/callback - Callback da autenticação Google
+GET    /refresh-token   - Renovar token de acesso
+GET    /logout          - Fazer logout do usuário
+
+USUÁRIOS (/user)
+--------------
+GET    /me/details      - Obter detalhes do usuário atual
+PATCH  /me/update       - Atualizar usuário atual
+DELETE /me/delete       - Deletar usuário atual
+
+ADMIN (/user) - Requer permissão de administrador
+---------------------------------------------
+GET    /users           - Listar todos usuários
+GET    /:id            - Buscar usuário por ID 
+PATCH  /:id            - Atualizar usuário por ID
+DELETE /:id            - Deletar usuário por ID
+
+TIPOS DE DADOS
+-------------
+LoginDto:
+- email: string (Email do usuário)
+
+CreateUserDto:
+- email: string (Email do usuário)
+- firstName: string (Primeiro nome)
+- lastName: string (Sobrenome)
+- whatsappNumber?: string (Número WhatsApp, opcional)
+
+UpdateUserDto:
+- email: string (Email do usuário)
+- firstName: string (Primeiro nome)
+- lastName: string (Sobrenome) 
+- whatsappNumber?: string (Número WhatsApp, opcional)
+
+HOOKS REACT QUERY
+---------------
+Autenticação:
+- useLogin() - Mutation para login
+- useRegisterUser() - Mutation para registro
+- useVerifyLogin() - Query para verificar magic link
+- useVerifyRegister() - Query para verificar registro
+- useGoogleLogin() - Query para auth Google
+- useGoogleCallback() - Query para callback Google
+- useRefreshToken() - Query para renovar token
+- useLogout() - Query para logout
+
+Usuários:
+- useUserDetails() - Query para detalhes do usuário atual
+- useUpdateUser() - Mutation para atualizar usuário atual
+- useDeleteUser() - Mutation para deletar usuário atual 
+
+Admin:
+- useGetUsers() - Query para listar todos usuários
+- useFindUserById() - Query para buscar usuário por ID
+- useUpdateUserById() - Mutation para atualizar usuário por ID
+- useDeleteUserById() - Mutation para deletar usuário por ID
+
+Observações:
+- Queries: Para buscar/ler dados
+- Mutations: Para criar/atualizar/deletar dados
+- Todos os hooks aceitam options para customização
+- Retornam dados tipados baseados nas interfaces definidas

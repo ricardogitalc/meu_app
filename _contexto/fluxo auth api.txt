@@ -1,0 +1,40 @@
+FLUXO DE AUTENTICAÇÃO DA API
+
+1. REGISTRO DE USUÁRIO
+   - Endpoint: POST /auth/register
+   - Enviar: email, firstName, lastName, whatsappNumber (opcional)
+   - Sistema envia email com link de verificação
+
+2. VERIFICAÇÃO DE REGISTRO
+   - Endpoint: GET /auth/verify-register
+   - Requer: x-register-token no header
+   - Retorna: accessToken e refreshToken
+
+3. LOGIN (MAGIC LINK)
+   - Endpoint: POST /auth/login
+   - Enviar: apenas email
+   - Sistema envia email com magic link
+
+4. VERIFICAÇÃO DE LOGIN
+   - Endpoint: GET /auth/verify-login
+   - Requer: x-login-token no header
+   - Retorna: accessToken e refreshToken
+
+5. LOGIN COM GOOGLE
+   - Iniciar: GET /auth/google
+   - Callback: GET /auth/google/callback
+   - Redireciona para frontend com token após autenticação
+
+6. RENOVAÇÃO DE TOKEN
+   - Endpoint: GET /auth/refresh-token
+   - Requer: x-refresh-token no header
+   - Retorna: novo accessToken
+
+SEGURANÇA:
+- Todas as rotas protegidas requerem Bearer token
+- Tokens JWT são utilizados para autenticação
+- Refresh token permite renovação sem novo login
+
+ROTAS PROTEGIDAS:
+- Todas as rotas /user/* requerem autenticação
+- Rotas com (Admin) requerem privilégios administrativos

@@ -6,6 +6,7 @@ import { Logger } from '@nestjs/common';
 import helmet from 'helmet';
 import * as compression from 'compression';
 import { SwaggerModule, DocumentBuilder } from '@nestjs/swagger';
+import * as session from 'express-session';
 
 async function bootstrap() {
   const logger = new Logger('Bootstrap');
@@ -32,6 +33,15 @@ async function bootstrap() {
     return date.toTimeString().split(' ')[0];
   });
 
+  app.use(
+    session({
+      secret:
+        '913849b8ec4c43a364215fe0a3075984f17ee3083a8722264b0804feb27a39f3',
+      resave: false,
+      saveUninitialized: false,
+    }),
+  );
+
   app.use(morgan('[:method :url :status :time]'));
   app.use(helmet());
   app.use(compression());
@@ -45,12 +55,13 @@ async function bootstrap() {
     allowedHeaders: [
       'Content-Type',
       'Authorization',
-      'loginToken',
-      'registerToken',
+      'x-login-token',
+      'x-register-token',
+      'x-refresh-token',
     ],
     exposedHeaders: ['set-cookie'],
   });
 
-  await app.listen(3003);
+  await app.listen(process.env.PORT ?? 3003);
 }
 bootstrap();

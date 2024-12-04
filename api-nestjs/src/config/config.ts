@@ -1,3 +1,5 @@
+import path from 'path';
+
 export const CONFIG_MESSAGES = {
   // USER SUCCESS
   userCreated: 'Usuário criado.',
@@ -47,4 +49,21 @@ export const JWT_CONFIG = {
   algorithm: 'HS256',
   encoding: 'UTF8',
   noTimestamp: true,
+} as const;
+
+export const COOKIE_CONFIG = {
+  accessToken: {
+    httpOnly: true,
+    secure: process.env.NODE_ENV === 'production',
+    // sameSite: 'strict',
+    path: '/',
+    maxAge: 30 * 60 * 1000, // 15 MINUTOS
+  },
+  refreshToken: {
+    httpOnly: true,
+    secure: process.env.NODE_ENV === 'production',
+    // sameSite: 'strict',
+    path: '/',
+    maxAge: 1 * 24 * 60 * 60 * 1000, // 7 DIAS
+  },
 } as const;

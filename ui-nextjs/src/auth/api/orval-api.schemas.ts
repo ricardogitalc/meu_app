@@ -153,4 +153,3 @@ export interface UpdateUserDto {
   /** Número do WhatsApp */
   whatsappNumber?: string;
 }
-

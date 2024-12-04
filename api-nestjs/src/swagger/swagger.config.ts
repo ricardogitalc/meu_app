@@ -34,8 +34,8 @@ export interface VerifyLoginResponse {
 
 export interface VerifyRegisterResponse {
   message: string;
-  accessToken: string;
-  refreshToken: string;
+  // accessToken: string;
+  // refreshToken: string;
 }
 
 export interface RefreshTokenResponse {
@@ -215,6 +215,24 @@ export const AuthSwaggerDocs = {
               type: 'string',
               example: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...',
             },
+          },
+        },
+      },
+    },
+  },
+
+  logout: {
+    operation: { summary: 'Fazer logout do usuário' },
+    operationId: 'logout',
+    response: {
+      status: 200,
+      description: CONFIG_MESSAGES.userLoggedOut,
+      schema: {
+        type: 'object',
+        properties: {
+          message: {
+            type: 'string',
+            example: CONFIG_MESSAGES.userLoggedOut,
           },
         },
       },

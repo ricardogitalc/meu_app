@@ -848,6 +848,37 @@
           "auth"
         ]
       }
+    },
+    "/auth/logout": {
+      "get": {
+        "operationId": "logout",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "Logout realizado.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "message": {
+                      "type": "string",
+                      "example": "Logout realizado."
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Não autorizado."
+          }
+        },
+        "summary": "Fazer logout do usuário",
+        "tags": [
+          "auth"
+        ]
+      }
     }
   },
   "info": {

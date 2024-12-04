@@ -1,16 +1,21 @@
-"use client";
+export default async function VerifyLoginPage({
+  searchParams,
+}: {
+  searchParams: Promise<{ loginToken?: string }>;
+}) {
+  const params = await searchParams;
+  const loginToken = params.loginToken;
 
-import { useSearchParams } from "next/navigation";
-
-export default function VerifyLoginPage() {
-  const searchParams = useSearchParams();
-  const loginToken = searchParams.get("loginToken");
-
-  console.log("loginToken:", loginToken);
+  console.log("Token recebido:", loginToken);
 
   return (
     <div>
       <h1>Verificação de Login</h1>
+      {loginToken ? (
+        <p>Token recebido com sucesso!</p>
+      ) : (
+        <p>Nenhum token fornecido.</p>
+      )}
     </div>
   );
 }
